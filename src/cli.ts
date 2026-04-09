@@ -1,5 +1,6 @@
 import { Command } from "commander";
-import { VERSION } from "./lib/banner.js";
+import pc from "picocolors";
+import { VERSION, showBanner } from "./lib/banner.js";
 import { initCommand } from "./commands/init.js";
 import { listCommand } from "./commands/list.js";
 import { updateCommand } from "./commands/update.js";
@@ -28,7 +29,15 @@ program
   .description("Update installed components from GitHub")
   .action(updateCommand);
 
-// Default to init if no command given
-program.action(initCommand);
+// Default: show banner + available commands
+program.action(() => {
+  showBanner();
+  console.log(`  ${pc.bold("Commands:")}`);
+  console.log(`    ${pc.green("iroko init")}     Interactive setup`);
+  console.log(`    ${pc.green("iroko list")}     Show components`);
+  console.log(`    ${pc.green("iroko update")}   Update from GitHub`);
+  console.log(`    ${pc.green("iroko --help")}   All commands`);
+  console.log();
+});
 
 program.parse();

@@ -162,6 +162,14 @@ export const components: Component[] = [
     hint: "for Convex users",
     defaultSelected: false,
   },
+  {
+    name: "npm-publish",
+    description: "Bump version, build, publish to npm, git tag, push",
+    type: "skill",
+    origin: "custom",
+    path: "skills/npm-publish",
+    defaultSelected: true,
+  },
 
   // ═══════════════════════════════════════════════
   // AGENTS — Specialized subagents

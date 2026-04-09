@@ -19,7 +19,7 @@ npx @james10192/iroko init
 
 ## What's inside
 
-**26 components**, each does one thing well:
+**28 components**, each does one thing well:
 
 ### Rules (5)
 
@@ -35,7 +35,7 @@ marcel-global-preferences   Personal: pnpm, French UI, no AI slop
 
 `marcel-global-preferences` is my personal config. Deselect it during init unless you want French UI and pnpm enforcement.
 
-### Skills (13)
+### Skills (15)
 
 Slash commands. Type `/commit` in Claude Code and it runs.
 
@@ -53,6 +53,7 @@ merge               Context-aware conflict resolution
 fix-errors          Fix ESLint + TypeScript errors with parallel agents
 fix-grammar         Fix spelling while preserving formatting
 fix-pr-comments     Implement all PR review comments
+npm-publish         Bump version, build, publish to npm, git tag, push
 ```
 
 Optional:
@@ -140,19 +141,19 @@ cp -r iroko/hooks/* ~/.claude/hooks/
 
 ---
 
-## Third-party plugins
+## Recommended plugins
 
-These are not included in iroko. They have their own repos and update cycles.
+These are tools I use daily alongside iroko. They have their own repos and install commands.
 
-| Plugin | Author | Install |
-|--------|--------|---------|
-| [AI Blueprint](https://github.com/Melvynx/aiblueprint) | Melvynx | APEX, ralph-loop, oneshot, ultrathink |
-| [Impeccable](https://github.com/pbakaus/impeccable) | Paul Bakaus | Design quality skills |
-| [Superpowers Laravel](https://github.com/jpcaparas/superpowers-laravel) | JP Caparas | 50+ Laravel patterns |
-| [Claude Plugins Official](https://github.com/anthropics/claude-plugins-official) | Anthropic | feature-dev, pr-review, vercel, slack |
+| Plugin | Author | What it does |
+|--------|--------|-------------|
+| [AI Blueprint](https://github.com/Melvynx/aiblueprint) | Melvynx | APEX methodology, ralph-loop autonomous coding, ultrathink deep thinking, oneshot fast implementation |
+| [GSD (Get Shit Done)](https://github.com/) | GSD Team | Full project management framework: 16 agents, 30+ skills, statusline, phase planning |
+| [Impeccable](https://github.com/pbakaus/impeccable) | Paul Bakaus | Design quality and adaptation skills |
+| [Superpowers Laravel](https://github.com/jpcaparas/superpowers-laravel) | JP Caparas | 50+ Laravel-specific patterns (TDD, controllers, policies, queues) |
+| [Claude Plugins Official](https://github.com/anthropics/claude-plugins-official) | Anthropic | feature-dev, pr-review-toolkit, code-review, frontend-design, vercel, slack |
 
-Install them via Claude Code:
-
+Install via Claude Code:
 ```bash
 claude plugins add anthropics/claude-plugins-official
 claude plugins add pbakaus/impeccable
@@ -169,13 +170,11 @@ iroko/
 │   ├── commands/         init, list, update
 │   └── lib/              manifest, installer, paths
 ├── rules/                5 global rules
-├── skills/               13 slash commands
+├── skills/               15 slash commands
 ├── agents/               6 subagents
 ├── hooks/                2 event hooks
 ├── templates/            settings.json template
-├── .github/              CODEOWNERS, dependabot, security policy
-├── song/                 Notification sounds (finish, need-human)
-└── scripts/              command-validator, statusline
+└── .github/              CODEOWNERS, dependabot, security policy
 ```
 
 ---
@@ -192,8 +191,10 @@ This config is the result of months of daily iteration with Claude Code on produ
 
 ---
 
+## Credits
+
+Built by Marcel DJEDJE-LI. Recommended plugins credit their respective authors.
+
 ## License
 
 MIT
-
-Third-party components (GSD, AI Blueprint, Impeccable, Superpowers Laravel) retain their original licenses. See their respective repositories.

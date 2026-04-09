@@ -1,1 +1,51 @@
-{"type":"commonjs"}
+{
+  "name": "iroko",
+  "version": "1.0.0",
+  "description": "Premium Claude Code configuration installer. Rules, skills, agents, hooks — curated by a West African dev.",
+  "type": "module",
+  "bin": {
+    "iroko": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "configs",
+    "templates",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/cli.ts",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.2.0",
+    "commander": "^13.1.0",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "cli",
+    "configuration",
+    "ai",
+    "developer-tools",
+    "productivity"
+  ],
+  "author": "Marcel DJEDJE-LI <marcel.djedjeli@africandigitconsulting.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/James10192/iroko.git"
+  },
+  "homepage": "https://github.com/James10192/iroko#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -38,3 +38,6 @@ gsd-file-manifest.json
 # Node modules
 node_modules/
 *.lockb
+node_modules
+dist
+pnpm-lock.yaml

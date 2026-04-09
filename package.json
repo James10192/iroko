@@ -1,6 +1,6 @@
 {
   "name": "@james10192/iroko",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Premium Claude Code configuration installer. Rules, skills, agents, hooks — curated by a West African dev.",
   "type": "module",
   "bin": {
@@ -16,6 +16,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/cli.ts",
+    "postinstall": "node dist/postinstall.js || true",
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {

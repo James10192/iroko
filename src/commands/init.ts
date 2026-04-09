@@ -56,13 +56,13 @@ export async function initCommand() {
     const items = getComponentsByType(type);
     const key = `${pc.bold(info.label)} ${pc.dim(`— ${info.desc}`)}`;
 
-    groups[key] = items.map((c) => ({
-      value: c.name,
-      label: c.name,
-      hint: c.hint
-        ? `${c.description} ${pc.yellow(`(${c.hint})`)}`
-        : c.description,
-    }));
+    groups[key] = items.map((c) => {
+      const tag = c.hint ? pc.yellow(` (${c.hint})`) : "";
+      return {
+        value: c.name,
+        label: `${pc.bold(c.name)} ${pc.dim("—")} ${pc.dim(c.description)}${tag}`,
+      };
+    });
   }
 
   const selected = await p.groupMultiselect({

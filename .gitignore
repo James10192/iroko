@@ -1,0 +1,40 @@
+# Secrets & credentials
+.credentials.json
+settings.local.json
+mcp-needs-auth-cache.json
+
+# Session data
+history.jsonl
+sessions/
+session-env/
+paste-cache/
+image-cache/
+file-history/
+backups/
+cache/
+debug/
+
+# Project-specific memories (contain tokens, passwords)
+projects/
+
+# Installed plugins (install via marketplace)
+plugins/
+
+# IDE integration
+ide/
+
+# Chrome DevTools
+chrome/
+
+# Downloads
+downloads/
+
+# Plans (session-specific)
+plans/
+
+# GSD manifest (auto-generated)
+gsd-file-manifest.json
+
+# Node modules
+node_modules/
+*.lockb

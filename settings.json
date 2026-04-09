@@ -1,0 +1,150 @@
+{
+  "permissions": {
+    "allow": [],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | bash)"
+    ],
+    "defaultMode": "bypassPermissions"
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/monitor-session.sh\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -c \"Add-Type -AssemblyName presentationCore; \\$m = New-Object System.Windows.Media.MediaPlayer; \\$m.Open([System.Uri]'file:///C:/Users/YOUR_USER/.claude/song/finish.mp3'); \\$m.Play(); Start-Sleep 3; \\$m.Close()\"",
+            "_comment": "Play a sound when Claude finishes — replace YOUR_USER with your username"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/monitor-session.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/monitor-session.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt|idle_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/monitor-session.sh\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -c \"Add-Type -AssemblyName presentationCore; \\$m = New-Object System.Windows.Media.MediaPlayer; \\$m.Open([System.Uri]'file:///C:/Users/YOUR_USER/.claude/song/need-human.mp3'); \\$m.Play(); Start-Sleep 3; \\$m.Close()\"",
+            "_comment": "Play a sound when Claude needs human input — replace YOUR_USER"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/gsd-check-update.js\"",
+            "_comment": "GSD update checker — requires Get Shit Done plugin"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/gsd-context-monitor.js\"",
+            "_comment": "GSD context monitor — requires Get Shit Done plugin"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/notify-workflow.sh\"",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun $HOME/.claude/scripts/command-validator/src/cli.ts",
+            "_comment": "Validates commands before execution — blocks dangerous patterns"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node $HOME/.claude/hooks/gsd-statusline.js",
+    "padding": 0,
+    "_comment": "GSD statusline — shows session stats, spend tracking"
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true,
+    "superpowers-laravel@superpowers-laravel-marketplace": true,
+    "superpowers@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "impeccable": {
+      "source": {
+        "source": "github",
+        "repo": "pbakaus/impeccable"
+      }
+    }
+  }
+}

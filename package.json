@@ -1,10 +1,10 @@
 {
-  "name": "iroko",
+  "name": "@james10192/iroko",
   "version": "1.0.0",
   "description": "Premium Claude Code configuration installer. Rules, skills, agents, hooks — curated by a West African dev.",
   "type": "module",
   "bin": {
-    "iroko": "./dist/cli.js"
+    "iroko": "dist/cli.js"
   },
   "files": [
     "dist",

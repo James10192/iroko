@@ -5,14 +5,14 @@ Claude Code configuration that I use every day across 4 production SaaS projects
 Named after the West African hardwood — durable, solid, the foundation everything else builds on.
 
 ```
-pnpm add -g iroko
+pnpm add -g @james10192/iroko
 iroko init
 ```
 
 Or one-shot:
 
 ```
-npx iroko init
+npx @james10192/iroko init
 ```
 
 ---
@@ -106,13 +106,13 @@ Skipped for trivial diffs: markdown, config files, <5 lines.
 ### Quick
 
 ```bash
-npx iroko init
+npx @james10192/iroko init
 ```
 
 ### Global
 
 ```bash
-pnpm add -g iroko
+pnpm add -g @james10192/iroko
 iroko init
 ```
 

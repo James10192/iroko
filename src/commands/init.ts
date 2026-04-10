@@ -65,6 +65,10 @@ export async function initCommand() {
     });
   }
 
+  p.log.message(
+    `${pc.dim("Navigation:")} ${pc.bold("↑↓")} move  ${pc.bold("space")} toggle  ${pc.bold("a")} select all  ${pc.bold("enter")} confirm`
+  );
+
   const selected = await p.groupMultiselect({
     message: "Select components to install",
     options: groups,

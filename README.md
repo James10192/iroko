@@ -102,6 +102,30 @@ Skipped for trivial diffs: markdown, config files, <5 lines.
 
 ---
 
+## Notification Sounds
+
+Two MP3 files that play when Claude Code triggers specific hooks:
+
+- `finish.mp3` — plays when Claude completes a task (Stop hook)
+- `need-human.mp3` — plays when Claude needs human input (Notification hook)
+
+Adapted from [AI Blueprint](https://github.com/Melvynx/aiblueprint)'s Mac-only `afplay` pattern. This version works on Windows (PowerShell MediaPlayer), Mac (`afplay`), and Linux (`paplay`). See `song/README.md` for setup instructions.
+
+---
+
+## Auto-update
+
+iroko checks for new versions on every run. If a newer version exists on npm:
+
+```
+  Update available 1.2.0 → 1.3.0
+  Run pnpm add -g @james10192/iroko@latest to update
+```
+
+`iroko update` updates your installed config files from GitHub. If the CLI itself is outdated, it tells you.
+
+---
+
 ## Installation
 
 ### Quick
@@ -173,6 +197,7 @@ iroko/
 ├── skills/               15 slash commands
 ├── agents/               6 subagents
 ├── hooks/                2 event hooks
+├── song/                 Notification sounds (Windows PowerShell, Mac, Linux)
 ├── templates/            settings.json template
 └── .github/              CODEOWNERS, dependabot, security policy
 ```

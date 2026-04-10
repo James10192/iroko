@@ -1,9 +1,13 @@
 import { Command } from "commander";
 import pc from "picocolors";
 import { VERSION, showBanner } from "./lib/banner.js";
+import { checkForUpdates } from "./lib/update-checker.js";
 import { initCommand } from "./commands/init.js";
 import { listCommand } from "./commands/list.js";
 import { updateCommand } from "./commands/update.js";
+
+// Check for updates silently on every run
+checkForUpdates();
 
 const program = new Command();
 

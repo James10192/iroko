@@ -64,6 +64,23 @@ export async function updateCommand() {
 
   s.stop(`${pc.green(`${updated} components updated`)}`);
 
+  // Check if CLI itself needs upgrade
+  try {
+    const latest = execSync("npm view @james10192/iroko version", {
+      timeout: 3000,
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
+    const { VERSION } = await import("../lib/banner.js");
+    if (latest && latest !== VERSION) {
+      p.log.info(
+        `CLI update available: ${pc.dim(VERSION)} → ${pc.green(latest)}\n  Run ${pc.bold("pnpm add -g @james10192/iroko@latest")} to upgrade the CLI itself.`
+      );
+    }
+  } catch {
+    // Offline — skip
+  }
+
   p.outro(
     `${pc.green("Up to date!")} Run ${pc.bold("iroko list")} to verify.`
   );

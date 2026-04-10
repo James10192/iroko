@@ -1,0 +1,38 @@
+{
+  "name": "iroko",
+  "owner": {
+    "name": "Marcel DJEDJE-LI",
+    "email": "marcel.djedjeli@africandigitconsulting.com"
+  },
+  "metadata": {
+    "description": "Claude Code configuration: rules, skills, agents, hooks. Built in Abidjan.",
+    "version": "1.4.0"
+  },
+  "plugins": [
+    {
+      "name": "iroko",
+      "source": "./",
+      "description": "28 components for Claude Code: quality gate, parallel agents, doc lookup, PR automation, and more",
+      "version": "1.4.0",
+      "author": {
+        "name": "Marcel DJEDJE-LI",
+        "email": "marcel.djedjeli@africandigitconsulting.com"
+      },
+      "homepage": "https://github.com/James10192/iroko",
+      "repository": "https://github.com/James10192/iroko",
+      "license": "MIT",
+      "keywords": ["claude-code", "rules", "skills", "agents", "hooks", "productivity", "quality"],
+      "category": "productivity",
+      "skills": "./skills/",
+      "agents": [
+        "./agents/critic.md",
+        "./agents/explore-codebase.md",
+        "./agents/explore-docs.md",
+        "./agents/websearch.md",
+        "./agents/linkedin-post.md",
+        "./agents/action.md"
+      ],
+      "strict": false
+    }
+  ]
+}

@@ -5,28 +5,7 @@ import { components, getComponentsByType } from "../lib/manifest.js";
 import { installComponent, saveIrokoConfig, installSettingsTemplate } from "../lib/installer.js";
 import { CLAUDE_DIR } from "../lib/paths.js";
 import { existsSync, mkdirSync } from "node:fs";
-import type { ComponentType } from "../types.js";
-
-const TYPE_LABELS: Record<ComponentType, { label: string; desc: string }> = {
-  rule: {
-    label: "Rules",
-    desc: "Loaded in every conversation — shape how Claude behaves globally",
-  },
-  skill: {
-    label: "Skills",
-    desc: "Slash commands (/commit, /plan-and-confirm, ...)",
-  },
-  agent: {
-    label: "Agents",
-    desc: "Specialized subagents for parallel research and review",
-  },
-  hook: {
-    label: "Hooks",
-    desc: "Automatic triggers on session events",
-  },
-};
-
-const TYPE_ORDER: ComponentType[] = ["rule", "skill", "agent", "hook"];
+import { TYPE_ORDER, TYPE_META } from "../lib/constants.js";
 
 export async function initCommand() {
   showBanner();
@@ -52,7 +31,7 @@ export async function initCommand() {
   const groups: Record<string, { value: string; label: string; hint?: string }[]> = {};
 
   for (const type of TYPE_ORDER) {
-    const info = TYPE_LABELS[type];
+    const info = TYPE_META[type];
     const items = getComponentsByType(type);
     const key = `${pc.bold(info.label)} ${pc.dim(`— ${info.desc}`)}`;
 
@@ -93,7 +72,7 @@ export async function initCommand() {
     const count = selectedNames.filter((n) =>
       components.find((c) => c.name === n && c.type === type)
     ).length;
-    return count > 0 ? `${count} ${TYPE_LABELS[type].label.toLowerCase()}` : null;
+    return count > 0 ? `${count} ${TYPE_META[type].label.toLowerCase()}` : null;
   })
     .filter(Boolean)
     .join(", ");
@@ -148,7 +127,7 @@ export async function initCommand() {
     );
     if (typeComponents.length === 0) continue;
 
-    console.log(`  ${pc.bold(TYPE_LABELS[type].label)}`);
+    console.log(`  ${pc.bold(TYPE_META[type].label)}`);
     for (const name of typeComponents) {
       console.log(`    ${pc.green("+")} ${name}`);
     }

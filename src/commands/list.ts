@@ -2,15 +2,7 @@ import pc from "picocolors";
 import { showBanner } from "../lib/banner.js";
 import { components } from "../lib/manifest.js";
 import { isComponentInstalled, loadIrokoConfig } from "../lib/installer.js";
-import type { ComponentType } from "../types.js";
-
-const TYPE_ORDER: ComponentType[] = ["rule", "skill", "agent", "hook"];
-const TYPE_ICONS: Record<ComponentType, string> = {
-  rule: "R",
-  skill: "S",
-  agent: "A",
-  hook: "H",
-};
+import { TYPE_ORDER, TYPE_META } from "../lib/constants.js";
 
 export function listCommand() {
   showBanner();
@@ -31,8 +23,7 @@ export function listCommand() {
     const typeComponents = components.filter((c) => c.type === type);
     if (typeComponents.length === 0) continue;
 
-    const typeName = type.charAt(0).toUpperCase() + type.slice(1) + "s";
-    console.log(`  ${pc.bold(typeName)}`);
+    console.log(`  ${pc.bold(TYPE_META[type].label)}`);
 
     for (const c of typeComponents) {
       totalAvailable++;

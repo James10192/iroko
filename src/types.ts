@@ -9,11 +9,6 @@ export interface Component {
   origin: Origin;
   path: string;
   hint?: string;
-  defaultSelected?: boolean;
-}
-
-export interface InstalledComponent extends Component {
-  installedAt: string;
 }
 
 export interface IrokoConfig {

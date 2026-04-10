@@ -7,7 +7,10 @@ import { VERSION } from "./banner.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+let _configsRoot: string | null = null;
+
 function getConfigsRoot(): string {
+  if (_configsRoot) return _configsRoot;
   // In npm package: dist/cli.js → look for configs/ at package root
   // In dev: src/lib/installer.ts → look for configs/ at repo root
   const candidates = [
@@ -16,10 +19,14 @@ function getConfigsRoot(): string {
     resolve(__dirname, ".."),                  // fallback: files at package root level
   ];
   for (const dir of candidates) {
-    if (existsSync(dir)) return dir;
+    if (existsSync(dir)) {
+      _configsRoot = dir;
+      return dir;
+    }
   }
   // If no configs/ dir, use the repo root structure (rules/, skills/, etc.)
-  return resolve(__dirname, "..", "..");
+  _configsRoot = resolve(__dirname, "..", "..");
+  return _configsRoot;
 }
 
 export function installComponent(component: Component): boolean {

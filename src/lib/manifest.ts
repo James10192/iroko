@@ -10,7 +10,6 @@ export const components: Component[] = [
     type: "rule",
     origin: "custom",
     path: "rules/pre-commit-quality-gate.md",
-    defaultSelected: true,
   },
   {
     name: "parallel-agents",
@@ -18,7 +17,7 @@ export const components: Component[] = [
     type: "rule",
     origin: "custom",
     path: "rules/parallel-agents.md",
-    defaultSelected: true,
+
   },
   {
     name: "token-efficiency",
@@ -26,7 +25,7 @@ export const components: Component[] = [
     type: "rule",
     origin: "custom",
     path: "rules/token-efficiency.md",
-    defaultSelected: true,
+
   },
   {
     name: "use-available-tools",
@@ -34,7 +33,7 @@ export const components: Component[] = [
     type: "rule",
     origin: "custom",
     path: "rules/use-available-tools.md",
-    defaultSelected: true,
+
   },
   {
     name: "marcel-global-preferences",
@@ -43,7 +42,7 @@ export const components: Component[] = [
     origin: "custom",
     path: "rules/marcel-global-preferences.md",
     hint: "personal — adapt to your own preferences",
-    defaultSelected: false,
+
   },
 
   // ═══════════════════════════════════════════════
@@ -55,7 +54,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/commit",
-    defaultSelected: true,
+
   },
   {
     name: "plan-and-confirm",
@@ -63,7 +62,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/plan-and-confirm",
-    defaultSelected: true,
+
   },
   {
     name: "find-doc",
@@ -71,7 +70,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/find-doc",
-    defaultSelected: true,
+
   },
   {
     name: "linkedin-post",
@@ -79,7 +78,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/linkedin-post",
-    defaultSelected: true,
+
   },
   {
     name: "visual-check",
@@ -87,7 +86,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/visual-check",
-    defaultSelected: true,
+
   },
   {
     name: "create-pr",
@@ -95,7 +94,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/create-pr",
-    defaultSelected: true,
+
   },
   {
     name: "create-issue",
@@ -103,7 +102,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/create-issue",
-    defaultSelected: true,
+
   },
   {
     name: "worktree-start",
@@ -111,7 +110,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/worktree-start",
-    defaultSelected: true,
+
   },
   {
     name: "worktree-finish",
@@ -119,7 +118,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/worktree-finish",
-    defaultSelected: true,
+
   },
   {
     name: "merge",
@@ -127,7 +126,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/merge",
-    defaultSelected: true,
+
   },
   {
     name: "fix-errors",
@@ -135,7 +134,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/fix-errors",
-    defaultSelected: true,
+
   },
   {
     name: "fix-grammar",
@@ -143,7 +142,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/fix-grammar",
-    defaultSelected: true,
+
   },
   {
     name: "fix-pr-comments",
@@ -151,7 +150,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/fix-pr-comments",
-    defaultSelected: true,
+
   },
   {
     name: "convex-cli",
@@ -160,7 +159,7 @@ export const components: Component[] = [
     origin: "custom",
     path: "skills/convex-cli",
     hint: "for Convex users",
-    defaultSelected: false,
+
   },
   {
     name: "npm-publish",
@@ -168,7 +167,7 @@ export const components: Component[] = [
     type: "skill",
     origin: "custom",
     path: "skills/npm-publish",
-    defaultSelected: true,
+
   },
 
   // ═══════════════════════════════════════════════
@@ -180,7 +179,7 @@ export const components: Component[] = [
     type: "agent",
     origin: "custom",
     path: "agents/critic.md",
-    defaultSelected: true,
+
   },
   {
     name: "explore-docs",
@@ -188,7 +187,7 @@ export const components: Component[] = [
     type: "agent",
     origin: "custom",
     path: "agents/explore-docs.md",
-    defaultSelected: true,
+
   },
   {
     name: "linkedin-post-agent",
@@ -196,7 +195,7 @@ export const components: Component[] = [
     type: "agent",
     origin: "custom",
     path: "agents/linkedin-post.md",
-    defaultSelected: true,
+
   },
 
   // ═══════════════════════════════════════════════
@@ -208,7 +207,7 @@ export const components: Component[] = [
     type: "hook",
     origin: "custom",
     path: "hooks/monitor-session.sh",
-    defaultSelected: true,
+
   },
   {
     name: "notify-workflow",
@@ -216,14 +215,10 @@ export const components: Component[] = [
     type: "hook",
     origin: "custom",
     path: "hooks/notify-workflow.sh",
-    defaultSelected: true,
+
   },
 ];
 
 export function getComponentsByType(type: Component["type"]) {
   return components.filter((c) => c.type === type);
-}
-
-export function getCustomComponents() {
-  return components.filter((c) => c.origin === "custom");
 }

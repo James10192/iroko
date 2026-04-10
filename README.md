@@ -4,7 +4,7 @@
 
 # iroko
 
-My Claude Code configuration. 28 components I use every day across 4 production SaaS projects.
+My Claude Code configuration. 25 components I use every day across 4 production SaaS projects.
 
 Named after the West African hardwood: durable, solid, the foundation everything else builds on.
 
@@ -18,7 +18,7 @@ npx @james10192/iroko init
 |------|-------|-------------|
 | Rules | 5 | Loaded in every conversation. Shape how Claude behaves. |
 | Skills | 15 | Slash commands: `/commit`, `/plan-and-confirm`, `/find-doc`... |
-| Agents | 6 | Specialized subagents for review, research, search. |
+| Agents | 3 | Specialized subagents for review, research, search. |
 | Hooks | 2 | Automatic triggers on session events. |
 | Sounds | 2 | MP3 notifications when Claude finishes or needs input. |
 
@@ -45,7 +45,7 @@ Type `/command` in Claude Code. These are the commands I built.
 | `/commit` | Quality-gated commit. Runs the 4-axes audit on your diff, generates a conventional message, pushes. Blocks on critical issues. |
 | `/plan-and-confirm` | Launches a critic + 3 research agents in parallel, presents a detailed plan, waits for your explicit OKAY before touching any file. |
 | `/find-doc` | Looks up library documentation via ctx7 CLI, Context7 MCP, and WebSearch. Use before writing code with any external API. |
-| `/linkedin-post` | Generates a LinkedIn post from your current work context: git history, conversation, tech trends. Publishes via MCP if configured. |
+| `/linkedin-post` | Generates a LinkedIn post from your current work context: git history, conversation, tech trends. Publishes via MCP if configured. (optional) |
 | `/visual-check` | Opens dev-browser (sandboxed Chromium), navigates to a URL, takes screenshots to verify your implementation visually. |
 | `/create-pr` | Creates a PR with auto-generated title and structured description. Analyzes the full diff, not just the last commit. |
 | `/create-issue` | Creates a GitHub issue with labels, scope detection, and epic linking. |
@@ -55,8 +55,8 @@ Type `/command` in Claude Code. These are the commands I built.
 | `/fix-errors` | Fixes all ESLint and TypeScript errors using parallel agents. Groups errors by file area, max 5 per agent. |
 | `/fix-grammar` | Fixes grammar and spelling in one or multiple files while preserving formatting. |
 | `/fix-pr-comments` | Fetches all unresolved PR review comments and implements the requested changes. |
-| `/npm-publish` | Bumps version, builds, publishes to npm, creates a git tag, pushes. One command for a full release. |
-| `/convex-cli` | Initializes and manages Convex projects non-interactively. For Convex users only. |
+| `/npm-publish` | Bumps version, builds, publishes to npm, creates a git tag, pushes. One command for a full release. (optional) |
+| `/convex-cli` | Initializes and manages Convex projects non-interactively. For Convex users only. (optional) |
 
 ## Agents
 
@@ -65,11 +65,8 @@ Subagents used by skills under the hood. You can also invoke them directly via t
 | Agent | What it does |
 |-------|-------------|
 | `critic` | Technical reviewer. Auto-detects which lenses to apply: CTO, UX, Security, Performance, Cost. Gives a verdict: PROCEED, RETHINK, or REJECT. |
-| `explore-codebase` | Deep codebase exploration. Follows import chains, discovers dependencies, reports with file:line references. |
 | `explore-docs` | Documentation research via ctx7 CLI (primary), Context7 MCP (fallback), WebSearch (complement). |
-| `websearch` | Targeted web search for best practices, breaking changes, community patterns. |
 | `linkedin-post` | Content generation agent for LinkedIn. Positions as expert, never as learner. Respects reputation rules. |
-| `action` | Conditional executor. Performs actions only when specific conditions are met. Batch processor for up to 5 independent tasks. |
 
 ## Hooks
 
@@ -79,6 +76,19 @@ Triggered automatically by Claude Code session events.
 |------|---------|-------------|
 | `monitor-session` | Stop, Permission, Notification | Monitors session state, sends notifications via OpenClaw/Telegram. |
 | `notify-workflow` | PostToolUse (Bash) | Sends a notification after Bash command execution completes. |
+
+## Use cases
+
+| Workflow | Components |
+|----------|-----------|
+| Before coding | `/find-doc`, explore-docs agent |
+| During coding | `/visual-check`, `/fix-errors` |
+| Before committing | `/commit` (quality gate), critic agent |
+| Collaboration | `/create-pr`, `/create-issue`, `/worktree-start`, `/worktree-finish`, `/merge`, `/fix-pr-comments` |
+| Content (optional) | `/linkedin-post` — requires LinkedIn MCP or typefully-cli |
+| Publishing (optional) | `/npm-publish`, `/convex-cli` |
+| Always active | Rules (quality gate, parallel agents, token efficiency, tool usage) |
+| Notifications | Sounds (finish.mp3, need-human.mp3) — cross-platform |
 
 ## The quality gate
 
@@ -109,7 +119,7 @@ Adapted from [AI Blueprint](https://github.com/Melvynx/aiblueprint)'s Mac-only `
 iroko checks npm for new versions on every run. If an update is available:
 
 ```
-  Update available 1.3.0 → 1.4.0
+  Update available 1.4.0 → 2.0.0
   Run pnpm add -g @james10192/iroko@latest to update
 ```
 
@@ -188,7 +198,7 @@ iroko/
 ├── src/                  CLI source (TypeScript)
 ├── rules/                5 global rules
 ├── skills/               15 slash commands
-├── agents/               6 subagents
+├── agents/               3 subagents
 ├── hooks/                2 event hooks
 ├── song/                 Notification sounds (cross-platform)
 └── templates/            settings.json template

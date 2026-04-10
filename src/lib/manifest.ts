@@ -183,14 +183,6 @@ export const components: Component[] = [
     defaultSelected: true,
   },
   {
-    name: "explore-codebase",
-    description: "Deep codebase exploration with file:line references",
-    type: "agent",
-    origin: "custom",
-    path: "agents/explore-codebase.md",
-    defaultSelected: true,
-  },
-  {
     name: "explore-docs",
     description: "Documentation research via ctx7 CLI and Context7 MCP",
     type: "agent",
@@ -199,27 +191,11 @@ export const components: Component[] = [
     defaultSelected: true,
   },
   {
-    name: "websearch",
-    description: "Targeted web search for best practices and breaking changes",
-    type: "agent",
-    origin: "custom",
-    path: "agents/websearch.md",
-    defaultSelected: true,
-  },
-  {
     name: "linkedin-post-agent",
     description: "LinkedIn content generation agent (used by /linkedin-post skill)",
     type: "agent",
     origin: "custom",
     path: "agents/linkedin-post.md",
-    defaultSelected: true,
-  },
-  {
-    name: "action",
-    description: "Conditional action executor — acts only when specific conditions are met",
-    type: "agent",
-    origin: "custom",
-    path: "agents/action.md",
     defaultSelected: true,
   },
 

@@ -9,6 +9,14 @@ allowed-tools: Bash(gh :*), Bash(git :*)
 
 Create a well-structured GitHub issue for tracking work.
 
+## Prerequisites
+
+This skill requires the GitHub CLI (`gh`). Check availability before proceeding:
+- Run: `gh auth status`
+- If not installed: https://cli.github.com
+- If not authenticated: `gh auth login`
+- If `gh` is missing, inform the user and stop. This skill cannot work without it.
+
 ## Context
 
 - Open issues: !`gh issue list --state open --limit 10`

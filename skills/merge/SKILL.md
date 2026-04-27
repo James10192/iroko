@@ -9,6 +9,14 @@ argument-hint: <branch-name>
 
 Merge branches intelligently by understanding feature context and resolving conflicts efficiently.
 
+## Prerequisites
+
+This skill requires the GitHub CLI (`gh`). Check availability before proceeding:
+- Run: `gh auth status`
+- If not installed: https://cli.github.com
+- If not authenticated: `gh auth login`
+- If `gh` is missing, the merge still works but with less PR context.
+
 ## Context
 
 - Current branch: !`git branch --show-current`

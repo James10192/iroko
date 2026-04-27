@@ -7,6 +7,14 @@ description: Start work on a GitHub issue using a git worktree. Use when startin
 
 Follow these steps to start working on a GitHub issue.
 
+## Prerequisites
+
+This skill requires the GitHub CLI (`gh`). Check availability before proceeding:
+- Run: `gh auth status`
+- If not installed: https://cli.github.com
+- If not authenticated: `gh auth login`
+- If `gh` is missing, inform the user and stop. This skill cannot work without it.
+
 ## Step 0 — Should you use a worktree?
 
 | Situation | Use worktree? | Why |

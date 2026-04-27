@@ -10,6 +10,13 @@ argument-hint: "<library-name> <topic or question>"
 
 # Find Doc — Documentation Research Pipeline
 
+## Prerequisites
+
+This skill uses ctx7 for documentation lookup. Check availability:
+- Run: `npx ctx7 --version`
+- If ctx7 is not available, fall back to Context7 MCP plugin, then WebSearch.
+- ctx7 is recommended but not required. The skill will degrade gracefully.
+
 ## When to use
 
 - **BEFORE writing any code** that uses an external library API

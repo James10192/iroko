@@ -9,6 +9,14 @@ Follow these steps **strictly in order** to clean up after a merged PR.
 
 The issue number being cleaned is passed as `$ARGUMENTS`.
 
+## Prerequisites
+
+This skill requires the GitHub CLI (`gh`). Check availability before proceeding:
+- Run: `gh auth status`
+- If not installed: https://cli.github.com
+- If not authenticated: `gh auth login`
+- If `gh` is missing, inform the user and stop. This skill cannot work without it.
+
 ## Step 1 — Detect repo name and worktree path
 
 ```bash

@@ -1,0 +1,110 @@
+name: release-guard
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# CHANGELOG.md is the source of truth for versioning.
+# This workflow blocks the merge/push if any version source disagrees with CHANGELOG.
+
+jobs:
+  changelog-version-sync:
+    name: Versions match CHANGELOG.md
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: CHANGELOG.md must exist with a released entry
+        run: |
+          test -f CHANGELOG.md || { echo "CHANGELOG.md is missing — required."; exit 1; }
+          grep -qE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md \
+            || { echo "CHANGELOG.md has no released version heading like '## [X.Y.Z]'."; exit 1; }
+
+      - name: Version sources match CHANGELOG (package.json / banner.ts / marketplace.json)
+        run: node scripts/sync-version-from-changelog.mjs --check
+
+      - name: If diff touches code without CHANGELOG update, fail
+        if: github.event_name == 'pull_request'
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+
+          touches_code=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- \
+            'rules/' 'skills/' 'agents/' 'hooks/' 'src/' 'templates/' 'song/' \
+            | head -n 1)
+          touches_changelog=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- 'CHANGELOG.md' \
+            | head -n 1)
+
+          if [ -n "$touches_code" ] && [ -z "$touches_changelog" ]; then
+            echo "::error::Code/skills changed but CHANGELOG.md was not updated."
+            echo ""
+            echo "Files changed (code):"
+            git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- \
+              'rules/' 'skills/' 'agents/' 'hooks/' 'src/' 'templates/' 'song/'
+            echo ""
+            echo "Add an entry under '## [Unreleased]' in CHANGELOG.md describing the change."
+            exit 1
+          fi
+
+  build:
+    name: Build CLI
+    runs-on: ubuntu-latest
+    needs: changelog-version-sync
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Build
+        run: pnpm build
+
+  skills-drift-audit:
+    name: No leaked tokens or absolute paths
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan for leaked secrets in skills/agents/rules
+        run: |
+          set -e
+          # Patterns we never want in the published bundle.
+          patterns=(
+            'sk-[A-Za-z0-9_-]{12,}'        # API keys
+            'sk-ant-(api|oat)[0-9]+'       # Anthropic
+            'x-openclaw-token'             # Marcel's local hook
+            'ghp_[A-Za-z0-9]{20,}'         # GitHub PAT
+            'AKIA[0-9A-Z]{16}'             # AWS access key
+            'AIza[0-9A-Za-z_-]{20,}'       # Google API key
+          )
+          found=0
+          for pat in "${patterns[@]}"; do
+            if grep -REn --include='*.md' --include='*.ts' --include='*.json' "$pat" rules skills agents hooks; then
+              echo "::error::Pattern '$pat' detected — must not ship."
+              found=1
+            fi
+          done
+          # Forbid absolute Windows paths that would break on user machines.
+          if grep -REn --include='*.md' 'C:\\\\Users\\\\yabla' rules skills agents hooks; then
+            echo "::error::Absolute Windows path leaked — replace with ~/ or relative path."
+            found=1
+          fi
+          [ "$found" -eq 0 ] || exit 1
+          echo "✓ No secrets or personal absolute paths detected."

@@ -8,6 +8,14 @@ allowed-tools: Bash(gh :*), Bash(git :*), Read, Edit, MultiEdit
 
 Systematically address ALL unresolved review comments until PR is approved.
 
+## Prerequisites
+
+This skill requires the GitHub CLI (`gh`). Check availability before proceeding:
+- Run: `gh auth status`
+- If not installed: https://cli.github.com
+- If not authenticated: `gh auth login`
+- If `gh` is missing, inform the user and stop. This skill cannot work without it.
+
 ## Context
 
 - Current branch: !`git branch --show-current`

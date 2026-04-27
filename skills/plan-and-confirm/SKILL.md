@@ -1,193 +1,313 @@
 ---
 name: plan-and-confirm
 description: >
-  Explore the codebase, challenge the idea with a context-adaptive critic, present a clear implementation plan,
-  and wait for explicit user approval before writing any code. Use for any non-trivial change
-  (new feature, bug fix, refactor). Launches critic + research agents in parallel.
-  Rule #1 — never code without OKAY.
-argument-hint: "[description of the change] [--quick] [--no-issue] [--no-worktree]"
+  Ultraplan — depth-variable planning pipeline. Auto-detects task complexity, runs N parallel
+  research agents + adversarial debate + 5 ultrathink lenses + premortem, presents alternatives
+  with confidence scores, waits for explicit OKAY before any code change. Rule #1 — never code without OKAY.
+argument-hint: "[description] [--depth=1..5 | --quick | --ultra] [--alternatives=N] [--no-issue] [--no-worktree]"
 ---
 
-# Plan & Confirm — Full Pipeline
+# Plan & Confirm — Ultraplan v3
 
-## Options
+> "Plan like Da Vinci. Question every assumption. Solve the real problem, not the stated one."
 
-Parse `$ARGUMENTS` for flags. **Default mode is FULL** (deep research + issue + worktree).
+## Prerequisites
 
-| Flag | Short | Effect |
+- ctx7 CLI (`npx ctx7 --version`) — falls back to Context7 MCP, then WebSearch.
+- gh CLI for issue/worktree phases (FULL mode only).
+
+## Phase 0 — Depth selection
+
+Parse `$ARGUMENTS` for explicit flags first:
+
+| Flag | Depth | Effect |
 |------|-------|--------|
-| `--quick` | `-q` | Skip deep research, skip critic debate, 1 local explore only |
-| `--no-issue` | `-ni` | Skip GitHub issue creation after OKAY |
-| `--no-worktree` | `-nw` | Skip worktree creation after issue |
+| `--depth=1` or `--quick` / `-q` | 1 | Direct read of relevant files. No agents. No critic. Plan is a 1-paragraph diff preview. |
+| `--depth=2` | 2 | Local explore + critic (1 agent). 4-axis audit. No alternatives. |
+| `--depth=3` (DEFAULT auto) | 3 | Critic + 3 research agents (codebase, docs, web). 4-axis audit. Reflection pass. 1 plan + salt. |
+| `--depth=4` | 4 | Depth 3 + Devil's Advocate (5th agent) + 2 alternatives (A/B). Confidence scoring per section. |
+| `--depth=5` or `--ultra` | 5 | Full ultrathink: depth 4 + premortem + simplification pass + 3 alternatives (A/B/C) + "future-self review" + opposite-day check. |
 
-If no flag is present → **FULL mode** (critic + parallel research + issue + worktree).
+**Auto-detect depth** if no flag given. Score signals from the prompt:
 
-Extract the task description by removing any flags from `$ARGUMENTS`.
+| Signal | Score |
+|--------|-------|
+| "typo", "fix label", "rename file", "update string" | depth=1 |
+| "fix bug", "correct behavior", "small adjustment" | depth=2 |
+| "add feature", "implement X", "build Y" | depth=3 |
+| "refactor", "migrate", "consolidate", "redesign" | depth=4 |
+| "rearchitect", "rewrite", "overhaul", "v2", "from scratch" | depth=5 |
+| Touches >5 files predicted, OR domain-critical (auth/payments/data) | floor=4 |
+| Trivial repo or sandbox | ceil=3 |
+
+If multiple signals match, take the **maximum**. Announce the chosen depth in the first reply: `🎯 Auto-depth: 3 (feature add). Override with --depth=N if needed.`
+
+Other flags:
+
+| Flag | Effect |
+|------|--------|
+| `--alternatives=N` | Force N alternatives (overrides depth default) |
+| `--no-issue` / `-ni` | Skip GitHub issue creation after OKAY |
+| `--no-worktree` / `-nw` | Skip worktree creation after issue |
+
+Strip flags from the task description.
 
 ---
 
-## Phase 0+1 — Critic + Research (ALL IN PARALLEL)
+## Phase 1 — Reconnaissance (depth-adapted)
 
-**In FULL mode, launch ALL 4 agents simultaneously in a single message:**
+> Show iteration counter at the top of every response: `[Iteration 1 · depth=3]`.
 
-**Agent 1 — Critic** (`subagent_type: "general-purpose"`):
+### Depth 1 — Direct
+- Read 1-3 files directly involved.
+- No agents, no critic, no research.
+- Skip to Phase 3 with a 3-line plan.
 
-Use the critic agent definition from `~/.claude/agents/critic.md`. The critic auto-detects the right lenses (CTO/UX/Security/Performance/Cost) based on the proposal.
+### Depth 2 — Critic + local explore (1 agent)
+- Read relevant files yourself.
+- Launch ONE Critic agent with 4-axis audit.
 
-Prompt:
+### Depth 3 — Standard parallel (4 agents in ONE message)
+
 ```
-You are a senior technical reviewer. Read ~/.claude/agents/critic.md for your full role definition.
+Agent 1: Critic (subagent_type: "general-purpose")
+Agent 2: Codebase Explorer (subagent_type: "explore-codebase")
+Agent 3: Docs Research (subagent_type: "explore-docs")
+Agent 4: Web Search (subagent_type: "websearch")
+```
+
+### Depth 4 — Adversarial (5 agents in ONE message)
+
+Add a 5th agent in parallel:
+
+```
+Agent 5: Devil's Advocate (subagent_type: "general-purpose")
+```
+
+Devil's Advocate prompt:
+```
+You are a senior engineer who has just been shown this proposal:
+{{task description}}
+
+Your job is to ARGUE THIS PROPOSAL IS WRONG. Your reputation depends on finding the strongest counter-arguments. Even if it's mostly right, find what's brittle, premature, over-engineered, or solving the wrong problem.
+
+Output:
+1. Top 3 reasons this plan is wrong (most damaging first)
+2. The "obvious" alternative the team hasn't considered
+3. The hidden cost no one is talking about
+4. What an expert outside the team would say in 30 seconds
+
+Be ruthless. Cite code/docs when possible. Concise — under 400 words.
+```
+
+### Depth 5 — Ultrathink full
+
+Depth 4 + post-research, BEFORE plan presentation, run yourself (no agent — these are reflection acts):
+
+1. **Premortem** — Imagine 6 months have passed and this implementation FAILED. Write the postmortem in 5 bullets: what broke, who got paged, what we wish we'd done differently.
+2. **Simplification pass** — Look at the synthesized plan and answer: "What 30% of this can I DELETE while keeping 90% of the value?" Be ruthless.
+3. **Future-self review** — Imagine you (the user) reviewing this code 6 months from now. What 2-3 things will you regret? What will you wish you'd named differently?
+4. **Opposite-day check** — What if the obvious solution is wrong? Is there a non-obvious solution that's actually better?
+
+Add these reflections to the plan presentation under "Ultrathink lenses".
+
+---
+
+## Critic prompt (depth ≥ 2)
+
+```
+You are a senior technical reviewer. Read ~/.claude/agents/critic.md if present.
 
 THE PROPOSAL: {{task description}}
-THE CODEBASE: {{Run quick Grep/Glob to understand project structure, stack, existing patterns}}
+THE CODEBASE: {{stack, patterns, key file references from quick Grep/Glob}}
 
-Follow the critic.md instructions exactly. Auto-detect which lenses apply.
-Output your verdict in the specified format.
+Auto-detect lenses (CTO / UX / Security / Performance / Cost / Accessibility).
+
+MANDATORY 4-AXIS AUDIT (per pre-commit-quality-gate rule):
+
+1. Architecture — best architectural solution? SRP respected? No god-class aggravation? Existing patterns honored?
+2. Quality vs Speed — tests planned for critical logic? Any shortcut that will need rework? No N+1, no copy-paste?
+3. Production-grade — feature flags? a11y? rate limiting? monitoring? graceful degradation? secret handling?
+4. SOLID / Liskov — Open/Closed for extensibility? interfaces (ISP)? dependency inversion?
+
+For each axis: PASS / WARN / BLOCK + concrete finding (file:line) + concrete fix.
+
+ADDITIONALLY — answer the 5 ultrathink lenses (concise, 1-2 sentences each):
+A. The Real Problem — Is the stated problem the actual problem? What's the second-order goal?
+B. The Elegant Solution — Is there a simpler solution we're missing?
+C. The Premortem — Name 3 ways this fails in 6 months.
+D. The Simplification — What can we DELETE from this plan?
+E. The Senior Test — What would the smartest senior eng on this team ask about this plan?
+
+FINAL VERDICT:
+- 4-axis row: Architecture / Quality / Prod / SOLID → PASS|WARN|BLOCK each
+- Lens row: A/B/C/D/E → 1-line answer each
+- Overall: GO / GO-WITH-CHANGES / RETHINK / REJECT
+- Rule: any axis BLOCK → overall ≤ GO-WITH-CHANGES.
 ```
-
-**Agent 2 — Codebase Explorer** (`subagent_type: "explore-codebase"`):
-```
-Explore the codebase to understand how to implement: {{task description}}.
-Find: relevant files, existing patterns, imports/exports that will be affected,
-similar implementations to follow. Report with file:line references.
-```
-
-**Agent 3 — Documentation Research** (`subagent_type: "explore-docs"`):
-```
-Research documentation for the libraries/frameworks needed to implement: {{task description}}.
-
-MANDATORY: Use ctx7 CLI to look up current API signatures:
-1. Run: npx ctx7 library "<library>" "<topic>" to find the library ID
-2. Run: npx ctx7 docs "<libraryId>" "<specific question>" to get docs
-
-Also try Context7 MCP tools if available:
-- mcp__context7__resolve-library-id
-- mcp__context7__get-library-docs (5000-10000 tokens)
-
-Focus on what's actually needed, not general overviews.
-Report actual API signatures, code examples, and breaking changes.
-```
-
-**Agent 4 — Web Search** (`subagent_type: "websearch"`):
-```
-Search for best practices, common pitfalls, and proven patterns for: {{task description}}.
-Focus on production-grade solutions, not tutorials.
-Search for breaking changes if using: Next.js 16, Prisma 7, Tailwind v4, Convex, Resend v6.
-Return concise findings with sources.
-```
-
-Wait for all 4 to complete, then synthesize their findings.
-
-### If QUICK mode (`--quick`): Local explore only
-
-1. Read all files directly related to the task
-2. Grep for usages of affected symbols
-3. Understand patterns and conventions
-4. Identify side effects
-
-**Rule: zero file modifications in this phase.**
 
 ---
 
-## Phase 2 — Present the plan
+## Phase 2 — Synthesis & Reflection (depth ≥ 3)
 
-Structure your response exactly as follows:
+After agents return, BEFORE presenting the plan, do a **reflection pass yourself**:
 
-### Critic's verdict
-- Present the critic's feedback verbatim — do not filter or soften it
-- Note which lenses were activated (CTO, UX, Security, etc.)
-- If verdict is REJECT → explain why and suggest alternative. Ask user to choose.
-- If verdict is RETHINK → present alternative approach. Ask user to choose.
-- If verdict is PROCEED WITH CHANGES → note changes, incorporate in plan.
+1. Re-read the user's original request word by word.
+2. Ask: "Did the agents answer the question I was asked, or did they answer an easier version of it?"
+3. Identify the 1-2 things the agents missed or under-weighted.
+4. Resolve contradictions between agents (if any) — pick the side with stronger evidence and explain why.
+
+Output a 3-line synthesis at the top of Phase 3:
+
+> **Synthesis** — Critic says X. DevAdvocate says Y. My read: Z (because…). I'll address Y by [adjustment].
+
+If Critic verdict is **REJECT**, halt before Phase 3 — present the rejection and ask the user to choose: pivot, override, or quit.
+
+---
+
+## Phase 3 — Plan presentation
+
+Structure your response in this exact order. Skip sections that don't apply at the chosen depth.
+
+### `[Iteration 1 · depth=N]` Header
+
+### Synthesis (depth ≥ 3)
+3-line summary integrating critic + devil's advocate + your reflection.
 
 ### What I understood
-- Describe the request with precise file:line references
-- Flag any ambiguous or non-obvious points
+- Bullet list with `file_path:line_number` references
+- Explicitly flag any ambiguity. **Ask now**, don't assume.
 
-### What I will do
-- List every file to modify or create, with the reasoning for each change
-- State explicitly what will NOT be changed and why
+### The Real Problem (depth ≥ 3)
+1-2 sentences. Often distinct from the stated problem.
 
-### Research findings
-- Key patterns found in codebase (from Agent 2)
-- Relevant documentation/API notes (from Agent 3)
-- Best practices and pitfalls to avoid (from Agent 4)
+### Plan(s)
 
-### Agent routing recommendation
+**Depth 1-3**: ONE plan.
+**Depth 4**: TWO alternatives (A: minimal/reversible, B: balanced).
+**Depth 5**: THREE alternatives (A: minimal, B: balanced, C: ambitious/"right" architecture).
 
-| Task type | Recommended approach |
-|-----------|---------------------|
-| Bug fix (1-2 files) | Direct fix, no agent needed |
-| Bug fix (complex) | `gsd-debugger` agent pattern |
-| Feature (new page/component) | Direct implementation |
-| Refactor (multi-file) | Agent with `isolation: "worktree"` |
-| Multi-file independent changes | Parallel agents (one per file group) |
+For each plan:
+
+```
+### Plan [A/B/C] — [name] · confidence: X/5
+
+Files to modify:
+- path:line — what changes — confidence: X/5
+- path:line — what changes — confidence: X/5
+
+Files NOT touched (and why):
+- path — reason
+
+Tradeoffs:
+- pro: …
+- con: …
+
+Build sequence:
+1. step
+2. step
+```
+
+**Confidence scale (1-5)**:
+- 5: I've done this exact thing here, low risk
+- 4: I understand fully, minor unknowns
+- 3: Some unknowns, will resolve at impl
+- 2: Significant unknowns, may need to revisit
+- 1: Speculation, needs validation before coding
+
+> If ANY section scores ≤ 2 → halt and ask before OKAY.
+
+### Recommendation (depth ≥ 4)
+"My pick: Plan B because [reason anchored in evidence]. Override if you disagree."
+
+### Salt — what I'm NOT doing (depth ≥ 3)
+List 3 things that look like good ideas but I'm leaving out, with the reason.
+1. Tempting idea 1 — why I'm skipping (e.g., scope creep, premature, breaks invariant X)
+2. ...
+3. ...
+
+### Ultrathink lenses (depth = 5)
+
+| Lens | Answer |
+|------|--------|
+| Real Problem | … |
+| Elegant Solution | … |
+| Premortem (3 failure modes) | 1. … 2. … 3. … |
+| Simplification (delete 30%) | … |
+| Senior Test | … |
+| Future-you regrets | … |
+| Opposite-day check | … |
+
+### 4-axis audit (always)
+| Axis | Verdict | Finding | Fix |
+|------|---------|---------|-----|
+| Architecture | PASS/WARN/BLOCK | … | … |
+| Quality vs Speed | PASS/WARN/BLOCK | … | … |
+| Production-grade | PASS/WARN/BLOCK | … | … |
+| SOLID | PASS/WARN/BLOCK | … | … |
 
 ### Risks & attention points
-- Any code that could break elsewhere
-- Any assumption made (and why) — cross-reference with critic's findings
-- Any breaking API change, DB migration, or env variable addition
+- Side effects, breaking changes, migrations, env vars, infra impact.
+
+### Why this is the right approach (depth ≥ 3)
+> "I believe this is the *right* approach (not just *a* right approach) because:
+> 1. [reason anchored in evidence/code]
+> 2. [reason]
+> 3. [reason]
+> Challenge me if you disagree — I'd rather rethink now than rework later."
 
 ---
 
-## Phase 3 — Wait for approval
+## Phase 4 — OKAY gate
 
 **STOP. Do not touch any file.**
 
-Send a Telegram notification:
+(Optional notification — only if `OPENCLAW_TOKEN` is set in env, ping your local Telegram hook. Skip silently otherwise.)
 
-```bash
-curl -s -X POST "http://127.0.0.1:18789/hooks/agent" \
-  -H "x-openclaw-token: 342f171b9e6b74f2eb63c8a1b41d9fdd381df7ff020d3ae8" \
-  -H "Content-Type: application/json" \
-  -d "{\"message\": \"Plan pret — en attente de ton OKAY\", \"deliver\": true, \"channel\": \"last\"}" \
-  > /dev/null 2>&1
-```
+Output literally:
 
-Then output literally:
+> Confirm with **OKAY** to proceed (default = Plan B if multiple alternatives).
+> Or: `OKAY plan A`, `OKAY but skip step 3`, or describe what you want to change.
 
-> Please confirm with **OKAY** if the understanding and plan are correct.
-> Otherwise, tell me what is wrong and I will adjust before coding.
-
-**Absolute rule:** If the user does not say OKAY (or equivalent: "yes", "go", "ok", "c'est bon", "lance"), stay in Phase 3. Do not proceed.
-
-**The user can debate the critic.** If they disagree, re-run the critic with counter-arguments. Max 2 rounds — then user's decision is final.
+**Absolute rules**:
+- No OKAY → no code change. Period.
+- "OKAY but ..." → adjust plan, re-emit Phase 3 as Iteration K+1.
+- User can debate the critic. Re-run critic with counter-arguments. **Max 2 debate rounds**, then user's decision is final.
+- User can demand a deeper iteration: "go deeper" → bump depth +1, re-run Phase 1.
 
 ---
 
-## Phase 4 — Create issue & worktree (FULL mode, skip if `--no-issue`)
+## Phase 5 — Issue & worktree (FULL mode, skip with `--no-issue` / `--no-worktree`)
 
-Once OKAY is received:
-
-### 4a. Create GitHub issue
+### 5a. GitHub issue (after OKAY)
 
 ```bash
 gh issue create \
   --title "<type>(<scope>): <description>" \
   --body "## Description
-<summary from the approved plan>
+<summary from approved plan>
 
 ## Implementation plan
-<file list from Phase 2>
+<file list with confidences>
 
 ## Acceptance criteria
 - [ ] <criterion 1>
 - [ ] <criterion 2>
 
 ## Context
+- Depth: <N>
 - Critic verdict: <verdict>
-- Lenses: <CTO, UX, Security, ...>
-- Mode: <FULL/QUICK>
+- Plan chosen: <A/B/C>
 " \
-  --label "<appropriate label>"
+  --label "<label>"
 ```
 
-### 4b. Create worktree (skip if `--no-worktree`)
+### 5b. Worktree
 
 ```bash
 TYPE="feat"  # or fix, refactor, perf, chore
-ISSUE_NUM=<from 4a>
-SLUG=<short-kebab-case-description>
+ISSUE_NUM=<from 5a>
+SLUG=<short-kebab>
 
 git checkout develop 2>/dev/null || git checkout master
 git pull
@@ -196,35 +316,56 @@ git checkout -b ${TYPE}/${ISSUE_NUM}-${SLUG}
 
 ---
 
-## Phase 5 — Implement (only after OKAY)
+## Phase 6 — Implementation (only after OKAY)
 
-1. Implement exactly as described in the approved plan — no additions beyond scope
-2. Follow the agent routing recommendation from Phase 2
-3. If something discovered during implementation changes the plan → **stop and re-present**
-4. Run project-specific verification (pnpm tsc --noEmit, pnpm lint, etc.)
-5. Summarize changes with file:line references
+1. Implement exactly the approved plan — no scope additions.
+2. Follow the agent routing recommendation if any.
+3. **If a discovery changes the plan → STOP, re-emit Phase 3 as Iteration K+1.** Do not silently deviate.
+4. Run project verification: `pnpm tsc --noEmit`, `pnpm lint`, project tests.
+5. Summarize changes with `file_path:line` references.
 
-**Never commit** unless the user explicitly asks. When asked, use `/commit`.
+**Never commit unless asked.** When asked, use `/commit`.
 
 ---
 
-## Phase 6 — Post-implementation (FULL mode)
+## Phase 7 — Post-implementation
 
-1. If UI impact → suggest: "Use `/visual-check <route>` to verify."
-2. Suggest: "Ready to commit. Use `/commit`."
-3. After commit → suggest: "Use `/create-pr` with `Closes #<issue>`."
+1. UI impact → suggest `/visual-check <route>`.
+2. Suggest `/commit`.
+3. After commit → suggest `/create-pr` with `Closes #<issue>`.
+
+---
+
+## Iteration counter rules
+
+- First plan presentation = Iteration 1.
+- User pushback / "go deeper" / changed flags = Iteration N+1.
+- Show counter at top of every plan: `[Iteration 2 · depth=4]`.
+- Track iteration in your head, no need for a file.
+
+---
+
+## Anti-patterns (block these)
+
+- Coding without OKAY — rule #1.
+- Auto-bumping depth without telling the user.
+- Filtering or softening critic feedback (must be verbatim).
+- Presenting one plan at depth ≥ 4 (must be alternatives).
+- Skipping confidence scoring at depth ≥ 4.
+- Skipping "salt" / "what I'm not doing" at depth ≥ 3.
+- Treating any axis BLOCK as just a warning.
+- Trivial change (typo, single string) → suggest `--depth=1` or skip skill entirely.
 
 ---
 
 ## Rules
 
-- **Never code without OKAY** — rule #1, non-negotiable
-- **The critic runs in parallel with research** — saves time, small token waste if critic rejects
-- **The critic is honest** — never soften, filter, or apologize for its feedback
-- **The user can override the critic** — after debate, user's decision is final
-- Base all analysis on files actually read — no guessing
-- A "trivial change" (typo, single string edit) → suggest `--quick` or skip entirely
-- **Default is FULL** — user must explicitly opt out with flags
-- **Use ctx7 CLI and WebSearch** to verify APIs before coding — training data is stale
+- **Never code without OKAY.** Non-negotiable.
+- Critic runs in parallel with research. Time saved > tokens wasted on rejections.
+- Critic is honest, never softened.
+- User overrides everything (critic, devil's advocate, defaults). User is the principal.
+- Base analysis on files actually read — never guess.
+- Use ctx7 CLI + WebSearch to verify APIs. Training data is stale.
+- Default depth is auto-detected. User can override anytime.
 
 $ARGUMENTS

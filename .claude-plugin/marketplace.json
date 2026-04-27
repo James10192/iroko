@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Claude Code configuration: rules, skills, agents, hooks. Built in Abidjan.",
-    "version": "2.0.0"
+    "version": "2.1.0"
   },
   "plugins": [
     {
       "name": "iroko",
       "source": "./",
       "description": "25 components for Claude Code: quality gate, parallel agents, doc lookup, PR automation, and more",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "Marcel DJEDJE-LI",
         "email": "marcel.djedjeli@africandigitconsulting.com"

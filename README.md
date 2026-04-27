@@ -22,6 +22,8 @@ npx @james10192/iroko init
 | Hooks | 2 | Automatic triggers on session events. |
 | Sounds | 2 | MP3 notifications when Claude finishes or needs input. |
 
+Release notes live in [CHANGELOG.md](./CHANGELOG.md).
+
 ---
 
 ## Rules
@@ -43,7 +45,7 @@ Type `/command` in Claude Code. These are the commands I built.
 | Skill | What it does |
 |-------|-------------|
 | `/commit` | Quality-gated commit. Runs the 4-axes audit on your diff, generates a conventional message, pushes. Blocks on critical issues. |
-| `/plan-and-confirm` | Launches a critic + 3 research agents in parallel, presents a detailed plan, waits for your explicit OKAY before touching any file. |
+| `/plan-and-confirm` | **Ultraplan v3** — depth-variable (1–5) planning pipeline. Auto-detects complexity, runs up to 5 parallel agents (critic + research + Devil's Advocate), presents alternatives with confidence scores, premortem, and the 5 ultrathink lenses. Waits for explicit OKAY before any code. |
 | `/find-doc` | Looks up library documentation via ctx7 CLI, Context7 MCP, and WebSearch. Use before writing code with any external API. |
 | `/linkedin-post` | Generates a LinkedIn post from your current work context: git history, conversation, tech trends. Publishes via MCP if configured. (optional) |
 | `/visual-check` | Opens dev-browser (sandboxed Chromium), navigates to a URL, takes screenshots to verify your implementation visually. |

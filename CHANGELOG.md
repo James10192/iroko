@@ -8,6 +8,31 @@ following the rules in [`rules/iroko-versioning.md`](./rules/iroko-versioning.md
 
 ## [Unreleased]
 
+## [2.2.0] — 2026-04-27
+
+### Changed
+
+- **Premium CLI redesign** — full visual overhaul of the iroko CLI:
+  - **New banner** — botanical iroko silhouette in walnut tone, replacing the generic green tree.
+  - **Single signature character** — `▰` (U+25B0, BLACK PARALLELOGRAM) used everywhere as the iroko mark: status icons, KPI bars, section headers, outro tags. Reusable as a logo outside the CLI (npm avatar, LinkedIn posts, screenshots).
+  - **New palette** — walnut (RGB 139,111,71) for the tree, ochre (RGB 212,160,23) as the single accent, ivory for body, graphite for dim. ANSI 24-bit when supported (`COLORTERM=truecolor`), automatic fallback to ANSI 16 elsewhere.
+  - **`▰`/`▱`/`▴`/`×` status grammar** replaces `●`/`○`/`+` across `init` and `list`.
+  - **KPI bars** in `iroko list` — visual progress (`▰▰▰▰▰▱▱▱▱▱`) per component type.
+  - **Compact banner** for sub-commands (init/list/update) — keeps the workflow focused while preserving the iroko mark.
+  - **Right-aligned outro tag** (`▰  by @LeVraiMD`) — discreet authorship signature after each successful action.
+  - **Default screen** now lists commands with `▰` markers and ends with a one-line author signature (Marcel DJEDJE-LI · github.com/James10192 · @LeVraiMD).
+  - **UTF-8 detection** — `Côte d'Ivoire` rendered with accents on capable terminals, ASCII fallback on legacy cmd.exe.
+
+### Added
+
+- `iroko about` — new sub-command with full author and project credits (name, GitHub, X, LinkedIn, email, npm, repo, issues, license).
+- `src/lib/theme.ts` — centralised palette, marks, and country/UTF-8 detection.
+- `src/lib/ui.ts` — reusable terminal-UI primitives (`mark`, `divider`, `sectionHeader`, `kpiBar`, `rightTag`, `row`).
+
+### Fixed
+
+- `iroko list` no longer crashes when `~/.claude/.iroko.json` exists without an `installedAt` field (created by the update-checker before any `iroko init`). Now prompts the user to run `iroko init` instead.
+
 ## [2.1.0] — 2026-04-27
 
 ### Changed
@@ -65,7 +90,8 @@ following the rules in [`rules/iroko-versioning.md`](./rules/iroko-versioning.md
 
 Initial public releases. See git history for details.
 
-[Unreleased]: https://github.com/James10192/iroko/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/James10192/iroko/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/James10192/iroko/releases/tag/v2.2.0
 [2.1.0]: https://github.com/James10192/iroko/releases/tag/v2.1.0
 [2.0.1]: https://github.com/James10192/iroko/releases/tag/v2.0.1
 [2.0.0]: https://github.com/James10192/iroko/releases/tag/v2.0.0

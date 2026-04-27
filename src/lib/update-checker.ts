@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import pc from "picocolors";
 import { VERSION } from "./banner.js";
+import { ochre, graphite, ivory, MARK_UP } from "./theme.js";
 import { IROKO_CONFIG } from "./paths.js";
 import { PACKAGE_NAME } from "./constants.js";
 
@@ -43,8 +43,12 @@ export function checkForUpdates(): void {
 
     if (isNewer) {
       console.log();
-      console.log(`  ${pc.yellow("Update available")} ${pc.dim(VERSION)} → ${pc.green(latest)}`);
-      console.log(`  Run ${pc.bold("pnpm add -g @james10192/iroko@latest")} to update`);
+      console.log(
+        `   ${ochre(MARK_UP)}  ${ivory("update available")}  ${graphite(`${VERSION} → ${latest}`)}`,
+      );
+      console.log(
+        `      ${graphite(`pnpm add -g ${PACKAGE_NAME}@latest`)}`,
+      );
       console.log();
     }
 

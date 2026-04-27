@@ -1,21 +1,26 @@
 import * as p from "@clack/prompts";
-import pc from "picocolors";
-import { showBanner } from "../lib/banner.js";
+import { showBannerCompact } from "../lib/banner.js";
+import { ochre, graphite, ivory, MARK } from "../lib/theme.js";
+import { divider, rightTag } from "../lib/ui.js";
 import { components, getComponentsByType } from "../lib/manifest.js";
-import { installComponent, saveIrokoConfig, installSettingsTemplate } from "../lib/installer.js";
+import {
+  installComponent,
+  saveIrokoConfig,
+  installSettingsTemplate,
+} from "../lib/installer.js";
 import { CLAUDE_DIR } from "../lib/paths.js";
 import { existsSync, mkdirSync } from "node:fs";
 import { TYPE_ORDER, TYPE_META } from "../lib/constants.js";
 
 export async function initCommand() {
-  showBanner();
+  showBannerCompact();
 
-  p.intro(pc.bold("Interactive Setup"));
+  p.intro(`${ochre(MARK)}  ${ivory("Interactive Setup")}`);
 
-  // Check if ~/.claude exists
+  // Bootstrap ~/.claude if missing.
   if (!existsSync(CLAUDE_DIR)) {
     p.log.warn(
-      `${pc.yellow("~/.claude")} directory not found. Is Claude Code installed?`
+      `${graphite("~/.claude")} directory not found. Is Claude Code installed?`,
     );
     const proceed = await p.confirm({
       message: "Create ~/.claude and continue?",
@@ -27,25 +32,29 @@ export async function initCommand() {
     mkdirSync(CLAUDE_DIR, { recursive: true });
   }
 
-  // Build grouped options
-  const groups: Record<string, { value: string; label: string; hint?: string }[]> = {};
+  // Group options by component type. Each group label is the type label;
+  // a `▰` prefix on each item carries the iroko signature inside the prompt.
+  const groups: Record<
+    string,
+    { value: string; label: string; hint?: string }[]
+  > = {};
 
   for (const type of TYPE_ORDER) {
     const info = TYPE_META[type];
     const items = getComponentsByType(type);
-    const key = `${pc.bold(info.label)} ${pc.dim(`— ${info.desc}`)}`;
+    const key = `${ivory(info.label)} ${graphite(`— ${info.desc}`)}`;
 
     groups[key] = items.map((c) => {
-      const tag = c.hint ? pc.yellow(` (${c.hint})`) : "";
+      const tag = c.hint ? graphite(` (${c.hint})`) : "";
       return {
         value: c.name,
-        label: `${pc.bold(c.name)} ${pc.dim("—")} ${pc.dim(c.description)}${tag}`,
+        label: `${ivory(c.name)} ${graphite("—")} ${graphite(c.description)}${tag}`,
       };
     });
   }
 
   p.log.message(
-    `${pc.dim("Navigation:")} ${pc.bold("↑↓")} move  ${pc.bold("space")} toggle  ${pc.bold("a")} select all  ${pc.bold("enter")} confirm`
+    `${graphite("Navigation:")} ${ivory("↑↓")} move  ${ivory("space")} toggle  ${ivory("a")} select all  ${ivory("enter")} confirm`,
   );
 
   const selected = await p.groupMultiselect({
@@ -63,21 +72,21 @@ export async function initCommand() {
 
   if (selectedNames.length === 0) {
     p.log.warn("No components selected.");
-    p.outro(pc.dim("Nothing installed. Run iroko init again to start over."));
+    p.outro(graphite("Nothing installed. Run iroko init again to start over."));
     return;
   }
 
-  // Confirm
+  // Confirm with a one-line summary by type.
   const summary = TYPE_ORDER.map((type) => {
     const count = selectedNames.filter((n) =>
-      components.find((c) => c.name === n && c.type === type)
+      components.find((c) => c.name === n && c.type === type),
     ).length;
     return count > 0 ? `${count} ${TYPE_META[type].label.toLowerCase()}` : null;
   })
     .filter(Boolean)
     .join(", ");
 
-  p.log.info(`Installing: ${pc.bold(summary)}`);
+  p.log.info(`Installing: ${ivory(summary)}`);
 
   const confirm = await p.confirm({
     message: `Install ${selectedNames.length} components to ~/.claude?`,
@@ -88,7 +97,7 @@ export async function initCommand() {
     process.exit(0);
   }
 
-  // Install
+  // Install — single spinner, count successes/failures.
   const s = p.spinner();
   s.start("Installing components");
 
@@ -104,37 +113,36 @@ export async function initCommand() {
       installed++;
     } else {
       failed++;
-      p.log.warn(`Could not install ${pc.bold(name)} — source not found`);
+      p.log.warn(`Could not install ${ivory(name)} — source not found`);
     }
   }
 
-  // Install settings template if no settings.json exists
   installSettingsTemplate();
-
-  // Save iroko config
   saveIrokoConfig(selectedNames);
 
-  s.stop(`${pc.green(`${installed} components installed`)}${failed > 0 ? pc.yellow(` (${failed} failed)`) : ""}`);
+  const successMsg = ochre(`${installed} components installed`);
+  const failMsg = failed > 0 ? graphite(`  (${failed} failed)`) : "";
+  s.stop(`${successMsg}${failMsg}`);
 
-  // Summary
+  // Per-type recap with the `▰` mark for each new component.
   console.log();
-  console.log(`  ${pc.dim("Installed to")} ${pc.bold("~/.claude/")}`);
-  console.log();
+  console.log(`   ${graphite(`Installed to ~/.claude/`)}`);
+  console.log(`   ${divider()}`);
 
   for (const type of TYPE_ORDER) {
     const typeComponents = selectedNames.filter((n) =>
-      components.find((c) => c.name === n && c.type === type)
+      components.find((c) => c.name === n && c.type === type),
     );
     if (typeComponents.length === 0) continue;
 
-    console.log(`  ${pc.bold(TYPE_META[type].label)}`);
+    console.log(`   ${ochre(MARK)}  ${ivory(TYPE_META[type].label)}`);
     for (const name of typeComponents) {
-      console.log(`    ${pc.green("+")} ${name}`);
+      console.log(`      ${ochre(MARK)} ${name}`);
     }
     console.log();
   }
 
-  p.outro(
-    `${pc.green("Done!")} Run ${pc.bold("iroko list")} to see installed components.`
-  );
+  p.outro(`${ochre("Done.")} Run ${ivory("iroko list")} to verify.`);
+  console.log(rightTag(`${ochre(MARK)}  ${graphite("by @LeVraiMD")}`));
+  console.log();
 }

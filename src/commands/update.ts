@@ -1,31 +1,36 @@
 import * as p from "@clack/prompts";
-import pc from "picocolors";
 import { execSync } from "node:child_process";
-import { existsSync, mkdtempSync, cpSync } from "node:fs";
+import { existsSync, mkdtempSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { showBanner } from "../lib/banner.js";
-import { loadIrokoConfig, installComponent, saveIrokoConfig } from "../lib/installer.js";
+import { showBannerCompact } from "../lib/banner.js";
+import { ochre, graphite, ivory, MARK } from "../lib/theme.js";
+import { rightTag } from "../lib/ui.js";
+import {
+  loadIrokoConfig,
+  installComponent,
+  saveIrokoConfig,
+} from "../lib/installer.js";
 import { components } from "../lib/manifest.js";
 import { getLatestVersion } from "../lib/update-checker.js";
 import { REPO_URL, PACKAGE_NAME } from "../lib/constants.js";
 
 export async function updateCommand() {
-  showBanner();
+  showBannerCompact();
 
-  p.intro(pc.bold("Update"));
+  p.intro(`${ochre(MARK)}  ${ivory("Update")}`);
 
   const config = loadIrokoConfig();
   if (!config) {
     p.log.warn(
-      `No iroko installation found. Run ${pc.bold("iroko init")} first.`
+      `No iroko installation found. Run ${ivory("iroko init")} first.`,
     );
-    p.outro(pc.dim("Nothing to update."));
+    p.outro(graphite("Nothing to update."));
     return;
   }
 
   p.log.info(
-    `Current install: ${pc.bold(`v${config.version}`)} with ${pc.bold(String(config.components.length))} components`
+    `Current install: ${ivory(`v${config.version}`)} with ${ivory(String(config.components.length))} components`,
   );
 
   const s = p.spinner();
@@ -37,15 +42,14 @@ export async function updateCommand() {
     execSync(`git clone --depth 1 ${REPO_URL} "${tmpDir}"`, {
       stdio: "pipe",
     });
-  } catch (error) {
-    s.stop(pc.red("Failed to fetch updates"));
+  } catch {
+    s.stop(graphite("Failed to fetch updates"));
     p.log.error("Could not clone repository. Check your network connection.");
     return;
   }
 
-  s.stop(pc.green("Latest version fetched"));
+  s.stop(ochre("Latest version fetched"));
 
-  // Re-install previously selected components
   s.start("Updating components");
 
   let updated = 0;
@@ -61,21 +65,20 @@ export async function updateCommand() {
   }
 
   saveIrokoConfig(config.components);
+  s.stop(ochre(`${updated} components updated`));
 
-  s.stop(`${pc.green(`${updated} components updated`)}`);
-
-  // Check if CLI itself needs upgrade
+  // CLI self-upgrade hint when a newer iroko package is published.
   const latest = getLatestVersion();
   if (latest) {
     const { VERSION } = await import("../lib/banner.js");
     if (latest !== VERSION) {
       p.log.info(
-        `CLI update available: ${pc.dim(VERSION)} → ${pc.green(latest)}\n  Run ${pc.bold(`pnpm add -g ${PACKAGE_NAME}@latest`)} to upgrade the CLI itself.`
+        `CLI update available: ${graphite(VERSION)} → ${ochre(latest)}\n  Run ${ivory(`pnpm add -g ${PACKAGE_NAME}@latest`)} to upgrade.`,
       );
     }
   }
 
-  p.outro(
-    `${pc.green("Up to date!")} Run ${pc.bold("iroko list")} to verify.`
-  );
+  p.outro(`${ochre("Up to date.")} Run ${ivory("iroko list")} to verify.`);
+  console.log(rightTag(`${ochre(MARK)}  ${graphite("by @LeVraiMD")}`));
+  console.log();
 }

@@ -1,6 +1,6 @@
 {
   "name": "@james10192/iroko",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Premium Claude Code configuration installer. Rules, skills, agents, hooks — curated by a West African dev.",
   "type": "module",
   "bin": {

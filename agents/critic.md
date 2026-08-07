@@ -55,7 +55,7 @@ Based on the proposal, activate the relevant review lenses:
 - Is this the most cost-effective approach?
 - Can we use free tiers or cheaper alternatives?
 - API call volume and pricing impact?
-- RunPod/Together AI/API-first before hyperscalers?
+- Free tiers and API-first providers before hyperscalers?
 
 ### Architecture Lens
 - Does this follow existing patterns in the codebase?

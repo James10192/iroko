@@ -3,7 +3,7 @@ import { ochre, graphite, ivory, MARK } from "../lib/theme.js";
 import { divider, kpiBar, mark } from "../lib/ui.js";
 import { components } from "../lib/manifest.js";
 import { isComponentInstalled, loadIrokoConfig } from "../lib/installer.js";
-import { TYPE_ORDER, TYPE_META } from "../lib/constants.js";
+import { TYPE_ORDER, TYPE_META, STEP_META } from "../lib/constants.js";
 
 export function listCommand() {
   showBannerCompact();
@@ -53,7 +53,9 @@ export function listCommand() {
       const icon = mark(isInstalled ? "installed" : "available");
       const name = isInstalled ? ivory(c.name) : graphite(c.name);
       const tag = c.origin === "community" ? graphite(" [community]") : "";
-      console.log(`     ${icon}  ${name}${tag}`);
+      const step = ochre(`[${STEP_META[c.step].badge}]`);
+      const pack = graphite(`pack: ${c.pack}`);
+      console.log(`     ${icon}  ${name}  ${step} ${pack}${tag}`);
       console.log(`        ${graphite(c.description)}`);
     }
     console.log();

@@ -20,7 +20,10 @@ program
 program
   .command("init")
   .description("Interactive setup — select and install components")
-  .action(initCommand);
+  .option("--guide", "beginner pack only, prompts in French (pack débutant, invites en français)")
+  .option("--full", "install everything, including create-pr and create-issue")
+  .option("--yes", "non-interactive: install the selected pack without prompts")
+  .action((opts) => initCommand(opts));
 
 program
   .command("list")

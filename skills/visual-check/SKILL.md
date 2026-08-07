@@ -1,9 +1,10 @@
 ---
 name: visual-check
 description: >
-  Launch dev-browser to visually verify a page after implementation. Navigate to a URL,
-  take screenshots, inspect elements with AI snapshots, and report visual issues.
-  Use after implementing UI changes to verify they render correctly.
+  Launch dev-browser to visually verify a page after implementation: navigate, capture screenshots
+  and token-efficient AI snapshots, exercise the submit path, report visual issues.
+  Vérification visuelle d'une page après implémentation : navigation, captures et snapshots
+  accessibilité économes en tokens, test du submit, rapport des problèmes visuels.
 argument-hint: "[url-or-route] [--screenshot] [--snapshot] [--full]"
 allowed-tools: Bash(npx dev-browser *), Bash(dev-browser *), Read
 ---
@@ -28,21 +29,24 @@ This skill requires dev-browser (sandboxed Chromium). Check availability:
 | `--full` | `-f` | Both screenshot + snapshot + report |
 | (none) | | Default: snapshot + screenshot |
 
-## Step 1 — Parse input
+## Step 1 — Determine the URL
 
-Extract the URL/route from `$ARGUMENTS`. If only a route path is given (e.g., `/admin/dashboard`), prepend `http://localhost:3000`.
+- If `$ARGUMENTS` contains a full URL, use it.
+- If only a route path is given (e.g., `/admin/dashboard`), detect the dev server base URL:
+  1. Look for the port in the project config (`package.json` dev script, `vite.config`, `next.config`, `.env` `PORT`).
+  2. Probe common local ports (3000, 5173, 4200, 8080) with curl until one responds.
+  3. If none responds, ASK the user for the URL. Never assume a hardcoded port.
 
 ## Step 2 — Pre-check
 
 Verify the dev server is reachable before launching the browser:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 2>/dev/null || echo "UNREACHABLE"
+curl -s -o /dev/null -w "%{http_code}" $BASE_URL 2>/dev/null || echo "UNREACHABLE"
 ```
 
 If unreachable, inform the user:
-> Le serveur dev n'est pas accessible sur localhost:3000.
-> Lance-le avec `pnpm run dev` puis relance `/visual-check`.
+> The dev server is not reachable at $BASE_URL. Start it (e.g. `pnpm run dev`) then re-run `/visual-check`.
 
 Do NOT proceed if the server is down.
 
@@ -79,13 +83,13 @@ SCRIPT
 
 Read the screenshot file to verify:
 - Layout and spacing look correct
-- Colors match the design system (primary=#0F3F8C, accent=#F58220)
+- Colors match the project's design system (read it from the project's styles/tokens, don't assume)
 - Dark mode works if applicable
-- Mobile responsiveness (if `--mobile` flag added later)
+- Mobile responsiveness when relevant
 
 ## Step 4 — Exercise the submit/mutation path (CRITICAL when interactive)
 
-**A 200-rendered page can hide a 500 on submit.** When the change touches a form, modal, or any CTA that fires a network mutation (POST/PATCH/DELETE), the visual check is INCOMPLETE until you exercise the submit and verify the response is a real success — not a generic "Erreur serveur" toast.
+**A 200-rendered page can hide a 500 on submit.** When the change touches a form, modal, or any CTA that fires a network mutation (POST/PATCH/DELETE), the visual check is INCOMPLETE until you exercise the submit and verify the response is a real success — not a generic "Server error" toast.
 
 ### When to apply this step
 
@@ -93,23 +97,24 @@ Read the screenshot file to verify:
 |---|---|
 | New page that only reads data (dashboard, list, detail view) | Optional |
 | Form, modal, or any CTA with a mutation | **Mandatory** |
-| Cascading dropdown / dependent fields | **Mandatory** — the cascade may render correctly while the submit fails for an unrelated downstream bug |
+| Cascading dropdown / dependent fields | **Mandatory** — the cascade may render correctly while the submit fails downstream |
 | Auth flow, payment flow, file upload | **Mandatory** |
 
 ### How to exercise the submit headlessly
 
-If the user is authenticated in dev-browser, you can POST directly via `page.evaluate` using the FE's session :
+If the user is authenticated in dev-browser, you can POST directly via `page.evaluate` using the frontend's session (adapt the auth pattern to the project):
 
 ```bash
 npx dev-browser <<'SCRIPT'
 const page = await browser.getPage("check");
 const result = await page.evaluate(async () => {
-  // Get the current FE session token (NextAuth pattern, adapt for other auth)
-  const sess = await fetch("/api/auth/session", { credentials: "include" }).then(r => r.json());
-  const headers = { Authorization: `Bearer ${sess.accessToken}`, "Content-Type": "application/json" };
-
   const payload = { /* the exact payload the form would POST */ };
-  const resp = await fetch("/api-be/<endpoint>", { method: "POST", headers, body: JSON.stringify(payload) });
+  const resp = await fetch("<endpoint>", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
   const text = await resp.text();
   let body;
   try { body = JSON.parse(text); } catch { body = "[non-JSON]: " + text.substring(0, 300); }
@@ -120,22 +125,19 @@ console.log("BODY:", JSON.stringify(result.body, null, 2));
 SCRIPT
 ```
 
-**Acceptance** :
+**Acceptance**:
 - 2xx with the expected JSON body → PASS
 - 4xx with an actionable error message in the right language → PASS (controlled validation, surface in report)
-- **5xx, especially `500 "Internal Server Error"` plain text** → BLOCK. The exception bypassed all handlers (typical: TypeError in audit/serialization, unhandled DBAPI error, JSON column rejecting a Python `date`/`Decimal`). Investigate before declaring the visual check passed.
+- **5xx, especially a plain-text `500 Internal Server Error`** → BLOCK. The exception bypassed all handlers (typical: serialization TypeError, unhandled DB error). Investigate before declaring the visual check passed.
 
 ### When the submit fails
 
-If the response is a plain-text 500 (no JSON `detail` field), the FE shows a generic fallback ("Erreur serveur" / "Server error"). The actual exception is **invisible to the user and to the visual check**. To diagnose :
+A plain-text 500 (no structured error body) means the frontend shows a generic fallback toast — the real exception is **invisible to the user and to the visual check**. To diagnose:
 
-1. Check Sentry (BE + FE) for the stack trace.
-2. SSH the server and `journalctl -u <service> --since "5 minutes ago"`.
-3. Compare the failing path against analogous services in the codebase — a single service that diverges from the convention (e.g. `model_dump()` vs `model_dump(mode="json")`) is a common culprit.
+1. Check the server logs / error tracker for the stack trace.
+2. Compare the failing path against analogous code in the codebase — a single module that diverges from the convention used by its siblings is a top suspect.
 
 ## Step 5 — Report
-
-Present findings in this format:
 
 ### Visual Check Report — `$URL`
 
@@ -150,8 +152,7 @@ Present findings in this format:
 
 #### Submit / mutation path
 - [ ] **Form/CTA submit returned 2xx** (or expected 4xx with actionable message)
-- [ ] No `500 Internal Server Error` plain text
-- [ ] Cascading dropdowns produce a valid downstream payload
+- [ ] No plain-text `500 Internal Server Error`
 
 #### Visual issues
 - [severity] description — location on page
@@ -160,8 +161,6 @@ Present findings in this format:
 - Any missing aria labels, roles, or keyboard navigation issues found in the snapshot
 
 ## Step 6 — Cleanup (optional)
-
-If done with verification:
 
 ```bash
 npx dev-browser <<'SCRIPT'
@@ -174,21 +173,10 @@ SCRIPT
 ### Check multiple routes
 
 ```
-/visual-check /admin/dashboard /admin/enrollments /admin/fees
+/visual-check /admin/dashboard /admin/users
 ```
 
 Loop through each route, capture snapshot + screenshot, aggregate report.
-
-### Connect to existing Chrome
-
-If the user has Chrome open with the app:
-
-```bash
-npx dev-browser --connect <<'SCRIPT'
-const tabs = await browser.listPages();
-console.log(JSON.stringify(tabs, null, 2));
-SCRIPT
-```
 
 ### Mobile viewport
 
@@ -205,30 +193,19 @@ SCRIPT
 
 ## Rules
 
-- Always check server is reachable BEFORE launching browser
-- Prefer `snapshotForAI()` for structure (3-5x fewer tokens than screenshots)
-- Use screenshots only when visual layout/styling matters
+- Always check the server is reachable BEFORE launching the browser
+- Prefer `snapshotForAI()` for structure — it costs **3-5x fewer tokens than screenshots** while capturing headings, roles, text, and form state. Use screenshots only when visual layout/styling matters.
 - Keep page names descriptive: "check", "check-mobile", "check-dark"
 - Close pages when done to avoid resource leaks
 - Do NOT modify any code — this skill is read-only verification
-- **When the change touches a form/modal/CTA, exercise the submit (Step 4). UI rendering correctly ≠ feature working.** A `500 Internal Server Error` plain-text response is invisible from a screenshot and gets reduced to a generic "Erreur serveur" toast — undetectable without an explicit submit test.
+- **When the change touches a form/modal/CTA, exercise the submit (Step 4). UI rendering correctly ≠ feature working.** A plain-text 500 is invisible from a screenshot and gets reduced to a generic error toast — undetectable without an explicit submit test.
 
-## Lessons learned
+## En clair (FR)
 
-### 2026-04-27 — KLASSCI cascade Subject Select (BE #76 / FE #112)
+Après un changement d'interface, ce skill ouvre la page dans un navigateur automatisé, vérifie que tout s'affiche, et surtout teste le bouton d'envoi des formulaires : une page qui s'affiche bien (code 200) peut cacher une erreur serveur (500) au moment de valider. Le snapshot accessibilité coûte 3 à 5 fois moins de tokens qu'une capture d'écran.
 
-A new cascade filter was shipped to prod and visually validated end-to-end : Subject Select disabled + helper text, dropdown filtered by class, mobile + desktop both correct. The visual check reported PASS.
+## Next step
 
-**Then the user clicked "Créer l'évaluation" and got "Erreur serveur".**
-
-What we learned :
-
-1. **Visual check alone wasn't enough.** It validated the UI but didn't exercise the submit. The cascade cosmetic (greyed Select, helper text, filtered dropdown, KPI tiles, all 5 of 5 cibles) was 100% correct. The bug was downstream of any visual signal — a 500 in the submit handler that the FE swallowed into a generic toast.
-
-2. **The cascade was working from the start.** The 500 was a **latent pre-existing bug** in `grades_service.create_evaluation` since the initial merge of the grades feature : `data.model_dump()` returned Python `date` objects which the JSON audit column couldn't serialize, raising `TypeError` that `audit_log` re-raised. Likely no one tested eval creation on prod with real data before the cascade testing forced the discovery. **Visual check that stops at "the form renders" misses bugs that have been latent for weeks.**
-
-3. **The fix was a one-line convention drift.** Five other services (`admin_service`, `fee_service`, `attendance_service`, `enrollment_service`, etc.) already used `model_dump(mode="json")` for the audit payload. Only `grades_service` diverged. **When investigating a single-service 500, grep for the analogous pattern in sibling services — drift from convention is a top suspect.**
-
-The takeaway is now baked into Step 4 above : if the page has a form, modal, or CTA that fires a mutation, the visual check is **incomplete** until you POST the payload and verify a 2xx response. A plain-text `500 Internal Server Error` (no JSON `detail`) is a red flag that the exception bypassed FastAPI/Starlette handlers — usually a serialization issue.
+PASS → `/commit`. FAIL or PARTIAL → fix the issue, re-run `/visual-check`.
 
 $ARGUMENTS

@@ -1,6 +1,8 @@
 ---
 name: create-pr
-description: Create and push PR with auto-generated title and description
+description: >
+  Create and push a pull request with an auto-generated title and description.
+  Crée et pousse une pull request avec titre et description générés automatiquement.
 model: haiku
 allowed-tools: Bash(git :*), Bash(gh :*)
 ---
@@ -57,5 +59,9 @@ This skill requires the GitHub CLI (`gh`). Check availability before proceeding:
 - Auto-detect base branch (main/master/develop)
 - Use HEREDOC for multi-line body
 - If PR exists, return existing URL
+
+## Next step
+
+Before merging a large change → `/deep-review` on the branch. After merge → back to the next task with `/plan-and-confirm` or `/oneshot`.
 
 User: $ARGUMENTS

@@ -1,6 +1,9 @@
 ---
 name: create-issue
-description: Create a GitHub issue with labels, template, and epic linking. Use when starting new work that needs tracking.
+description: >
+  Create a GitHub issue with labels, template, and epic linking. Use when starting new work that
+  needs tracking. Crée une issue GitHub avec labels, gabarit et lien vers l'epic, pour tracer un
+  nouveau travail avant de le commencer.
 model: haiku
 allowed-tools: Bash(gh :*), Bash(git :*)
 ---
@@ -76,7 +79,7 @@ This skill requires the GitHub CLI (`gh`). Check availability before proceeding:
 5. **Output** the issue number and suggest next step:
    ```
    Issue #<N> created: <title>
-   → To start working: /worktree-start <N>
+   → To start working: git checkout -b <type>/<N>-<slug>  (e.g. feat/12-login), then /plan-and-confirm
    → Or commit directly on current branch with: Refs #<N>
    ```
 
@@ -88,5 +91,9 @@ This skill requires the GitHub CLI (`gh`). Check availability before proceeding:
 - EPIC LINKING: Always check open issues for a related epic before creating standalone
 - NO INTERACTION: Analyze context and create — don't ask the user to fill in details
 - TASK LIST: Include 2-5 checkboxes in the Scope section to make progress trackable
+
+## Next step
+
+→ create the branch `type/N-slug` (e.g. `feat/12-login`), then `/plan-and-confirm` to plan the work.
 
 $ARGUMENTS

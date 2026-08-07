@@ -1,12 +1,16 @@
 ---
 name: commit
-description: Quality-gated commit and push. Audits code on 4 axes before committing, then generates detailed or quick commit messages. Use "commit détaillé" for multi-line body.
-allowed-tools: Bash(git :*), Bash(npm :*), Bash(pnpm :*), Bash(gh :*), Grep, Glob, Read, Agent
+description: >
+  Quality-gated commit: stages ONLY the files changed in this conversation, audits the diff per
+  the quality-gate rule, writes a conventional message, pushes only when a remote exists.
+  Commit avec garde-fou qualité : ne stage que les fichiers modifiés dans la conversation, audite
+  le diff selon la rule quality-gate, message conventionnel, push seulement si un remote existe.
+allowed-tools: Bash(git :*), Bash(npm :*), Bash(pnpm :*), Bash(gh :*), Grep, Glob, Read
 ---
 
 # Commit — Quality-Gated
 
-Audit code quality, then commit with conventional message format and push.
+Audit code quality, then commit with a conventional message.
 
 ## Context
 
@@ -15,105 +19,92 @@ Audit code quality, then commit with conventional message format and push.
 - Unstaged changes: !`git diff --stat`
 - Recent commits: !`git log --oneline -5`
 - Current branch: !`git branch --show-current`
-- Full diff: !`git diff`
 
 ## Workflow
 
-### 1. Analyze git state
+### 1. Stage PRECISELY — never `git add .`
 
-- Nothing staged but unstaged changes exist: `git add .`
-- Nothing to commit: inform user and exit
+List the files you modified or created **in this conversation**. Stage them explicitly, by name:
 
-### 2. Quality Gate — 4 Axes Audit
+```bash
+git add path/to/file1.ts path/to/file2.ts
+```
 
-**Skip audit if** the diff is ONLY: `.md` files, `.json` config, `.env.example`, OR less than 5 lines changed in 1 file, OR only deletions.
+- **NEVER** `git add .`, `git add -A`, or `git add --all`. Other files in the working tree (another agent's work, local config, untracked experiments) are not yours to commit.
+- If files are already staged that you did NOT touch in this conversation, warn the user and ask before including them.
+- Nothing to commit → inform the user and exit.
 
-**Otherwise, audit the diff on 4 axes:**
+### 2. Quality gate — audit per the quality-gate rule
 
-| Axe | Check | BLOCK if |
-|-----|-------|----------|
-| **Architecture** | God class? Mixed responsibilities? Existing pattern ignored? | New file >300 lines with 3+ unrelated concerns |
-| **Qualité vs Vitesse** | N+1 queries? Debug code (`dd()`, `console.log`, `var_dump`)? Missing validation? | Debug code in diff, or obvious N+1 in a loop |
-| **Production-grade** | Stack traces exposed? Unprotected routes? Missing transactions? Secrets hardcoded? | Stack traces in JSON responses, routes without auth, secrets in code |
-| **SOLID** | Parent contracts violated? `hasRole()` hardcoded instead of permissions? | Liskov violation in overridden methods |
+**Skip the audit if** the diff is ONLY: `.md` files, `.json` config, `.env.example`, OR less than 5 lines changed in 1 file, OR only deletions.
+
+Otherwise, audit the staged diff (`git diff --cached`) on the 4 axes **defined in the quality-gate rule** (Architecture / Quality vs Speed / Production-grade / SOLID). The axis definitions, checks, and BLOCK criteria live in that rule — do not restate them here.
 
 **Output format:**
 ```
-## Quality Gate
+## Quality Gate (per the quality-gate rule)
 
-| Axe | Verdict |
-|-----|---------|
+| Axis | Verdict |
+|------|---------|
 | Architecture | PASS/WARN/BLOCK — detail |
-| Qualité vs Vitesse | PASS/WARN/BLOCK — detail |
+| Quality vs Speed | PASS/WARN/BLOCK — detail |
 | Production-grade | PASS/WARN/BLOCK — detail |
 | SOLID | PASS/WARN/BLOCK — detail |
 ```
 
-- **All PASS** → proceed to commit
-- **Any WARN** → show warnings, ask user to confirm before committing
+- **All PASS** → proceed to commit.
+- **Any WARN** → show warnings, ask the user to confirm before committing.
 - **Any BLOCK** → DO NOT COMMIT. Show issues and propose fixes. Stop here.
 
-### 3. Detect issue context (Issue Linking)
+### 3. Detect issue context
 
-- Check if the user mentioned an issue number in the conversation (e.g. "issue #158", "Refs #42")
-- Check if the branch name contains an issue number (e.g. `feat/158-lmd-system`, `fix-42`)
-- Check recent conversation for epic/lot references (e.g. "Lot 3/7", "Part of #158")
-- If an issue is detected, include `Refs #N` in the commit footer
-- If the user says "closes", "ferme", "résout" the issue, use `Closes #N` instead
+- Issue number mentioned in the conversation (e.g. "issue #158") → `Refs #N` in the footer.
+- Branch name contains an issue number (convention `type/N-slug`, e.g. `feat/158-lmd-system`) → `Refs #N`.
+- User says the work closes the issue → `Closes #N` instead.
+- **Opt-in only**: never guess or fabricate issue numbers.
 
-### 4. Generate commit message
+### 4. Generate the commit message
 
-- Title format: `type(scope): brief description`
-- Types: `feat`, `fix`, `update`, `docs`, `chore`, `refactor`, `test`, `perf`, `revert`
-- Title: under 72 chars, imperative mood, lowercase after colon
-- **Detailed mode** (when user says "détaillé", "detailed", "descriptif", or diff touches 3+ files):
-  - Add blank line after title
-  - Add body with bullet points describing each meaningful change
-  - Group by area/file when relevant
-  - Include WHY not just WHAT when non-obvious
-  - If lot/phase tracking is relevant, add `Lot X/Y: description` line before issue ref
-  - Use HEREDOC format for multi-line:
-    ```bash
-    git commit -m "$(cat <<'EOF'
-    type(scope): title
+- Title: `type(scope): brief description` — under 72 chars, imperative mood, lowercase after colon.
+- Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `perf`, `style`, `ci`.
+- **Detailed mode** (user asks for it, or diff touches 3+ files): blank line after title, then bullet points per meaningful change, WHY when non-obvious. Use HEREDOC:
+  ```bash
+  git commit -m "$(cat <<'EOF'
+  type(scope): title
 
-    - Change 1 description
-    - Change 2 description
-    - Change 3 description
+  - Change 1
+  - Change 2
 
-    Lot 3/7: Service layer
-    Refs #158
-    EOF
-    )"
-    ```
-- **Quick mode** (default for small/obvious changes): single line `git commit -m "message"`
-  - If issue context detected, append on same line: `type(scope): description (Refs #N)`
+  Refs #158
+  EOF
+  )"
+  ```
+- **Quick mode** (small/obvious changes): single line `git commit -m "type(scope): description"`.
 
-### 5. Commit and push
+### 5. Commit, then push conditionally
 
-- Execute the commit
-- `git push`
-
-## Issue Linking Rules
-
-| Situation | Footer | Example |
-|-----------|--------|---------|
-| Work related to an open issue | `Refs #N` | `Refs #158` |
-| Completing/closing an issue | `Closes #N` | `Closes #42` |
-| Multiple related issues | `Refs #N, #M` | `Refs #158, #160` |
-| Lot/phase of an epic | `Lot X/Y: desc` + `Refs #N` | `Lot 3/7: Controllers` + `Refs #158` |
-| No issue context detected | No footer | (skip entirely) |
-
-**Issue linking is opt-in**: only add when context is clear from the conversation, branch name, or user request. Never guess or fabricate issue numbers.
+- Execute the commit.
+- Push ONLY if BOTH are true:
+  1. A remote exists: `git remote` returns at least one remote AND the branch has (or can set) an upstream.
+  2. The user has NOT said not to push in this conversation.
+- Push command: `git push` (or `git push -u origin HEAD` if no upstream yet).
+- No remote, or user said don't push → stop after the commit and say so.
 
 ## Rules
 
-- **QUALITY OVER SPEED**: The 4-axes audit runs BEFORE committing. Never skip it for speed.
-- **NO INTERACTION on trivial commits**: For exempt diffs (md, config, <5 lines), generate and commit directly.
-- **AUTO-STAGE**: If nothing staged, stage everything.
-- **AUTO-PUSH**: Always push after committing.
-- **IMPERATIVE MOOD**: "add", "update", "fix" not past tense.
-- **DETAILED BY DEFAULT** when diff touches 3+ files or user asks for it.
-- **NO "Generated with" or "Co-Authored-By"** footers unless user explicitly asks.
-- **ISSUE LINKING**: Add `Refs #N` when an issue is clearly in context, skip otherwise.
-- **BLOCK = NO COMMIT**: If any axis is BLOCK, fix first. No exceptions.
+- **PRECISE STAGING**: only files changed in this conversation, listed by name. `git add .` / `-A` is forbidden.
+- **BLOCK = NO COMMIT**: if any axis is BLOCK, fix first. No exceptions.
+- **NO "Generated with" or "Co-Authored-By"** footers unless the user explicitly asks.
+- **IMPERATIVE MOOD**: "add", "fix", not past tense.
+- **NO INTERACTION on trivial commits**: for exempt diffs (md, config, <5 lines), generate and commit directly.
+- **CONDITIONAL PUSH**: never force-push, never push without a remote, never push against the user's wishes.
+
+## En clair (FR)
+
+Ce skill commit uniquement les fichiers touchés pendant la conversation (jamais `git add .`, qui embarquerait des fichiers qui ne sont pas les vôtres), vérifie la qualité du diff selon la rule quality-gate avant de committer, et ne pousse vers GitHub que si un remote existe et que vous ne vous y êtes pas opposé.
+
+## Next step
+
+Large or structural change → `/deep-review` before merging. Ready to merge → `/create-pr`.
+
+$ARGUMENTS

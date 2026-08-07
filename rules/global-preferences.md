@@ -7,7 +7,7 @@ adapt them to your own workflow before installing, or deselect this rule during 
 
 - **No Co-Authored-By** in commit messages. Ever.
 - **pnpm exclusively.** Never use npm. Not even once.
-- **Commit only files changed in this conversation.** Never `git add -A` or `git add .` blindly.
+- **Stage precisely the files you changed in this conversation.** `git add -A` / `git add .` only when the user explicitly confirmed it.
 - **Solo/personal projects:** deploy direct on the default branch. No PRs. Commit + push + deploy.
 - **Team projects:** use PRs with parallel agent reviews.
 

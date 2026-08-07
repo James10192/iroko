@@ -2,7 +2,9 @@
 [![license](https://img.shields.io/npm/l/@james10192/iroko?style=flat)](LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D20-brightgreen?style=flat)](https://nodejs.org/)
 
-# iroko
+<p align="center">
+  <img src="assets/wordmark.png" alt="iroko" width="420" />
+</p>
 
 **Deep roots for building with AI.**
 

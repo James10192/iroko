@@ -41,3 +41,6 @@ node_modules/
 node_modules
 dist
 pnpm-lock.yaml
+
+# Personal Claude Code settings — never commit (template lives in templates/settings.json.tpl)
+/settings.json

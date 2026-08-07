@@ -6,8 +6,12 @@ HOOK_EVENT=$(echo "$INPUT" | jq -r '.hook_event_name // ""')
 CWD=$(echo "$INPUT" | jq -r '.cwd // "unknown"')
 PROJECT=$(basename "$CWD")
 
-OPENCLAW_URL="http://127.0.0.1:18789/hooks/agent"
-OPENCLAW_TOKEN="342f171b9e6b74f2eb63c8a1b41d9fdd381df7ff020d3ae8"
+# Configure via environment: export OPENCLAW_URL / OPENCLAW_TOKEN
+OPENCLAW_URL="${OPENCLAW_URL:-http://127.0.0.1:18789/hooks/agent}"
+OPENCLAW_TOKEN="${OPENCLAW_TOKEN:-}"
+
+# No token configured → nothing to notify, exit silently.
+[ -z "$OPENCLAW_TOKEN" ] && exit 0
 
 notify() {
   local MSG="$1"
@@ -40,7 +44,7 @@ if [ "$HOOK_EVENT" = "PostToolUse" ]; then
     # PR créée
     elif echo "$COMMAND" | grep -q "gh pr create"; then
       PR_URL=$(echo "$TOOL_OUTPUT" | grep -oP 'https://github\.com/[^\s]+' | head -1)
-      notify "🚀 [\`$PROJECT\`] PR créée${PR_URL:+ : $PR_URL}. En attente de ta validation Marcel ✅"
+      notify "🚀 [\`$PROJECT\`] PR créée${PR_URL:+ : $PR_URL}. En attente de validation ✅"
 
     # Worktree supprimé (cleanup)
     elif echo "$COMMAND" | grep -q "git worktree remove"; then

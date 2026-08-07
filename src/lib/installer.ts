@@ -25,12 +25,13 @@ function getConfigsRoot(): string {
     }
   }
   // If no configs/ dir, use the repo root structure (rules/, skills/, etc.)
-  _configsRoot = resolve(__dirname, "..", "..");
-  return _configsRoot;
+  const fallbackRoot = resolve(__dirname, "..", "..");
+  _configsRoot = fallbackRoot;
+  return fallbackRoot;
 }
 
-export function installComponent(component: Component): boolean {
-  const root = getConfigsRoot();
+export function installComponent(component: Component, sourceRoot?: string): boolean {
+  const root = sourceRoot ?? getConfigsRoot();
   const sourcePath = join(root, component.path);
 
   if (!existsSync(sourcePath)) {
@@ -64,13 +65,21 @@ function copyToTarget(sourcePath: string, component: Component): boolean {
 }
 
 export function installSettingsTemplate(): void {
+  // getConfigsRoot() returns the package root in the npm install (dist/..)
+  // but `src/` in dev (tsx src/cli.ts) — check both locations.
   const root = getConfigsRoot();
-  const tplPath = join(root, "..", "templates", "settings.json.tpl");
-
-  if (!existsSync(tplPath)) return;
+  const candidates = [
+    join(root, "templates", "settings.json.tpl"),                       // npm: <pkg>/templates
+    resolve(__dirname, "..", "..", "templates", "settings.json.tpl"),   // dev: src/lib/../../templates
+  ];
+  const tplPath = candidates.find((p) => existsSync(p));
+  if (!tplPath) return;
 
   const template = readFileSync(tplPath, "utf-8");
-  const resolved = template.replace(/\{\{HOME\}\}/g, process.env.HOME || process.env.USERPROFILE || "~");
+  const home = process.env.HOME || process.env.USERPROFILE || "~";
+  // JSON-escape the path (Windows backslashes would otherwise corrupt the JSON).
+  const homeJson = JSON.stringify(home).slice(1, -1);
+  const resolved = template.replace(/\{\{HOME\}\}/g, homeJson);
 
   const settingsPath = join(CLAUDE_DIR, "settings.json");
 

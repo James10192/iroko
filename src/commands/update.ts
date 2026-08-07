@@ -1,6 +1,6 @@
 import * as p from "@clack/prompts";
 import { execSync } from "node:child_process";
-import { existsSync, mkdtempSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { showBannerCompact } from "../lib/banner.js";
@@ -33,39 +33,63 @@ export async function updateCommand() {
     `Current install: ${ivory(`v${config.version}`)} with ${ivory(String(config.components.length))} components`,
   );
 
-  const s = p.spinner();
-  s.start("Fetching latest from GitHub");
-
-  let tmpDir: string;
+  // git is required to fetch the latest components.
   try {
-    tmpDir = mkdtempSync(join(tmpdir(), "iroko-update-"));
-    execSync(`git clone --depth 1 ${REPO_URL} "${tmpDir}"`, {
-      stdio: "pipe",
-    });
+    execSync("git --version", { stdio: "pipe" });
   } catch {
-    s.stop(graphite("Failed to fetch updates"));
-    p.log.error("Could not clone repository. Check your network connection.");
+    p.log.error(
+      "Git is required to update components but was not found in PATH.\n  Install git (https://git-scm.com) and try again.",
+    );
+    p.outro(graphite("Update aborted."));
     return;
   }
 
-  s.stop(ochre("Latest version fetched"));
+  const s = p.spinner();
+  s.start("Fetching latest from GitHub");
 
-  s.start("Updating components");
+  let tmpDir: string | null = null;
+  try {
+    let cloneDir: string;
+    try {
+      cloneDir = mkdtempSync(join(tmpdir(), "iroko-update-"));
+      tmpDir = cloneDir;
+      execSync(`git clone --depth 1 ${REPO_URL} "${cloneDir}"`, {
+        stdio: "pipe",
+      });
+    } catch {
+      s.stop(graphite("Failed to fetch updates"));
+      p.log.error("Could not clone repository. Check your network connection.");
+      return;
+    }
 
-  let updated = 0;
-  for (const name of config.components) {
-    const component = components.find((c) => c.name === name);
-    if (!component) continue;
+    s.stop(ochre("Latest version fetched"));
 
-    const sourcePath = join(tmpDir, component.path);
-    if (!existsSync(sourcePath)) continue;
+    s.start("Updating components");
 
-    installComponent(component);
-    updated++;
+    let updated = 0;
+    for (const name of config.components) {
+      const component = components.find((c) => c.name === name);
+      if (!component) continue;
+
+      const sourcePath = join(cloneDir, component.path);
+      if (!existsSync(sourcePath)) continue;
+
+      // Install from the freshly cloned repo, not from the local package.
+      installComponent(component, cloneDir);
+      updated++;
+    }
+
+    saveIrokoConfig(config.components);
+    s.stop(ochre(`${updated} components updated`));
+  } finally {
+    if (tmpDir) {
+      try {
+        rmSync(tmpDir, { recursive: true, force: true });
+      } catch {
+        // Best-effort cleanup — a locked temp dir must not fail the update.
+      }
+    }
   }
-
-  saveIrokoConfig(config.components);
-  s.stop(ochre(`${updated} components updated`));
 
   // CLI self-upgrade hint when a newer iroko package is published.
   const latest = getLatestVersion();

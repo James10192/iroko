@@ -8,8 +8,11 @@ import pc from "picocolors";
 // terminal advertises it (COLORTERM=truecolor|24bit), fallback to ANSI 16
 // elsewhere. No hard-coded hex on cmd.exe legacy.
 
+// Windows Terminal supports 24-bit color but does not set COLORTERM.
 const supports24bit =
-  process.env.COLORTERM === "truecolor" || process.env.COLORTERM === "24bit";
+  process.env.COLORTERM === "truecolor" ||
+  process.env.COLORTERM === "24bit" ||
+  Boolean(process.env.WT_SESSION);
 
 function rgb(
   r: number,

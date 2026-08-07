@@ -8,7 +8,10 @@
   },
   "files": [
     "dist",
-    "configs",
+    "rules",
+    "skills",
+    "agents",
+    "hooks",
     "templates",
     "song",
     "LICENSE",

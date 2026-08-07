@@ -9,7 +9,7 @@ import {
 } from "./theme.js";
 import { divider } from "./ui.js";
 
-const VERSION = "2.2.0";
+const VERSION = "2.2.1";
 
 // Iroko silhouette — full canopy + straight trunk + buttress roots.
 // 9 lines, max 32 chars wide. Walnut tone throughout, slight density variation

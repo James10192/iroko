@@ -3,10 +3,31 @@
 All notable changes to **iroko** are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
-following the rules in [`rules/iroko-versioning.md`](./rules/iroko-versioning.md).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
+fixes and content updates are PATCH, new components or CLI flags are MINOR,
+removals/renames and CLI interface changes are MAJOR.
 
 ## [Unreleased]
+
+## [2.2.1] — 2026-08-07
+
+### Fixed
+
+- **npm tarball was missing all distributed content** — the `files` field in `package.json` listed a non-existent `configs/` directory instead of the real `rules/`, `skills/`, `agents/`, `hooks/` folders. Published versions shipped a CLI with nothing to install. The tarball now contains every distributed folder, and a new `pack-smoke` CI job packs, extracts, and verifies the tarball content on every push/PR.
+- **Remove hardcoded gateway token from hooks** — `monitor-session.sh` and `notify-workflow.sh` now read `OPENCLAW_TOKEN` (and `OPENCLAW_URL`) from the environment and exit silently when no token is configured. Personal wording in hook messages replaced with generic text.
+- **CI secret scan hardened** — the release-guard scan no longer filters by file extension (shell scripts are now scanned), detects hardcoded gateway token assignments, and matches any absolute `C:\Users\<name>` path instead of a single hardcoded username.
+- **`iroko init` settings template resolution** — the template path no longer climbs above the package root in the npm install; both npm (`<pkg>/templates`) and dev (`repo/templates`) layouts are resolved.
+- **`{{HOME}}` substitution corrupted settings.json on Windows** — the home path is now JSON-escaped (`JSON.stringify(home).slice(1, -1)`) so backslashes survive.
+- **`iroko update` installed from the local package instead of the fresh clone** — components are now copied from the cloned repository, a `git --version` pre-check fails fast with a clear message when git is missing, and the temporary clone directory is always cleaned up in a `finally` block.
+- **Truecolor detection on Windows Terminal** — `WT_SESSION` now enables 24-bit color even when `COLORTERM` is unset.
+
+### Changed
+
+- **Distributed content depersonalized**:
+  - `skills/linkedin-post/references/profile-marcel.md` (personal emails, private repos, client data) replaced by a placeholder-based `profile.template.md`; the skill and agent now read a user-created `references/profile.md` with memory fallbacks.
+  - `rules/marcel-global-preferences.md` renamed to `rules/global-preferences.md` — same principles (pnpm, no Co-Authored-By, monochrome design, no AI slop) without private project names or personal context. Manifest and README updated.
+  - `agents/linkedin-post.md` no longer embeds a personal identity, project table, or company strategy; it reads the author profile instead.
+- **Personal `settings.json` removed from the repository** (contained `bypassPermissions` and machine-specific hooks) and added to `.gitignore`. The clean template remains in `templates/settings.json.tpl`.
 
 ## [2.2.0] — 2026-04-27
 
@@ -90,7 +111,8 @@ following the rules in [`rules/iroko-versioning.md`](./rules/iroko-versioning.md
 
 Initial public releases. See git history for details.
 
-[Unreleased]: https://github.com/James10192/iroko/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/James10192/iroko/compare/v2.2.1...HEAD
+[2.2.1]: https://github.com/James10192/iroko/releases/tag/v2.2.1
 [2.2.0]: https://github.com/James10192/iroko/releases/tag/v2.2.0
 [2.1.0]: https://github.com/James10192/iroko/releases/tag/v2.1.0
 [2.0.1]: https://github.com/James10192/iroko/releases/tag/v2.0.1

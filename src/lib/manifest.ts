@@ -36,12 +36,12 @@ export const components: Component[] = [
 
   },
   {
-    name: "marcel-global-preferences",
-    description: "Personal: pnpm, French UI, no AI slop, no Co-Authored-By",
+    name: "global-preferences",
+    description: "Opinionated defaults: pnpm, no Co-Authored-By, monochrome design, no AI slop",
     type: "rule",
     origin: "custom",
-    path: "rules/marcel-global-preferences.md",
-    hint: "personal — adapt to your own preferences",
+    path: "rules/global-preferences.md",
+    hint: "opinionated — adapt to your own preferences",
 
   },
 

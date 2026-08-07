@@ -36,7 +36,7 @@ Rules are always active. You don't invoke them, they just work.
 | `parallel-agents` | Enforces max 4 parallel agents, launched in a single message. Synthesize results, don't relay. |
 | `token-efficiency` | When to use agents (multi-file exploration) vs direct tools (Grep, Glob, Read). Saves context. |
 | `use-available-tools` | Always check docs via ctx7 CLI before coding with external APIs. Never guess. |
-| `marcel-global-preferences` | Personal config: pnpm, French UI, no AI slop. Deselect during init unless you share these preferences. |
+| `global-preferences` | Opinionated defaults: pnpm, no Co-Authored-By, monochrome design, no AI slop. Deselect during init unless you share these preferences. |
 
 ## Skills
 

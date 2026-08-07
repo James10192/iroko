@@ -48,8 +48,8 @@ Pour le sujet choisi, collecter :
 - Le "pourquoi c'etait difficile" — c'est ce qui rend le post interessant
 - La lecon apprise ou l'insight non-obvious
 
-Lire [references/profile-marcel.md](references/profile-marcel.md) pour le profil complet et les projets.
-Si ces references n'existent pas, utiliser `~/.claude/projects/*/memory/user_profile.md` et `project_*.md`.
+Lire `references/profile.md` (cree par l'utilisateur a partir de [references/profile.template.md](references/profile.template.md)) pour le profil complet et les projets.
+Si ce fichier n'existe pas, utiliser `~/.claude/projects/*/memory/user_profile.md` et `project_*.md`.
 
 ### Etape 3 : Enrichir avec tendances et data
 
@@ -156,16 +156,13 @@ Si le fichier memoire n'existe pas encore, le creer avec le format frontmatter s
 
 ## Projets et technos de reference
 
-| Projet | Stack | Mot-cle |
-|--------|-------|---------|
-| KLASSCI v2 | Laravel 12, Blade, Alpine.js, DomPDF, Claude Haiku | SaaS EdTech multi-tenant |
-| KLASSCI College | FastAPI, Next.js 15, shadcn/ui, TanStack Query | Rewrite moderne |
-| E-pagne | Next.js 16, Convex, Tailwind v4, Recharts | PWA Fintech africaine |
-| Kalga | FastAPI, Node.js Baileys, DeepSeek | Commerce WhatsApp IA |
+Les projets, stacks et chiffres cles de l'auteur vivent dans `references/profile.md`
+(a creer depuis `references/profile.template.md`). Ne jamais inventer de projets :
+si le fichier n'existe pas, s'appuyer sur le git log et les memoires du projet courant.
 
 ## References
 
-- **[references/profile-marcel.md](references/profile-marcel.md)** — Profil complet, projets, technos, style de contenu
+- **[references/profile.template.md](references/profile.template.md)** — Template de profil auteur (projets, technos, style de contenu) a copier en `references/profile.md`
 - **[references/post-templates.md](references/post-templates.md)** — 10 templates varies + regles de formatage LinkedIn
 - **[references/linkedin-best-practices.md](references/linkedin-best-practices.md)** — Algorithme 2026, longueur optimale (1300-1900 chars), engagement, personal branding dev
 - **[references/tech-trends-2026.md](references/tech-trends-2026.md)** — Tendances Laravel, AI agents, Fintech Afrique, EdTech, Next.js, hashtags par domaine

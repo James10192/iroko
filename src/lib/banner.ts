@@ -9,7 +9,7 @@ import {
 } from "./theme.js";
 import { divider } from "./ui.js";
 
-const VERSION = "2.2.1";
+const VERSION = "3.0.0";
 
 // Iroko silhouette — full canopy + straight trunk + buttress roots.
 // 9 lines, max 32 chars wide. Walnut tone throughout, slight density variation
@@ -42,7 +42,7 @@ export function showBanner(): void {
   );
   console.log(`   ${divider(FULL_WIDTH)}`);
   console.log(`   Claude Code Configuration`);
-  console.log(`   ${graphite(`25 components  ·  Built in Abidjan, ${COUNTRY}`)}`);
+  console.log(`   ${graphite(`24 components  ·  Grown in Abidjan, ${COUNTRY}`)}`);
   console.log();
 }
 

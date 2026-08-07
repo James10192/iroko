@@ -9,6 +9,48 @@ removals/renames and CLI interface changes are MAJOR.
 
 ## [Unreleased]
 
+## [3.0.0] — 2026-08-07
+
+iroko v3 is a repositioning, not a facelift: from "my personal Claude Code config" to **a guardrail environment for AI-assisted work**, organized around the builder cycle (frame → illustrate → document → build → verify) and three promises: frame it, save tokens, verify it. 24 components (7 rules, 12 skills, 4 agents, 1 hook), install packs (`--guide` / default / `--full`), and a French-first beginner path.
+
+### Migration v2 → v3
+
+| v2 component | v3 status |
+|---|---|
+| `pre-commit-quality-gate` (rule) | **Renamed** → `quality-gate` (single source for the 4-axes audit, plain-language glossary added) |
+| `use-available-tools` (rule) | **Renamed** → `docs-first` (single source for the docs pipeline) |
+| `find-doc` (skill) | **Renamed** → `/read-docs` (absorbs the ctx7/Context7 pipeline, adds a reading method) |
+| `parallel-agents` (rule) | **Removed** — merged into `token-efficiency` (the personal model-routing policy is not distributed) |
+| `worktree-start` (skill) | **Removed** — expert-only, and it wrote `bypassPermissions` into user settings |
+| `worktree-finish` (skill) | **Removed** — paired with worktree-start |
+| `merge` (skill) | **Removed** — AI-driven conflict resolution is an error source for the target audience |
+| `fix-pr-comments` (skill) | **Removed** — out of thesis |
+| `fix-grammar` (skill) | **Removed** — out of thesis |
+| `convex-cli` (skill) | **Removed** — niche |
+| `npm-publish` (skill) | **Removed** — out of target audience |
+| `linkedin-post` (skill + agent) | **Removed** — personal marketing tooling |
+| `monitor-session.sh`, `notify-workflow.sh` (hooks) | **Removed** — dead without the OpenClaw gateway |
+
+### Added
+
+- **Rules**: `git-safety` (destructive git/db commands forbidden without explicit written approval, backup first), `stay-in-scope` (never beyond the request, file-size thresholds), `ship-quality` (loading/empty/error/success states on every deliverable, no "coming soon").
+- **Skills**: `/sketch` (3-6 low-fidelity visual options on a local HTML board before any code), `/pick-stack` (stack advisor interviewing the real need), `/demarrer` (guided mode in French for complete beginners), `/deep-review` (ruthless structural review, generified from a personal skill), `/oneshot` (one trivial task: explore → code → test, stop after 2 failures).
+- **Agents**: `explore-codebase` and `websearch` — repairs the dead references in `/plan-and-confirm` and `token-efficiency`, which invoked agents iroko did not distribute.
+- **Hook**: `guard-destructive.sh` (PreToolUse) blocks `git reset --hard`, `git push --force`, `git checkout -- .`, `git clean -f`, `migrate:fresh`, `db:wipe`, `DROP DATABASE`, `--force-reset`, unscoped `rm -rf`. Pure bash, no jq dependency. Wired by default in `templates/settings.json.tpl`, whose deny list is extended to match.
+- **Install packs**: `iroko init --guide` (beginner pack, CLI prompts in French), default (guide + default packs), `iroko init --full` (everything). New `--yes` flag for non-interactive installs.
+- **Manifest metadata**: every component now carries a `step` (cadrer / illustrer / documenter / construire / verifier / ambient) and a `pack` (guide / default / full); `iroko list` displays both. Descriptions are bilingual EN/FR.
+
+### Changed (structural fixes)
+
+- **Single-source quality gate**: the 4-axes table lives ONLY in the `quality-gate` rule; `/commit` and `/plan-and-confirm` reference it instead of embedding divergent copies.
+- **Single-source docs pipeline**: the ctx7 → MCP → web search pipeline lives ONLY in `docs-first`; `/read-docs` and the agents reference it.
+- **`/plan-and-confirm` repaired**: the critic is invoked as an agent instead of being copied inline; branch convention unified to `type/N-slug`; cost displayed before high depths ("depth 5 ≈ 5 agents, confirm?").
+- **`/commit` repaired**: stages ONLY the files changed in the conversation — no more `git add .`, aligned with `global-preferences`.
+- **`/fix-errors` repaired**: sequential by default (token economy), parallel agents only past 20 errors; "snipper" typo fixed.
+- **`/visual-check` purged** of client-project leaks (internal colors, issues, lessons learned); URL configurable.
+- **`token-efficiency` repaired**: agent references point to distributed agents, absorbs the essentials of `parallel-agents`.
+- **`global-preferences` corrected**: no longer contradicts the skills (the `git add` clause is aligned).
+
 ## [2.2.1] — 2026-08-07
 
 ### Fixed

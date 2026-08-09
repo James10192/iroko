@@ -16,6 +16,7 @@ argument-hint: "[description] [--depth=1..5 | --quick | --ultra] [--grill] [--al
 
 - ctx7 CLI (`npx ctx7 --version`) — falls back to Context7 MCP, then WebSearch.
 - gh CLI for the optional issue phase.
+- If a tool is missing, apply the tooling check protocol of the `docs-first` rule: verify first, install it yourself (npx on the fly, winget/brew/apt for gh); only `gh auth login` is the user's step.
 
 ## Phase 0 — Depth selection
 

@@ -20,6 +20,8 @@ The distributed agents are exactly: `critic`, `explore-codebase`, `explore-docs`
 | Multi-source web research | Agent `websearch` |
 | Challenge a plan before coding | Agent `critic` |
 
+If ctx7 is not installed, run it on the fly with `npx --yes ctx7@latest` (full tooling check protocol in the `docs-first` rule).
+
 ## When to parallelize
 
 - **Research phase:** critic + explore-codebase + explore-docs + websearch (4 max).

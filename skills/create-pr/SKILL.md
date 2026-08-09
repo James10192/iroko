@@ -11,13 +11,13 @@ allowed-tools: Bash(git :*), Bash(gh :*)
 
 Create pull request with concise, meaningful description.
 
-## Prerequisites
+## Tooling check (before first use)
 
-This skill requires the GitHub CLI (`gh`). Check availability before proceeding:
-- Run: `gh auth status`
-- If not installed: https://cli.github.com
-- If not authenticated: `gh auth login`
-- If `gh` is missing, inform the user and stop. This skill cannot work without it.
+1. **Verify first**: `gh --version`. Never conclude gh is missing without this check.
+2. **Install directly if missing**: run the install yourself, per OS: Windows `winget install GitHub.cli`, macOS `brew install gh`, Debian/Ubuntu `sudo apt install gh`. Then check `gh auth status`; if not authenticated, STOP and ask the user to run `gh auth login` (authentication is the only human step).
+3. **Fallback**: if the install fails, push the branch yourself with `git push -u origin HEAD`, then give the user the manual PR creation URL: `https://github.com/<owner>/<repo>/compare/<base>...<branch>?expand=1` plus the drafted title and body to paste.
+
+FR : vérifier gh, l'installer soi-même selon l'OS, seule l'authentification (`gh auth login`) revient à l'utilisateur.
 
 ## Context
 

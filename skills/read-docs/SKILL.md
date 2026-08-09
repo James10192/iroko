@@ -12,6 +12,14 @@ argument-hint: "<library-name> <topic or question>"
 
 Never guess an API. Fetch the current documentation first, then read it with a method. Training data is stale; the docs are not.
 
+## Tooling check (before first use)
+
+1. **Verify first**: `npx --no-install ctx7 --version` for the CLI, `claude mcp list 2>/dev/null | grep -i context7` for the MCP. Never conclude a tool is missing without checking.
+2. **Install directly if missing**: ctx7 needs no permanent install, run it as `npx --yes ctx7@latest`. For the MCP, if the `claude` CLI exists, run `claude mcp add context7 -- npx -y @upstash/context7-mcp` yourself. If the `claude` CLI does not exist (other agent or environment), fall back to the ctx7 CLI, then WebSearch.
+3. **Fallback**: if everything fails, WebSearch the official documentation and read the most relevant page with WebFetch.
+
+FR : vérifier les outils avant de conclure qu'ils manquent, les installer soi-même si besoin, sinon se rabattre sur la recherche web de la doc officielle.
+
 ## When to use
 
 - **BEFORE writing any code** that uses an external library API

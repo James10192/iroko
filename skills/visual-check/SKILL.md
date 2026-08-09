@@ -6,19 +6,20 @@ description: >
   Vérification visuelle d'une page après implémentation : navigation, captures et snapshots
   accessibilité économes en tokens, test du submit, rapport des problèmes visuels.
 argument-hint: "[url-or-route] [--screenshot] [--snapshot] [--full]"
-allowed-tools: Bash(npx dev-browser *), Bash(dev-browser *), Read
+allowed-tools: Bash(npx dev-browser *), Bash(npx --no-install dev-browser *), Bash(npx --yes dev-browser *), Bash(dev-browser *), Read
 ---
 
 # Visual Check — dev-browser
 
 Verify UI changes visually using dev-browser (sandboxed Chromium with persistent state).
 
-## Prerequisites
+## Tooling check (before first use)
 
-This skill requires dev-browser (sandboxed Chromium). Check availability:
-- Run: `npx dev-browser --version`
-- If not available, inform the user: "dev-browser is required for visual checks. It will be downloaded automatically via npx on first use."
-- If npx is not available, this skill cannot work.
+1. **Verify first**: run `npx --no-install dev-browser --help`. Never conclude the tool is missing without this check.
+2. **Install directly if missing**: nothing to install permanently. Run every script through `npx --yes dev-browser` and npx downloads it on the fly. Execute this yourself, do not ask the user to install anything.
+3. **Fallback**: if npx cannot fetch it (offline, blocked registry), ask the user for a manual screenshot of the page and verify from that.
+
+FR : vérifier d'abord la présence de l'outil, l'utiliser via npx qui le télécharge à la volée, sinon demander une capture d'écran manuelle à l'utilisateur.
 
 ## Options
 

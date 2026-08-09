@@ -4,6 +4,12 @@ This rule is the single source of truth for the documentation pipeline. Skills
 (`/read-docs`, `/plan-and-confirm`) and the `explore-docs` agent reference it
 instead of copying it.
 
+## Tooling check (before first use)
+
+Verify before concluding anything is missing: `npx --no-install ctx7 --version`, `claude mcp list 2>/dev/null | grep -i context7`, `gh --version`.
+If missing, install it yourself: ctx7 runs on the fly via `npx --yes ctx7@latest`; the MCP via `claude mcp add context7 -- npx -y @upstash/context7-mcp` (when the `claude` CLI exists); gh via winget/brew/apt, then `gh auth status` (only `gh auth login` is the user's step).
+Full protocol: tooling sections of `/read-docs`, `/visual-check`, `/create-pr`; last-resort fallback is WebSearch of the official docs.
+
 ## The pipeline — mandatory order
 
 **BEFORE writing code that uses any external library API, check the documentation.**

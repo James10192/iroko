@@ -12,13 +12,13 @@ allowed-tools: Bash(gh :*), Bash(git :*)
 
 Create a well-structured GitHub issue for tracking work.
 
-## Prerequisites
+## Tooling check (before first use)
 
-This skill requires the GitHub CLI (`gh`). Check availability before proceeding:
-- Run: `gh auth status`
-- If not installed: https://cli.github.com
-- If not authenticated: `gh auth login`
-- If `gh` is missing, inform the user and stop. This skill cannot work without it.
+1. **Verify first**: `gh --version`. Never conclude gh is missing without this check.
+2. **Install directly if missing**: run the install yourself, per OS: Windows `winget install GitHub.cli`, macOS `brew install gh`, Debian/Ubuntu `sudo apt install gh`. Then check `gh auth status`; if not authenticated, STOP and ask the user to run `gh auth login` (authentication is the only human step).
+3. **Fallback**: if the install fails, give the user the manual URL `https://github.com/<owner>/<repo>/issues/new` with the drafted title, labels and body to paste.
+
+FR : vérifier gh, l'installer soi-même selon l'OS, seule l'authentification (`gh auth login`) revient à l'utilisateur.
 
 ## Context
 

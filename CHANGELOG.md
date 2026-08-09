@@ -9,6 +9,13 @@ removals/renames and CLI interface changes are MAJOR.
 
 ## [Unreleased]
 
+## [3.1.0] — 2026-08-09
+
+### Added
+
+- **CLI**: `iroko doctor` — environment diagnostic (node >= 20, git, gh + auth, ctx7, dev-browser, claude CLI + MCP context7, installed iroko components). Each missing line shows the exact install command; `--guide` switches the output to French. Always exits 0: it is a report, not a gate.
+- **Tooling check sections**: `visual-check`, `read-docs`, `create-pr`, `create-issue`, the `explore-docs` agent and the `docs-first` rule now carry a standard "Tooling check (before first use)" protocol: verify first (non-destructive probe), install directly if missing (npx on the fly for dev-browser/ctx7, `claude mcp add` for the Context7 MCP, winget/brew/apt for gh — only `gh auth login` stays a human step), documented fallback if the install fails. `plan-and-confirm` and `token-efficiency` reference the protocol.
+
 ## [3.0.0] — 2026-08-07
 
 iroko v3 is a repositioning, not a facelift: from "my personal Claude Code config" to **a guardrail environment for AI-assisted work**, organized around the builder cycle (frame → illustrate → document → build → verify) and three promises: frame it, save tokens, verify it. 24 components (7 rules, 12 skills, 4 agents, 1 hook), install packs (`--guide` / default / `--full`), and a French-first beginner path.

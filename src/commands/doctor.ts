@@ -4,6 +4,12 @@ import { ochre, graphite, ivory, MARK } from "../lib/theme.js";
 import { divider, mark, type State } from "../lib/ui.js";
 import { components } from "../lib/manifest.js";
 import { isComponentInstalled, loadIrokoConfig } from "../lib/installer.js";
+import {
+  SETTINGS_PATH,
+  isGuardHookWired,
+  guardHookSnippet,
+} from "../lib/settings.js";
+import { existsSync } from "node:fs";
 
 // iroko doctor — environment diagnostic. Never throws, always exits 0:
 // it is a report, not a gate. Every external probe is wrapped in run().
@@ -148,7 +154,9 @@ function checkIrokoComponents(fr: boolean): CheckRow {
   const config = loadIrokoConfig();
   const installed = components.filter((c) => isComponentInstalled(c)).length;
   const total = components.length;
-  if (!config && installed === 0) {
+  // No components in the config (missing, partial or corrupt file) and
+  // nothing on disk → this is a "to install" state, not "OK 0/24".
+  if (!config?.components?.length && installed === 0) {
     return {
       state: "available",
       label: fr ? "composants iroko" : "iroko components",
@@ -161,6 +169,38 @@ function checkIrokoComponents(fr: boolean): CheckRow {
     label: fr ? "composants iroko" : "iroko components",
     status: w.ok,
     detail: `${installed}/${total}${config?.version ? ` (v${config.version})` : ""}`,
+  };
+}
+
+function checkGuardHook(fr: boolean): CheckRow {
+  const w = words(fr);
+  const label = fr ? "hook de garde" : "guard hook";
+  if (!existsSync(SETTINGS_PATH)) {
+    return {
+      state: "available",
+      label,
+      status: w.toInstall,
+      detail: fr
+        ? "pas de settings.json — iroko init l'écrit avec le hook câblé"
+        : "no settings.json — iroko init writes it with the hook wired",
+      hint: "iroko init",
+    };
+  }
+  if (isGuardHookWired()) {
+    return {
+      state: "installed",
+      label,
+      status: w.ok,
+      detail: fr ? "câblé dans settings.json" : "wired in settings.json",
+    };
+  }
+  return {
+    state: "available",
+    label,
+    status: fr ? "à câbler" : "to wire",
+    detail: fr
+      ? "settings.json ne référence pas guard-destructive.sh"
+      : "settings.json does not reference guard-destructive.sh",
   };
 }
 
@@ -187,10 +227,27 @@ export function doctorCommand(opts: { guide?: boolean }): void {
     checkNpxTool("dev-browser", "npx --no-install dev-browser --help", fr),
     ...checkClaudeMcp(fr),
     checkIrokoComponents(fr),
+    checkGuardHook(fr),
   ];
 
   for (const row of rows) printRow(row);
   console.log();
+
+  // Guard hook present but not wired: show the exact block to paste.
+  if (existsSync(SETTINGS_PATH) && !isGuardHookWired()) {
+    console.log(
+      `   ${graphite(
+        fr
+          ? "Ajoutez ceci à votre ~/.claude/settings.json pour activer le hook de garde :"
+          : "Add this to your ~/.claude/settings.json to activate the guard hook:",
+      )}`,
+    );
+    console.log();
+    for (const line of guardHookSnippet().split("\n")) {
+      console.log(`      ${graphite(line)}`);
+    }
+    console.log();
+  }
 
   const missing = rows.filter((r) => r.state !== "installed" && r.hint);
   if (missing.length > 0) {

@@ -1,8 +1,15 @@
-import { existsSync, mkdirSync, cpSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  cpSync,
+  readFileSync,
+  writeFileSync,
+  rmSync,
+} from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Component, IrokoConfig } from "../types.js";
-import { CLAUDE_DIR, IROKO_CONFIG, targetDirs } from "./paths.js";
+import { IROKO_CONFIG, targetDirs } from "./paths.js";
 import { VERSION } from "./banner.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -30,7 +37,14 @@ function getConfigsRoot(): string {
   return fallbackRoot;
 }
 
-export function installComponent(component: Component, sourceRoot?: string): boolean {
+export interface InstallResult {
+  ok: boolean;
+  // True when the existing local version differed from the source and was
+  // saved as `<file>.bak` before being overwritten.
+  backedUp: boolean;
+}
+
+export function installComponent(component: Component, sourceRoot?: string): InstallResult {
   const root = sourceRoot ?? getConfigsRoot();
   const sourcePath = join(root, component.path);
 
@@ -38,55 +52,56 @@ export function installComponent(component: Component, sourceRoot?: string): boo
     // Fallback: try from repo root directly
     const repoRoot = resolve(__dirname, "..", "..");
     const fallback = join(repoRoot, component.path);
-    if (!existsSync(fallback)) return false;
+    if (!existsSync(fallback)) return { ok: false, backedUp: false };
     return copyToTarget(fallback, component);
   }
 
   return copyToTarget(sourcePath, component);
 }
 
-function copyToTarget(sourcePath: string, component: Component): boolean {
+function filesDiffer(a: string, b: string): boolean {
+  try {
+    return !readFileSync(a).equals(readFileSync(b));
+  } catch {
+    return true;
+  }
+}
+
+// One-level backup: `<dest>.bak`, overwritten on every new backup.
+function backupExisting(dest: string): void {
+  const bak = `${dest}.bak`;
+  rmSync(bak, { recursive: true, force: true });
+  cpSync(dest, bak, { recursive: true });
+}
+
+function copyToTarget(sourcePath: string, component: Component): InstallResult {
   const targetDir = targetDirs[component.type];
   mkdirSync(targetDir, { recursive: true });
 
+  const baseName = component.path.split("/").pop()!;
+  const dest = join(targetDir, baseName);
+  let backedUp = false;
+
   if (component.type === "skill") {
-    // Skills are directories
-    const skillName = component.path.split("/").pop()!;
-    const dest = join(targetDir, skillName);
+    // Skills are directories — compare their SKILL.md to detect local edits.
+    if (
+      existsSync(dest) &&
+      filesDiffer(join(sourcePath, "SKILL.md"), join(dest, "SKILL.md"))
+    ) {
+      backupExisting(dest);
+      backedUp = true;
+    }
     cpSync(sourcePath, dest, { recursive: true });
   } else {
-    // Rules, agents, hooks are single files
-    const fileName = component.path.split("/").pop()!;
-    const dest = join(targetDir, fileName);
+    // Rules, agents, hooks are single files.
+    if (existsSync(dest) && filesDiffer(sourcePath, dest)) {
+      backupExisting(dest);
+      backedUp = true;
+    }
     cpSync(sourcePath, dest);
   }
 
-  return true;
-}
-
-export function installSettingsTemplate(): void {
-  // getConfigsRoot() returns the package root in the npm install (dist/..)
-  // but `src/` in dev (tsx src/cli.ts) — check both locations.
-  const root = getConfigsRoot();
-  const candidates = [
-    join(root, "templates", "settings.json.tpl"),                       // npm: <pkg>/templates
-    resolve(__dirname, "..", "..", "templates", "settings.json.tpl"),   // dev: src/lib/../../templates
-  ];
-  const tplPath = candidates.find((p) => existsSync(p));
-  if (!tplPath) return;
-
-  const template = readFileSync(tplPath, "utf-8");
-  const home = process.env.HOME || process.env.USERPROFILE || "~";
-  // JSON-escape the path (Windows backslashes would otherwise corrupt the JSON).
-  const homeJson = JSON.stringify(home).slice(1, -1);
-  const resolved = template.replace(/\{\{HOME\}\}/g, homeJson);
-
-  const settingsPath = join(CLAUDE_DIR, "settings.json");
-
-  // Never overwrite existing settings
-  if (existsSync(settingsPath)) return;
-
-  writeFileSync(settingsPath, resolved, "utf-8");
+  return { ok: true, backedUp };
 }
 
 export function saveIrokoConfig(componentNames: string[]): void {
@@ -102,7 +117,12 @@ export function saveIrokoConfig(componentNames: string[]): void {
 export function loadIrokoConfig(): IrokoConfig | null {
   if (!existsSync(IROKO_CONFIG)) return null;
   try {
-    return JSON.parse(readFileSync(IROKO_CONFIG, "utf-8"));
+    const parsed = JSON.parse(readFileSync(IROKO_CONFIG, "utf-8"));
+    // A config without a components array is a stale partial artifact
+    // (e.g. the pre-3.2 update checker wrote { lastUpdateCheck } alone).
+    // Treat it as "not installed" instead of crashing downstream.
+    if (!parsed || !Array.isArray(parsed.components)) return null;
+    return parsed as IrokoConfig;
   } catch {
     return null;
   }

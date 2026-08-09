@@ -9,8 +9,9 @@ import {
 import {
   installComponent,
   saveIrokoConfig,
-  installSettingsTemplate,
+  loadIrokoConfig,
 } from "../lib/installer.js";
+import { installSettingsTemplate, guardHookSnippet } from "../lib/settings.js";
 import { CLAUDE_DIR } from "../lib/paths.js";
 import { existsSync, mkdirSync } from "node:fs";
 import { TYPE_ORDER, TYPE_META } from "../lib/constants.js";
@@ -48,6 +49,10 @@ const STRINGS = {
     installedTo: "Installed to ~/.claude/",
     done: "Done.",
     verify: (cmd: string) => `Run ${cmd} to verify.`,
+    backedUp: (name: string) =>
+      `${name}: local version saved as .bak before update`,
+    guardTitle:
+      "Your settings.json already exists — iroko never overwrites it.\n  Add this to your ~/.claude/settings.json to activate the guard hook:",
   },
   fr: {
     intro: "Installation interactive",
@@ -73,6 +78,10 @@ const STRINGS = {
     installedTo: "Installés dans ~/.claude/",
     done: "Terminé.",
     verify: (cmd: string) => `Lancez ${cmd} pour vérifier.`,
+    backedUp: (name: string) =>
+      `${name} : version locale sauvegardée en .bak avant mise à jour`,
+    guardTitle:
+      "Votre settings.json existe déjà : iroko ne l'écrase jamais.\n  Ajoutez ceci à votre ~/.claude/settings.json pour activer le hook de garde :",
   },
 };
 
@@ -187,26 +196,37 @@ export async function initCommand(opts: InitOptions = {}) {
 
   let installed = 0;
   let failed = 0;
+  const backedUpNames: string[] = [];
 
   for (const name of selectedNames) {
     const component = components.find((c) => c.name === name);
     if (!component) continue;
 
-    const ok = installComponent(component);
-    if (ok) {
+    const result = installComponent(component);
+    if (result.ok) {
       installed++;
+      if (result.backedUp) backedUpNames.push(name);
     } else {
       failed++;
       p.log.warn(t.installFail(ivory(name)));
     }
   }
 
-  installSettingsTemplate();
-  saveIrokoConfig(selectedNames);
+  const settingsStatus = installSettingsTemplate();
+
+  // Re-init never shrinks an install: the saved component list is the UNION
+  // of what was already installed and what was just selected.
+  const existingNames = loadIrokoConfig()?.components ?? [];
+  const mergedNames = Array.from(new Set([...existingNames, ...selectedNames]));
+  saveIrokoConfig(mergedNames);
 
   const successMsg = ochre(t.installedCount(installed));
   const failMsg = failed > 0 ? graphite(t.failedCount(failed)) : "";
   s.stop(`${successMsg}${failMsg}`);
+
+  for (const name of backedUpNames) {
+    p.log.info(graphite(t.backedUp(ivory(name))));
+  }
 
   // Per-type recap with the `▰` mark for each new component.
   console.log();
@@ -222,6 +242,21 @@ export async function initCommand(opts: InitOptions = {}) {
     console.log(`   ${ochre(MARK)}  ${ivory(TYPE_META[type].label)}`);
     for (const name of typeComponents) {
       console.log(`      ${ochre(MARK)} ${name}`);
+    }
+    console.log();
+  }
+
+  // C3 — the guard hook only works if settings.json runs it. When the user's
+  // settings pre-exist (never overwritten) and the hook script was installed
+  // but is not referenced, show the exact block to paste.
+  if (
+    settingsStatus === "exists-unwired" &&
+    selectedNames.includes("guard-destructive")
+  ) {
+    console.log(`   ${ochre(MARK)}  ${ivory(t.guardTitle)}`);
+    console.log();
+    for (const line of guardHookSnippet().split("\n")) {
+      console.log(`      ${graphite(line)}`);
     }
     console.log();
   }

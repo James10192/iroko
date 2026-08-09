@@ -23,7 +23,7 @@ FR : vérifier les outils avant de conclure qu'ils manquent, les installer soi-m
 ## When to use
 
 - **BEFORE writing any code** that uses an external library API
-- After `/pick-stack` chose a stack, before `/plan-and-confirm`
+- After a stack was chosen (with the default pack: `/pick-stack`), before `/plan-and-confirm`
 - When a library has had recent breaking changes
 - When you're not 100% sure of the current API signature
 - When the user asks how to use X or asks for the docs of X

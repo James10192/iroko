@@ -307,7 +307,7 @@ git checkout -b feat/12-login   # type/N-slug
 - Presenting one plan at depth >= 4 (must be alternatives).
 - Skipping confidence scoring at depth >= 4.
 - Treating any axis BLOCK as just a warning.
-- Trivial change (typo, single string) → suggest `--depth=1` or `/oneshot` instead.
+- Trivial change (typo, single string) → suggest `--depth=1` instead (or `/oneshot`, if installed with the default pack).
 
 ## Rules
 
@@ -322,6 +322,6 @@ Ce skill oblige l'agent à présenter un plan et à attendre votre OKAY avant d'
 
 ## Next step
 
-After OKAY and implementation → `/visual-check <route>` if the UI changed, then `/commit`. For a large change, run `/deep-review` before merging.
+After OKAY and implementation → `/commit`. With the default pack installed: `/visual-check <route>` if the UI changed, and `/deep-review` before merging a large change.
 
 $ARGUMENTS

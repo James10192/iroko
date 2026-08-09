@@ -8,7 +8,7 @@ instead of copying it.
 
 Verify before concluding anything is missing: `npx --no-install ctx7 --version`, `claude mcp list 2>/dev/null | grep -i context7`, `gh --version`.
 If missing, install it yourself: ctx7 runs on the fly via `npx --yes ctx7@latest`; the MCP via `claude mcp add context7 -- npx -y @upstash/context7-mcp` (when the `claude` CLI exists); gh via winget/brew/apt, then `gh auth status` (only `gh auth login` is the user's step).
-Full protocol: tooling sections of `/read-docs`, `/visual-check`, `/create-pr`; last-resort fallback is WebSearch of the official docs.
+Full protocol: tooling section of `/read-docs` (also in `/visual-check` and `/create-pr` when installed with the default/full packs); last-resort fallback is WebSearch of the official docs.
 
 ## The pipeline — mandatory order
 

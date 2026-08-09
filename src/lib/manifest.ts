@@ -68,7 +68,7 @@ export const components: Component[] = [
     origin: "custom",
     path: "rules/docs-first.md",
     step: "ambient",
-    pack: "default",
+    pack: "guide",
   },
   {
     name: "global-preferences",
@@ -123,7 +123,7 @@ export const components: Component[] = [
     origin: "custom",
     path: "skills/sketch",
     step: "illustrer",
-    pack: "default",
+    pack: "guide",
   },
   {
     name: "read-docs",
@@ -237,7 +237,7 @@ export const components: Component[] = [
     origin: "custom",
     path: "agents/explore-codebase.md",
     step: "ambient",
-    pack: "default",
+    pack: "guide",
   },
   {
     name: "websearch",
@@ -247,7 +247,7 @@ export const components: Component[] = [
     origin: "custom",
     path: "agents/websearch.md",
     step: "ambient",
-    pack: "default",
+    pack: "guide",
   },
 
   // ═══════════════════════════════════════════════

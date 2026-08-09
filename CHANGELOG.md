@@ -9,6 +9,37 @@ removals/renames and CLI interface changes are MAJOR.
 
 ## [Unreleased]
 
+## [3.2.0] — 2026-08-09
+
+Health-audit release: every critical and major defect from the August audit is fixed, plus a new `uninstall` command (the MINOR bump).
+
+### Added
+
+- **CLI**: `iroko uninstall` — removes ONLY the files listed in `.iroko.json` (mapped through the manifest), then `.iroko.json` and the update-check file, and recaps everything removed. If `~/.claude/settings.json` is the intact iroko template, only the guard hooks block is unwired; a user-modified settings.json is never touched (and the CLI says so). `--keep-settings` leaves settings.json completely untouched, `--yes` runs non-interactively, `--guide` switches the output to French. Unknown legacy components are listed and left in place.
+- **Init**: when `~/.claude/settings.json` already exists (never overwritten), init now detects whether the `guard-destructive` hook is wired and, if not, prints the exact JSON block to paste ("Add this to your settings.json to activate the guard hook", French under `--guide`). Previously the hook shipped but was silently never activated for anyone with existing settings.
+- **Doctor**: new "guard hook" check — wired in settings.json → OK, otherwise "to wire" with the exact JSON block to paste printed below the report.
+- **Installer backups**: before overwriting a component whose local version differs from the source, the previous version is saved as `<file>.bak` (single level, overwritten each time) and reported ("local version saved as .bak") — both on `init` and `update`.
+- **CI**: a `cli-smoke` job builds the CLI and exercises it in a throwaway `$HOME` (`--version`, `doctor`, `update` without an install — must exit 0 with a clean message and no stack trace — then `init --guide --yes`, `doctor`, `uninstall --yes`); the pack job now also verifies that all 24 manifest `path`s ship in the `npm pack` tarball; `tsc --noEmit` runs before the build.
+- **Docs**: CONTRIBUTING.md (component proposals, CHANGELOG-first versioning, CI overview) and issue templates (`bug.md`, `component.md`).
+
+### Fixed
+
+- **Crash of `update` before `init`**: the update checker used to write `lastUpdateCheck` into `.iroko.json`, creating a partial config that bypassed the "not installed" guard and crashed `update` on `config.components.length`. The throttle timestamp now lives in its own file (`~/.claude/.iroko-update-check.json`, legacy field read once then ignored), the guard is hardened to `!config?.components?.length` with a clean "No iroko installation found. Run npx @james10192/iroko init first." message, and `doctor` reports this partial state as "components: to install" instead of "OK 0/24".
+- **Guide pack is now self-contained (16 components)**: the `docs-first` rule, the `/sketch` skill and the `explore-codebase` / `websearch` agents move into the guide pack, and every remaining reference from a guide component to a non-guide component (`/deep-review`, `/create-pr`, `/oneshot`, `/visual-check`, `/pick-stack`) is reformulated as "if installed (with the default/full pack)". No more dead references for `--guide` installs.
+- **Re-init no longer shrinks the install**: the saved component list is the union of the existing install and the new selection, instead of a replacement that silently dropped previously installed components from `.iroko.json`.
+- **`update` fetches the matching version**: components are cloned from the `v<CLI version>` tag (fallback to master when the tag does not exist) instead of master HEAD, so a 3.2.0 CLI never installs future incompatible components. Legacy components absent from the manifest are listed at the end of the run as "unknown components kept as-is" instead of being silently re-saved.
+- **`update` self-upgrade hint**: only shown when the published version is strictly newer (it used to suggest "3.2.0 → 3.1.0" whenever the versions merely differed).
+- **song/ PowerShell snippet**: single quotes do not interpolate `$HOME` in PowerShell — the documented Stop/Notification hook commands now build the file URI by concatenation.
+- **guard-destructive.sh**: also blocks `git push -f`, `docker compose down -v` (and `docker-compose down -v`), `convex dev --reset`, `prisma migrate reset` (verified against simulated PreToolUse payloads).
+
+### Changed
+
+- **README**: `doctor` and `uninstall` added to both command lists; every quickstart command is prefixed with `npx @james10192/iroko` (an npx install does not put `iroko` in the PATH); pack tables updated for the self-contained guide pack; an honest line about the plugin path ("ships skills and agents only; rules and the hook come with npx init").
+- **npm tarball slimmed**: `song/` is no longer published to npm (the folder stays in the repo, and its README now documents repo-only usage); the tarball drops to ~35 kB.
+- **package.json**: repository URL in canonical `git+https://` form, keywords enriched (guardrails, rules, beginner, ai-safety), description rewritten around the guardrail thesis.
+- **tsup**: build target raised to node20 (matching `engines.node >= 20`).
+- **.gitignore**: cleaned of `~/.claude` entries copied by mistake (sessions/, projects/, ide/, gsd-file-manifest.json, ...).
+
 ## [3.1.0] — 2026-08-09
 
 ### Added

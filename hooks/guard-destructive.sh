@@ -52,6 +52,7 @@ CMD=$(printf '%s' "$INPUT" \
 PATTERNS='
 git[[:space:]]+reset[[:space:]]+.*--hard
 git[[:space:]]+push[[:space:]]+.*--force
+git[[:space:]]+push[[:space:]]+(.*[[:space:]])?-f([[:space:]]|$)
 git[[:space:]]+checkout[[:space:]]+--[[:space:]]+\.
 git[[:space:]]+clean[[:space:]]+-[A-Za-z]*f
 git[[:space:]]+stash[[:space:]]+drop
@@ -62,6 +63,9 @@ db[[:space:]]+wipe
 DROP[[:space:]]+DATABASE
 --force-reset
 supabase[[:space:]]+db[[:space:]]+reset
+docker([[:space:]]+|-)compose[[:space:]]+down[[:space:]]+.*-v
+convex[[:space:]]+dev[[:space:]]+.*--reset
+prisma[[:space:]]+migrate[[:space:]]+reset
 rm[[:space:]]+-[A-Za-z]*[rf][A-Za-z]*[[:space:]]+(/|~/?|\*)([[:space:]]|$)
 '
 

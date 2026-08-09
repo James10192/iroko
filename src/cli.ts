@@ -6,6 +6,7 @@ import { initCommand } from "./commands/init.js";
 import { listCommand } from "./commands/list.js";
 import { updateCommand } from "./commands/update.js";
 import { aboutCommand } from "./commands/about.js";
+import { doctorCommand } from "./commands/doctor.js";
 
 // Check for updates silently on every run (throttled to 1×/24h).
 checkForUpdates();
@@ -42,6 +43,12 @@ program
   .description("Author, links, and project info")
   .action(aboutCommand);
 
+program
+  .command("doctor")
+  .description("Diagnose the environment: node, git, gh, ctx7, dev-browser, MCP")
+  .option("--guide", "output in French (sortie en français)")
+  .action((opts) => doctorCommand(opts));
+
 // Default — banner + commands grid + signature line.
 program.action(() => {
   showBanner();
@@ -54,6 +61,9 @@ program.action(() => {
   );
   console.log(
     `     ${ochre(MARK)}  ${ivory("update")}    ${graphite("Update from GitHub")}`,
+  );
+  console.log(
+    `     ${ochre(MARK)}  ${ivory("doctor")}    ${graphite("Diagnose the environment")}`,
   );
   console.log(
     `     ${ochre(MARK)}  ${ivory("about")}     ${graphite("Author & links")}`,

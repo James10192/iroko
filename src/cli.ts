@@ -7,6 +7,7 @@ import { listCommand } from "./commands/list.js";
 import { updateCommand } from "./commands/update.js";
 import { aboutCommand } from "./commands/about.js";
 import { doctorCommand } from "./commands/doctor.js";
+import { uninstallCommand } from "./commands/uninstall.js";
 
 // Check for updates silently on every run (throttled to 1×/24h).
 checkForUpdates();
@@ -39,6 +40,14 @@ program
   .action(updateCommand);
 
 program
+  .command("uninstall")
+  .description("Remove installed iroko components, state files, and the guard hook wiring")
+  .option("--guide", "output in French (sortie en français)")
+  .option("--yes", "non-interactive: uninstall without confirmation")
+  .option("--keep-settings", "leave ~/.claude/settings.json completely untouched")
+  .action((opts) => uninstallCommand(opts));
+
+program
   .command("about")
   .description("Author, links, and project info")
   .action(aboutCommand);
@@ -64,6 +73,9 @@ program.action(() => {
   );
   console.log(
     `     ${ochre(MARK)}  ${ivory("doctor")}    ${graphite("Diagnose the environment")}`,
+  );
+  console.log(
+    `     ${ochre(MARK)}  ${ivory("uninstall")} ${graphite("Remove iroko from ~/.claude")}`,
   );
   console.log(
     `     ${ochre(MARK)}  ${ivory("about")}     ${graphite("Author & links")}`,

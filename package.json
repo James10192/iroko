@@ -1,7 +1,7 @@
 {
   "name": "@james10192/iroko",
-  "version": "3.1.0",
-  "description": "Premium Claude Code configuration installer. Rules, skills, agents, hooks — curated by a West African dev.",
+  "version": "3.2.0",
+  "description": "Guardrail environment for AI-assisted work with Claude Code: rules, skills, agents and a destructive-command guard hook that keep the agent in scope, save tokens and gate every commit. Curated by a West African dev.",
   "type": "module",
   "bin": {
     "iroko": "dist/cli.js"
@@ -13,7 +13,6 @@
     "agents",
     "hooks",
     "templates",
-    "song",
     "LICENSE",
     "README.md"
   ],
@@ -40,13 +39,17 @@
     "configuration",
     "ai",
     "developer-tools",
-    "productivity"
+    "productivity",
+    "guardrails",
+    "rules",
+    "beginner",
+    "ai-safety"
   ],
   "author": "Marcel DJEDJE-LI <marcel.djedjeli@africandigitconsulting.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/James10192/iroko.git"
+    "url": "git+https://github.com/James10192/iroko.git"
   },
   "homepage": "https://github.com/James10192/iroko#readme",
   "engines": {

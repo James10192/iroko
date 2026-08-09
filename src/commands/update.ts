@@ -3,7 +3,7 @@ import { execSync } from "node:child_process";
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { showBannerCompact } from "../lib/banner.js";
+import { showBannerCompact, VERSION } from "../lib/banner.js";
 import { ochre, graphite, ivory, MARK } from "../lib/theme.js";
 import { rightTag } from "../lib/ui.js";
 import {
@@ -15,15 +15,26 @@ import { components } from "../lib/manifest.js";
 import { getLatestVersion } from "../lib/update-checker.js";
 import { REPO_URL, PACKAGE_NAME } from "../lib/constants.js";
 
+// True when `remote` is strictly newer than `local` (plain semver triplets).
+function isNewerVersion(remote: string, local: string): boolean {
+  const r = remote.split(".").map(Number);
+  const l = local.split(".").map(Number);
+  for (let i = 0; i < 3; i++) {
+    if ((r[i] ?? 0) > (l[i] ?? 0)) return true;
+    if ((r[i] ?? 0) < (l[i] ?? 0)) return false;
+  }
+  return false;
+}
+
 export async function updateCommand() {
   showBannerCompact();
 
   p.intro(`${ochre(MARK)}  ${ivory("Update")}`);
 
   const config = loadIrokoConfig();
-  if (!config) {
+  if (!config?.components?.length) {
     p.log.warn(
-      `No iroko installation found. Run ${ivory("iroko init")} first.`,
+      `No iroko installation found. Run ${ivory(`npx ${PACKAGE_NAME} init`)} first.`,
     );
     p.outro(graphite("Nothing to update."));
     return;
@@ -53,9 +64,19 @@ export async function updateCommand() {
     try {
       cloneDir = mkdtempSync(join(tmpdir(), "iroko-update-"));
       tmpDir = cloneDir;
-      execSync(`git clone --depth 1 ${REPO_URL} "${cloneDir}"`, {
-        stdio: "pipe",
-      });
+      // Clone the tag matching THIS CLI version so components always match
+      // the code that installs them. Fall back to master when the tag does
+      // not exist (e.g. a dev build).
+      try {
+        execSync(
+          `git clone --branch v${VERSION} --depth 1 ${REPO_URL} "${cloneDir}"`,
+          { stdio: "pipe" },
+        );
+      } catch {
+        execSync(`git clone --depth 1 ${REPO_URL} "${cloneDir}"`, {
+          stdio: "pipe",
+        });
+      }
     } catch {
       s.stop(graphite("Failed to fetch updates"));
       p.log.error("Could not clone repository. Check your network connection.");
@@ -67,20 +88,43 @@ export async function updateCommand() {
     s.start("Updating components");
 
     let updated = 0;
+    const backedUpNames: string[] = [];
+    const unknownNames: string[] = [];
     for (const name of config.components) {
       const component = components.find((c) => c.name === name);
-      if (!component) continue;
+      if (!component) {
+        // Legacy component no longer in the manifest — keep the installed
+        // files untouched, but say so instead of re-saving it silently.
+        unknownNames.push(name);
+        continue;
+      }
 
       const sourcePath = join(cloneDir, component.path);
       if (!existsSync(sourcePath)) continue;
 
       // Install from the freshly cloned repo, not from the local package.
-      installComponent(component, cloneDir);
-      updated++;
+      const result = installComponent(component, cloneDir);
+      if (result.ok) {
+        updated++;
+        if (result.backedUp) backedUpNames.push(name);
+      }
     }
 
     saveIrokoConfig(config.components);
     s.stop(ochre(`${updated} components updated`));
+
+    for (const name of backedUpNames) {
+      p.log.info(
+        graphite(`${ivory(name)}: local version saved as .bak`),
+      );
+    }
+    if (unknownNames.length > 0) {
+      p.log.info(
+        graphite(
+          `Unknown components kept as-is (not in the current manifest): ${unknownNames.join(", ")}`,
+        ),
+      );
+    }
   } finally {
     if (tmpDir) {
       try {
@@ -93,13 +137,10 @@ export async function updateCommand() {
 
   // CLI self-upgrade hint when a newer iroko package is published.
   const latest = getLatestVersion();
-  if (latest) {
-    const { VERSION } = await import("../lib/banner.js");
-    if (latest !== VERSION) {
-      p.log.info(
-        `CLI update available: ${graphite(VERSION)} → ${ochre(latest)}\n  Run ${ivory(`pnpm add -g ${PACKAGE_NAME}@latest`)} to upgrade.`,
-      );
-    }
+  if (latest && isNewerVersion(latest, VERSION)) {
+    p.log.info(
+      `CLI update available: ${graphite(VERSION)} → ${ochre(latest)}\n  Run ${ivory(`pnpm add -g ${PACKAGE_NAME}@latest`)} to upgrade.`,
+    );
   }
 
   p.outro(`${ochre("Up to date.")} Run ${ivory("iroko list")} to verify.`);

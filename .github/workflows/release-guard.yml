@@ -73,8 +73,68 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile=false
 
+      - name: Type-check
+        run: npx tsc --noEmit
+
       - name: Build
         run: pnpm build
+
+  cli-smoke:
+    name: CLI runs end-to-end in a clean HOME
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Build
+        run: pnpm build
+
+      - name: Exercise the CLI in a temporary HOME
+        run: |
+          set -e
+          export HOME="$(mktemp -d)"
+          echo "— version"
+          node dist/cli.js --version
+
+          echo "— doctor before init"
+          node dist/cli.js doctor
+
+          echo "— update WITHOUT init must exit 0 with a clean message (no stack trace)"
+          out=$(node dist/cli.js update 2>&1)
+          echo "$out"
+          echo "$out" | grep -q "No iroko installation found" \
+            || { echo "::error::update without init did not print the expected message."; exit 1; }
+          echo "$out" | grep -qi "TypeError\|at .*(.*:[0-9]*:[0-9]*)" \
+            && { echo "::error::update without init printed a stack trace."; exit 1; } || true
+
+          echo "— init --guide --yes"
+          node dist/cli.js init --guide --yes
+
+          echo "— doctor after init"
+          node dist/cli.js doctor
+
+          echo "— uninstall --yes"
+          node dist/cli.js uninstall --yes
+
+          echo "— after uninstall, config files must be gone"
+          test ! -f "$HOME/.claude/.iroko.json" \
+            || { echo "::error::.iroko.json still present after uninstall."; exit 1; }
+          test ! -f "$HOME/.claude/.iroko-update-check.json" \
+            || { echo "::error::.iroko-update-check.json still present after uninstall."; exit 1; }
+          echo "✓ CLI smoke passed."
 
   skills-drift-audit:
     name: No leaked tokens or absolute paths
@@ -146,3 +206,24 @@ jobs:
             fi
           done
           echo "✓ Tarball contains rules/, skills/, agents/, hooks/, templates/, dist/."
+
+      - name: Every manifest path ships in the tarball
+        run: |
+          set -e
+          # Extract the `path` fields of src/lib/manifest.ts and verify each
+          # one exists in the extracted tarball (skills are directories).
+          node -e '
+            const { readFileSync, existsSync } = require("node:fs");
+            const src = readFileSync("src/lib/manifest.ts", "utf8");
+            const paths = [...src.matchAll(/^\s*path:\s*"([^"]+)"/gm)].map((m) => m[1]);
+            if (paths.length !== 24) {
+              console.error(`Expected 24 manifest paths, found ${paths.length}.`);
+              process.exit(1);
+            }
+            const missing = paths.filter((p) => !existsSync(`/tmp/pack-smoke/package/${p}`));
+            if (missing.length) {
+              console.error("Missing from tarball:", missing.join(", "));
+              process.exit(1);
+            }
+            console.log(`✓ All ${paths.length} manifest paths are present in the tarball.`);
+          '

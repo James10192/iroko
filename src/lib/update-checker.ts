@@ -1,8 +1,9 @@
 import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 import { VERSION } from "./banner.js";
 import { ochre, graphite, ivory, MARK_UP } from "./theme.js";
-import { IROKO_CONFIG } from "./paths.js";
+import { IROKO_CONFIG, IROKO_UPDATE_CHECK } from "./paths.js";
 import { PACKAGE_NAME } from "./constants.js";
 
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -19,14 +20,32 @@ export function getLatestVersion(): string | null {
   }
 }
 
+// The throttle timestamp lives in ~/.claude/.iroko-update-check.json —
+// NEVER in .iroko.json. Writing it there used to create a partial config
+// ({ lastUpdateCheck } only) that bypassed the "no install" guards of
+// `update` and `doctor`. The legacy field is read once for migration,
+// then simply ignored.
+function readLastCheck(): number {
+  try {
+    if (existsSync(IROKO_UPDATE_CHECK)) {
+      const data = JSON.parse(readFileSync(IROKO_UPDATE_CHECK, "utf-8"));
+      if (data?.lastUpdateCheck) return new Date(data.lastUpdateCheck).getTime();
+    }
+    // Migration: honor a legacy timestamp left in .iroko.json by <= 3.1.0.
+    if (existsSync(IROKO_CONFIG)) {
+      const legacy = JSON.parse(readFileSync(IROKO_CONFIG, "utf-8"));
+      if (legacy?.lastUpdateCheck) return new Date(legacy.lastUpdateCheck).getTime();
+    }
+  } catch {
+    // Corrupt state — treat as "never checked".
+  }
+  return 0;
+}
+
 export function checkForUpdates(): void {
   try {
-    // Throttle: only check once per 24h
-    if (existsSync(IROKO_CONFIG)) {
-      const config = JSON.parse(readFileSync(IROKO_CONFIG, "utf-8"));
-      const lastCheck = config.lastUpdateCheck ? new Date(config.lastUpdateCheck).getTime() : 0;
-      if (Date.now() - lastCheck < CHECK_INTERVAL_MS) return;
-    }
+    // Throttle: only check once per 24h.
+    if (Date.now() - readLastCheck() < CHECK_INTERVAL_MS) return;
 
     const latest = getLatestVersion();
     if (!latest || latest === VERSION) {
@@ -60,12 +79,12 @@ export function checkForUpdates(): void {
 
 function saveLastCheck(): void {
   try {
-    let config: Record<string, unknown> = {};
-    if (existsSync(IROKO_CONFIG)) {
-      config = JSON.parse(readFileSync(IROKO_CONFIG, "utf-8"));
-    }
-    config.lastUpdateCheck = new Date().toISOString();
-    writeFileSync(IROKO_CONFIG, JSON.stringify(config, null, 2), "utf-8");
+    mkdirSync(dirname(IROKO_UPDATE_CHECK), { recursive: true });
+    writeFileSync(
+      IROKO_UPDATE_CHECK,
+      JSON.stringify({ lastUpdateCheck: new Date().toISOString() }, null, 2),
+      "utf-8",
+    );
   } catch {
     // Silent — don't fail if we can't write
   }

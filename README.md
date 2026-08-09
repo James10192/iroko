@@ -38,9 +38,10 @@ Rules, agents and the hook are **ambient**: always active, watching every step.
 
 ```bash
 npx @james10192/iroko init           # default: guide + default packs (22 components)
-npx @james10192/iroko init --guide   # beginner pack, CLI prompts in French
+npx @james10192/iroko init --guide   # self-contained beginner pack (16 components), CLI prompts in French
 npx @james10192/iroko init --full    # everything (24 components)
-iroko list                           # see each component's step and pack
+npx @james10192/iroko list           # see each component's step and pack
+npx @james10192/iroko doctor         # diagnose the environment
 ```
 
 The **guide pack** is designed to accompany people who are discovering development: a French guided skill (`/demarrer`), plan-before-code, docs-before-guessing, safe commits, and a hook that blocks destructive commands before they run.
@@ -59,7 +60,7 @@ The **guide pack** is designed to accompany people who are discovering developme
 
 | Component | Pack | What it does |
 |---|---|---|
-| `/sketch` | default | Shows 3-6 low-fidelity visual options on a local HTML board BEFORE any code. You pick, then we build what you validated. |
+| `/sketch` | guide | Shows 3-6 low-fidelity visual options on a local HTML board BEFORE any code. You pick, then we build what you validated. |
 
 ### Document (documenter)
 
@@ -93,7 +94,7 @@ The **guide pack** is designed to accompany people who are discovering developme
 | `stay-in-scope` | guide | Never build beyond what was asked. No unrequested features, file-size thresholds enforced. |
 | `token-efficiency` | guide | When to use agents vs direct tools, so context is never wasted. |
 | `ship-quality` | default | Every deliverable handles loading, empty, error and success states. No "coming soon". |
-| `docs-first` | default | Never guess an API: current docs first (ctx7 → MCP → web search), with a reading method. |
+| `docs-first` | guide | Never guess an API: current docs first (ctx7 → MCP → web search), with a reading method. |
 | `global-preferences` | default | Opinionated defaults: pnpm, no Co-Authored-By, monochrome design, no AI slop. Adapt to taste. |
 
 ### Ambient — agents and hook
@@ -102,8 +103,8 @@ The **guide pack** is designed to accompany people who are discovering developme
 |---|---|---|
 | `critic` (agent) | guide | Technical reviewer with auto-detected lenses: CTO, UX, Security, Performance, Cost. |
 | `explore-docs` (agent) | guide | Documentation research via ctx7 CLI and Context7 MCP. |
-| `explore-codebase` (agent) | default | Maps patterns and files before implementing a feature. |
-| `websearch` (agent) | default | Quick targeted web research for planning and docs skills. |
+| `explore-codebase` (agent) | guide | Maps patterns and files before implementing a feature. |
+| `websearch` (agent) | guide | Quick targeted web research for planning and docs skills. |
 | `guard-destructive` (hook) | guide | PreToolUse hook that blocks `git reset --hard`, `push --force`, `migrate:fresh`, db wipes, unscoped `rm -rf`... with a clear "ask first" message. |
 
 ## Install
@@ -121,11 +122,15 @@ iroko init
 /plugin install iroko@iroko
 ```
 
+The Claude Code plugin ships skills and agents only; the rules and the guard hook come with `npx @james10192/iroko init`.
+
 ```bash
-iroko init      # interactive setup (guide + default packs preselected)
-iroko list      # installed vs available, with step and pack per component
-iroko update    # pull latest from GitHub and re-install
-iroko about     # author and links
+npx @james10192/iroko init        # interactive setup (guide + default packs preselected)
+npx @james10192/iroko list        # installed vs available, with step and pack per component
+npx @james10192/iroko update      # pull latest from GitHub and re-install
+npx @james10192/iroko doctor      # environment diagnostic (node, git, gh, ctx7, MCP, guard hook)
+npx @james10192/iroko uninstall   # remove installed components and iroko state files
+npx @james10192/iroko about       # author and links
 ```
 
 Release notes live in [CHANGELOG.md](./CHANGELOG.md).
@@ -169,9 +174,10 @@ Les rules, les agents et le hook sont **ambiants** : toujours actifs, à chaque 
 
 ```bash
 npx @james10192/iroko init           # défaut : packs guide + default (22 composants)
-npx @james10192/iroko init --guide   # pack débutant, invites du CLI en français
+npx @james10192/iroko init --guide   # pack débutant autonome (16 composants), invites du CLI en français
 npx @james10192/iroko init --full    # tout (24 composants)
-iroko list                           # étape et pack de chaque composant
+npx @james10192/iroko list           # étape et pack de chaque composant
+npx @james10192/iroko doctor --guide # diagnostic de l'environnement, en français
 ```
 
 Le **pack guide** est pensé pour accompagner des personnes qui découvrent le développement : un skill d'accompagnement en français (`/demarrer`), le plan avant le code, la doc avant la devinette, des commits sûrs, et un hook qui bloque les commandes destructrices avant qu'elles ne s'exécutent.
@@ -180,7 +186,7 @@ Le **pack guide** est pensé pour accompagner des personnes qui découvrent le d
 
 **Cadrer** : `/demarrer` (guide, mode accompagné en français, petits pas vérifiés, zéro jargon), `/plan-and-confirm` (guide, agents de recherche + critic + plan, OKAY obligatoire avant tout code), `/pick-stack` (default, interroge le vrai besoin puis recommande une stack argumentée).
 
-**Illustrer** : `/sketch` (default, montre 3 à 6 options visuelles basse fidélité sur une planche HTML locale AVANT d'écrire du code, vous choisissez, on construit ce que vous avez validé).
+**Illustrer** : `/sketch` (guide, montre 3 à 6 options visuelles basse fidélité sur une planche HTML locale AVANT d'écrire du code, vous choisissez, on construit ce que vous avez validé).
 
 **Documenter** : `/read-docs` (guide, récupère la doc à jour des bibliothèques et applique une méthode de lecture au lieu de deviner les API).
 
@@ -188,9 +194,9 @@ Le **pack guide** est pensé pour accompagner des personnes qui découvrent le d
 
 **Vérifier** : `/commit` (guide, commit sous quality gate, stage UNIQUEMENT les fichiers de la conversation), `/deep-review` (default, revue structurelle impitoyable, « correct ne suffit pas »), `/fix-errors` (guide, corrige toutes les erreurs lint et types, séquentiel par défaut), `/visual-check` (default, vérification visuelle dans un navigateur avec captures et rapport).
 
-**Ambiant, les rules** : `quality-gate` (guide, source unique de l'audit 4 axes avec glossaire en langage simple), `git-safety` (guide, interdit les commandes destructrices sans accord écrit, sauvegarde d'abord), `stay-in-scope` (guide, jamais au-delà de la demande), `token-efficiency` (guide, agents ou outils directs, jamais de contexte gaspillé), `ship-quality` (default, chaque livrable gère chargement, vide, erreur, succès), `docs-first` (default, jamais deviner une API), `global-preferences` (default, préférences assumées, à adapter).
+**Ambiant, les rules** : `quality-gate` (guide, source unique de l'audit 4 axes avec glossaire en langage simple), `git-safety` (guide, interdit les commandes destructrices sans accord écrit, sauvegarde d'abord), `stay-in-scope` (guide, jamais au-delà de la demande), `token-efficiency` (guide, agents ou outils directs, jamais de contexte gaspillé), `ship-quality` (default, chaque livrable gère chargement, vide, erreur, succès), `docs-first` (guide, jamais deviner une API), `global-preferences` (default, préférences assumées, à adapter).
 
-**Ambiant, les agents et le hook** : `critic` (guide, relecteur technique multi-angles), `explore-docs` (guide, recherche documentaire), `explore-codebase` (default, cartographie du code avant implémentation), `websearch` (default, recherche web ciblée), `guard-destructive` (guide, hook qui bloque `git reset --hard`, `push --force`, purges de base et `rm -rf` non scopé, avec un message clair : demande d'abord).
+**Ambiant, les agents et le hook** : `critic` (guide, relecteur technique multi-angles), `explore-docs` (guide, recherche documentaire), `explore-codebase` (guide, cartographie du code avant implémentation), `websearch` (guide, recherche web ciblée), `guard-destructive` (guide, hook qui bloque `git reset --hard`, `push --force`, purges de base et `rm -rf` non scopé, avec un message clair : demande d'abord).
 
 ### Installation
 
@@ -204,10 +210,12 @@ iroko init
 ```
 
 ```bash
-iroko init      # installation interactive (packs guide + default présélectionnés)
-iroko list      # installés et disponibles, avec étape et pack
-iroko update    # récupère la dernière version depuis GitHub et réinstalle
-iroko about     # auteur et liens
+npx @james10192/iroko init        # installation interactive (packs guide + default présélectionnés)
+npx @james10192/iroko list        # installés et disponibles, avec étape et pack
+npx @james10192/iroko update      # récupère la dernière version depuis GitHub et réinstalle
+npx @james10192/iroko doctor      # diagnostic de l'environnement (node, git, gh, ctx7, MCP, hook de garde)
+npx @james10192/iroko uninstall   # retire les composants installés et les fichiers d'état iroko
+npx @james10192/iroko about       # auteur et liens
 ```
 
 Les notes de version sont dans [CHANGELOG.md](./CHANGELOG.md).

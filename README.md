@@ -39,14 +39,14 @@ Rules, agents and the hook are **ambient**: always active, watching every step.
 ```bash
 npx @james10192/iroko init           # default: guide + default packs (22 components)
 npx @james10192/iroko init --guide   # self-contained beginner pack (16 components), CLI prompts in French
-npx @james10192/iroko init --full    # everything (24 components)
+npx @james10192/iroko init --full    # everything (25 components)
 npx @james10192/iroko list           # see each component's step and pack
 npx @james10192/iroko doctor         # diagnose the environment
 ```
 
 The **guide pack** is designed to accompany people who are discovering development: a French guided skill (`/demarrer`), plan-before-code, docs-before-guessing, safe commits, and a hook that blocks destructive commands before they run.
 
-## The 24 components
+## The 25 components
 
 ### Frame (cadrer)
 
@@ -73,6 +73,7 @@ The **guide pack** is designed to accompany people who are discovering developme
 | Component | Pack | What it does |
 |---|---|---|
 | `/oneshot` | default | ONE trivial task: explore, code, test. Strictly in scope, stop after 2 failed attempts. |
+| `/motion` | full | Animations with Motion (motion.dev): right API, verified imports, GPU-safe properties, reduced motion. |
 | `/create-pr` | full | Creates and pushes a PR with auto-generated title and description. |
 | `/create-issue` | full | Creates a GitHub issue with labels, template and epic linking. |
 
@@ -175,14 +176,14 @@ Les rules, les agents et le hook sont **ambiants** : toujours actifs, à chaque 
 ```bash
 npx @james10192/iroko init           # défaut : packs guide + default (22 composants)
 npx @james10192/iroko init --guide   # pack débutant autonome (16 composants), invites du CLI en français
-npx @james10192/iroko init --full    # tout (24 composants)
+npx @james10192/iroko init --full    # tout (25 composants)
 npx @james10192/iroko list           # étape et pack de chaque composant
 npx @james10192/iroko doctor --guide # diagnostic de l'environnement, en français
 ```
 
 Le **pack guide** est pensé pour accompagner des personnes qui découvrent le développement : un skill d'accompagnement en français (`/demarrer`), le plan avant le code, la doc avant la devinette, des commits sûrs, et un hook qui bloque les commandes destructrices avant qu'elles ne s'exécutent.
 
-### Les 24 composants
+### Les 25 composants
 
 **Cadrer** : `/demarrer` (guide, mode accompagné en français, petits pas vérifiés, zéro jargon), `/plan-and-confirm` (guide, agents de recherche + critic + plan, OKAY obligatoire avant tout code), `/pick-stack` (default, interroge le vrai besoin puis recommande une stack argumentée).
 
@@ -190,7 +191,7 @@ Le **pack guide** est pensé pour accompagner des personnes qui découvrent le d
 
 **Documenter** : `/read-docs` (guide, récupère la doc à jour des bibliothèques et applique une méthode de lecture au lieu de deviner les API).
 
-**Construire** : `/oneshot` (default, UNE tâche triviale : explorer, coder, tester, stop après 2 échecs), `/create-pr` (full, pull request avec titre et description générés), `/create-issue` (full, issue GitHub avec labels et gabarit).
+**Construire** : `/oneshot` (default, UNE tâche triviale : explorer, coder, tester, stop après 2 échecs), `/motion` (full, animations avec Motion : bonne API, imports vérifiés, propriétés tenues par le GPU, reduced motion), `/create-pr` (full, pull request avec titre et description générés), `/create-issue` (full, issue GitHub avec labels et gabarit).
 
 **Vérifier** : `/commit` (guide, commit sous quality gate, stage UNIQUEMENT les fichiers de la conversation), `/deep-review` (default, revue structurelle impitoyable, « correct ne suffit pas »), `/fix-errors` (guide, corrige toutes les erreurs lint et types, séquentiel par défaut), `/visual-check` (default, vérification visuelle dans un navigateur avec captures et rapport).
 

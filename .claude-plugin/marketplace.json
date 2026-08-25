@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Claude Code configuration: rules, skills, agents, hooks. Built in Abidjan.",
-    "version": "3.2.0"
+    "version": "3.3.0"
   },
   "plugins": [
     {
       "name": "iroko",
       "source": "./",
-      "description": "24 components for Claude Code: quality gate, git safety, docs-first pipeline, beginner guide pack, destructive-command guard, and more",
-      "version": "3.2.0",
+      "description": "25 components for Claude Code: quality gate, git safety, docs-first pipeline, beginner guide pack, destructive-command guard, and more",
+      "version": "3.3.0",
       "author": {
         "name": "Marcel DJEDJE-LI",
         "email": "marcel.djedjeli@africandigitconsulting.com"

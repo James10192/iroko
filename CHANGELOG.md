@@ -9,6 +9,14 @@ removals/renames and CLI interface changes are MAJOR.
 
 ## [Unreleased]
 
+## [3.3.0] — 2026-08-25
+
+New component (the MINOR bump): a Motion animation skill for the build step.
+
+### Added
+
+- **Skill `/motion`** (construire, full pack): build animations with Motion (motion.dev, formerly Framer Motion) without guessing the API — checks what is installed (`motion` vs legacy `framer-motion`), picks the right API from a decision table (motion components, AnimatePresence, layout, useAnimate, vanilla `animate`/`scroll`/`inView`), enforces verified imports per framework (including the Next.js App Router `"use client"` / `motion/react-client` gotcha), keeps animations on GPU-safe properties (transform/opacity/filter/clipPath, `layout` prop instead of animated dimensions), requires a reduced-motion path (`MotionConfig reducedMotion="user"` / `useReducedMotion`), and ships an `--audit` mode plus an anti-pattern blocklist. All APIs verified against current motion.dev docs via Context7.
+
 ## [3.2.0] — 2026-08-09
 
 Health-audit release: every critical and major defect from the August audit is fixed, plus a new `uninstall` command (the MINOR bump).

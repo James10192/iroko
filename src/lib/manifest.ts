@@ -1,6 +1,6 @@
 import type { Component, Pack } from "../types.js";
 
-// iroko v3 manifest — 24 components (7 rules, 12 skills, 4 agents, 1 hook)
+// iroko v3 manifest — 25 components (7 rules, 13 skills, 4 agents, 1 hook)
 // organized around the builder cycle:
 //   CADRER → ILLUSTRER → DOCUMENTER → CONSTRUIRE → VÉRIFIER
 // Rules, agents and hooks are "ambient" (always active).
@@ -144,6 +144,16 @@ export const components: Component[] = [
     path: "skills/oneshot",
     step: "construire",
     pack: "default",
+  },
+  {
+    name: "motion",
+    description:
+      "Animations with Motion (motion.dev): right API, verified imports, GPU-safe properties, reduced motion / Animations avec Motion (motion.dev) : bonne API, imports vérifiés, propriétés tenues par le GPU, reduced motion.",
+    type: "skill",
+    origin: "custom",
+    path: "skills/motion",
+    step: "construire",
+    pack: "full",
   },
   {
     name: "create-pr",

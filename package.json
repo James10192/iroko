@@ -1,6 +1,6 @@
 {
   "name": "@james10192/iroko",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Guardrail environment for AI-assisted work with Claude Code: rules, skills, agents and a destructive-command guard hook that keep the agent in scope, save tokens and gate every commit. Curated by a West African dev.",
   "type": "module",
   "bin": {

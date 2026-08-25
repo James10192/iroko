@@ -9,6 +9,20 @@ removals/renames and CLI interface changes are MAJOR.
 
 ## [Unreleased]
 
+## [4.0.0] — 2026-08-25
+
+Names the target audience understands instantly (the MAJOR bump: two renames), plus the end-to-end build orchestrator.
+
+### Changed
+
+- **`/grilling` renamed to `/cadrer`** — the skill now carries the name of its cycle step: a francophone reads `/cadrer` and knows exactly what happens. Content unchanged (relentless product interview, one question at a time, recommendation every time, decisions logged, OKAY required).
+- **`/deep-review` renamed to `/verdict`** — the review literally ends with APPROVE or BLOCK; the name now says it, and it is the same word in French and English. Existing installs keep their old `deep-review` files as unknown legacy components (listed by `update`, removable by hand); references in `/commit`, `/create-pr` and `/plan-and-confirm` updated.
+
+### Added
+
+- **Skill `/batir`** (construire, default pack): end-to-end build of ONE feature — analyse (codebase + current docs), short plan with explicit OKAY, construction in small verified increments, then the non-negotiable verification chain: lint + types, full test suite, `/visual-check` on changed UI, `/verdict` on the diff (BLOCK = fix first). Honest final report of what was verified and how. The orchestrator between `/oneshot` (too small) and `/plan-and-confirm` (bigger scopes).
+- **Panel mode in `/verdict`**: for plans, founding documents and products (not just code) — 3 to 6 domain experts (architecture, business, design, security, legal, payments...) launched in parallel, each with MANDATORY internet verification of the target's factual claims (every finding cites a URL), findings ordered BLOCK/HIGH/MED, then a synthesis that separates wrong facts (fix), structural judo moves (apply) and user decisions (ask). A false factual claim in a founding document is a BLOCK.
+
 ## [3.4.0] — 2026-08-25
 
 New component (the MINOR bump): the product-framing interview skill for the cadrer step.

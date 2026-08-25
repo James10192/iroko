@@ -322,6 +322,6 @@ Ce skill oblige l'agent à présenter un plan et à attendre votre OKAY avant d'
 
 ## Next step
 
-After OKAY and implementation → `/commit`. With the default pack installed: `/visual-check <route>` if the UI changed, and `/deep-review` before merging a large change.
+After OKAY and implementation → `/commit`. With the default pack installed: `/visual-check <route>` if the UI changed, and `/verdict` before merging a large change.
 
 $ARGUMENTS

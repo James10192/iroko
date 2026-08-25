@@ -1,6 +1,6 @@
 import type { Component, Pack } from "../types.js";
 
-// iroko v3 manifest — 26 components (7 rules, 14 skills, 4 agents, 1 hook)
+// iroko v4 manifest — 27 components (7 rules, 15 skills, 4 agents, 1 hook)
 // organized around the builder cycle:
 //   CADRER → ILLUSTRER → DOCUMENTER → CONSTRUIRE → VÉRIFIER
 // Rules, agents and hooks are "ambient" (always active).
@@ -106,12 +106,12 @@ export const components: Component[] = [
     pack: "guide",
   },
   {
-    name: "grilling",
+    name: "cadrer",
     description:
       "Relentless product interview: one question at a time, a recommendation every time, decisions logged, OKAY required / Interrogatoire produit sans complaisance : une question à la fois, une recommandation à chaque fois, décisions consignées, OKAY requis.",
     type: "skill",
     origin: "custom",
-    path: "skills/grilling",
+    path: "skills/cadrer",
     step: "cadrer",
     pack: "default",
   },
@@ -156,6 +156,16 @@ export const components: Component[] = [
     pack: "default",
   },
   {
+    name: "batir",
+    description:
+      "End-to-end build of ONE feature: analyse, short plan with OKAY, verified increments, then lint+types, tests, /visual-check and /verdict before commit / Construction de bout en bout d'UNE fonctionnalité : analyse, plan court avec OKAY, petits pas vérifiés, puis lint+types, tests, /visual-check et /verdict avant commit.",
+    type: "skill",
+    origin: "custom",
+    path: "skills/batir",
+    step: "construire",
+    pack: "default",
+  },
+  {
     name: "motion",
     description:
       "Animations with Motion (motion.dev): right API, verified imports, GPU-safe properties, reduced motion / Animations avec Motion (motion.dev) : bonne API, imports vérifiés, propriétés tenues par le GPU, reduced motion.",
@@ -196,12 +206,12 @@ export const components: Component[] = [
     pack: "guide",
   },
   {
-    name: "deep-review",
+    name: "verdict",
     description:
-      "Ruthless structural review: deletes complexity, blocks god files, 'correct is not enough' / Revue structurelle impitoyable : supprime la complexité, bloque les fichiers monstres, « correct ne suffit pas ».",
+      "Ruthless review ending in APPROVE or BLOCK: code judo, structural blockers, and a panel mode (domain experts + internet research) for plans and products / Revue impitoyable qui se termine par APPROVE ou BLOCK : code judo, blockers structurels, et un mode panel (experts + recherche internet) pour les plans et produits.",
     type: "skill",
     origin: "custom",
-    path: "skills/deep-review",
+    path: "skills/verdict",
     step: "verifier",
     pack: "default",
   },

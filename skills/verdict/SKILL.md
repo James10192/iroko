@@ -1,5 +1,5 @@
 ---
-name: deep-review
+name: verdict
 description: >
   Ruthless structural review of the branch diff: hunts for "code judo" moves that DELETE complexity,
   presumptive blockers (files past 1000 lines, spaghetti branching), inverted approval bar.
@@ -8,7 +8,7 @@ description: >
 disable-model-invocation: true
 ---
 
-# Deep Review
+# Verdict — the ruthless review
 
 Run an unusually strict review of the current branch's changes, focused on implementation quality, maintainability, abstraction quality, and codebase health.
 
@@ -123,9 +123,35 @@ Treat these as presumptive blockers unless clearly justified by the author:
 
 If the bar is not met, leave explicit, actionable feedback and push for the cleaner decomposition.
 
+## Panel mode — for plans, founding docs and products (not just code)
+
+When the target is a plan, a spec, founding documents or a product (or on `--panel`),
+run the same ruthless standards through a **panel of domain experts with mandatory
+internet research** instead of a single reviewer:
+
+1. **Cast the panel** from what the target touches (3 to 6): architecture/CTO,
+   business/pricing, design, security, legal/licensing, payments, DevX... One agent
+   per domain, launched in parallel (4 max per batch).
+2. **Each expert MUST verify against the world, not memory**: WebSearch/WebFetch the
+   current state of the art, the real competitors, the actual licenses, the official
+   docs. Every factual claim in the target gets checked; every finding cites a URL.
+3. **Each expert returns**: findings ordered [BLOCK|HIGH|MED] — claim quoted, reality
+   found (with source), structural correction — and a verdict APPROVE or BLOCK.
+4. **Synthesize, never relay**: cross the reports, resolve contradictions, merge
+   duplicates. Output three lists: facts that are wrong (fix, no debate), structural
+   judo moves (apply), and decisions that belong to the user (ask, one by one).
+5. A false factual claim in a founding document is a BLOCK. A layer an existing
+   standard already provides is a BLOCK. The bar is the same as for code.
+
+Panel mode exists because the cheapest moment to kill a bad idea is before it is
+built — and because a single reviewer shares the author's blind spots; six domain
+experts with fresh internet research do not.
+
 ## En clair (FR)
 
-À utiliser avant de merger un gros changement (grosse feature, refactor, plusieurs fichiers). Cette revue ne se contente pas de vérifier que « ça marche » : elle cherche si le changement rend le code plus difficile à maintenir, et s'il existe une façon nettement plus simple d'obtenir le même comportement. Un code correct mais qui salit la base est refusé.
+À utiliser avant de merger un gros changement (grosse feature, refactor, plusieurs fichiers). Cette revue ne se contente pas de vérifier que « ça marche » : elle cherche si le changement rend le code plus difficile à maintenir, et s'il existe une façon nettement plus simple d'obtenir le même comportement. Un code correct mais qui salit la base est refusé. Le verdict tombe : APPROVE ou BLOCK, et BLOCK veut dire on corrige avant, pas « on verra ».
+
+Le mode panel s'applique à autre chose que du code : un plan, un document fondateur, un produit. Plusieurs experts spécialisés relisent chacun leur domaine, avec obligation de vérifier sur internet (concurrents réels, licences réelles, doc officielle) au lieu de croire le document sur parole. Une affirmation fausse dans un document fondateur est bloquante : c'est avant de construire qu'elle coûte zéro à corriger.
 
 ## Next step
 

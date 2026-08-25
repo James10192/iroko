@@ -22,7 +22,7 @@ npx @james10192/iroko init
 |---|---|
 | **Frame it** | The AI never codes something you did not ask for. Plan first, explicit OKAY required (`/plan-and-confirm`, `stay-in-scope`). |
 | **Save tokens** | Targeted research before code, agents only when they earn their cost (`token-efficiency`, `/read-docs`). |
-| **Verify it** | Nothing ships without an audit: quality gate on every commit, ruthless review on demand (`quality-gate`, `/commit`, `/deep-review`). |
+| **Verify it** | Nothing ships without an audit: quality gate on every commit, ruthless review on demand (`quality-gate`, `/commit`, `/verdict`). |
 
 ## The builder cycle
 
@@ -37,23 +37,23 @@ Rules, agents and the hook are **ambient**: always active, watching every step.
 ## Quickstart
 
 ```bash
-npx @james10192/iroko init           # default: guide + default packs (23 components)
+npx @james10192/iroko init           # default: guide + default packs (24 components)
 npx @james10192/iroko init --guide   # self-contained beginner pack (16 components), CLI prompts in French
-npx @james10192/iroko init --full    # everything (26 components)
+npx @james10192/iroko init --full    # everything (27 components)
 npx @james10192/iroko list           # see each component's step and pack
 npx @james10192/iroko doctor         # diagnose the environment
 ```
 
 The **guide pack** is designed to accompany people who are discovering development: a French guided skill (`/demarrer`), plan-before-code, docs-before-guessing, safe commits, and a hook that blocks destructive commands before they run.
 
-## The 26 components
+## The 27 components
 
 ### Frame (cadrer)
 
 | Component | Pack | What it does |
 |---|---|---|
 | `/demarrer` | guide | Guided mode in French for complete beginners: tiny verified steps, zero jargon. |
-| `/grilling` | default | Relentless product interview: one question at a time, a recommendation every time, decisions logged, OKAY required. |
+| `/cadrer` | default | Relentless product interview: one question at a time, a recommendation every time, decisions logged, OKAY required. |
 | `/plan-and-confirm` | guide | Research agents + critic review + plan. Explicit OKAY required before any code. |
 | `/pick-stack` | default | Interviews the real need (budget, audience, offline, payments) then recommends one justified stack. |
 
@@ -74,6 +74,7 @@ The **guide pack** is designed to accompany people who are discovering developme
 | Component | Pack | What it does |
 |---|---|---|
 | `/oneshot` | default | ONE trivial task: explore, code, test. Strictly in scope, stop after 2 failed attempts. |
+| `/batir` | default | End-to-end build of ONE feature: analyse, short plan with OKAY, verified increments, then lint+types, tests, /visual-check and /verdict. |
 | `/motion` | full | Animations with Motion (motion.dev): right API, verified imports, GPU-safe properties, reduced motion. |
 | `/create-pr` | full | Creates and pushes a PR with auto-generated title and description. |
 | `/create-issue` | full | Creates a GitHub issue with labels, template and epic linking. |
@@ -83,7 +84,7 @@ The **guide pack** is designed to accompany people who are discovering developme
 | Component | Pack | What it does |
 |---|---|---|
 | `/commit` | guide | Quality-gated commit: stages ONLY the conversation's files, audits the diff, conventional message. |
-| `/deep-review` | default | Ruthless structural review: deletes complexity, blocks god files, "correct is not enough". |
+| `/verdict` | default | Ruthless review ending in APPROVE or BLOCK: code judo, structural blockers, panel mode (experts + web research) for plans and products. |
 | `/fix-errors` | guide | Fixes all lint and type errors. Sequential by default, parallel only past 20 errors. |
 | `/visual-check` | default | Opens a browser to visually verify a page: screenshots, accessibility snapshot, issue report. |
 
@@ -160,7 +161,7 @@ npx @james10192/iroko init --guide
 |---|---|
 | **Cadrer** | L'IA ne code jamais quelque chose que vous n'avez pas demandé. Plan d'abord, OKAY explicite obligatoire (`/plan-and-confirm`, `stay-in-scope`). |
 | **Économiser** | Recherche ciblée avant le code, agents seulement quand ils valent leur coût (`token-efficiency`, `/read-docs`). |
-| **Vérifier** | Rien ne part sans audit : quality gate sur chaque commit, revue impitoyable à la demande (`quality-gate`, `/commit`, `/deep-review`). |
+| **Vérifier** | Rien ne part sans audit : quality gate sur chaque commit, revue impitoyable à la demande (`quality-gate`, `/commit`, `/verdict`). |
 
 ### Le cycle du bâtisseur
 
@@ -175,26 +176,26 @@ Les rules, les agents et le hook sont **ambiants** : toujours actifs, à chaque 
 ### Démarrage rapide
 
 ```bash
-npx @james10192/iroko init           # défaut : packs guide + default (23 composants)
+npx @james10192/iroko init           # défaut : packs guide + default (24 composants)
 npx @james10192/iroko init --guide   # pack débutant autonome (16 composants), invites du CLI en français
-npx @james10192/iroko init --full    # tout (26 composants)
+npx @james10192/iroko init --full    # tout (27 composants)
 npx @james10192/iroko list           # étape et pack de chaque composant
 npx @james10192/iroko doctor --guide # diagnostic de l'environnement, en français
 ```
 
 Le **pack guide** est pensé pour accompagner des personnes qui découvrent le développement : un skill d'accompagnement en français (`/demarrer`), le plan avant le code, la doc avant la devinette, des commits sûrs, et un hook qui bloque les commandes destructrices avant qu'elles ne s'exécutent.
 
-### Les 26 composants
+### Les 27 composants
 
-**Cadrer** : `/demarrer` (guide, mode accompagné en français, petits pas vérifiés, zéro jargon), `/grilling` (default, interrogatoire produit sans complaisance : une question à la fois, une recommandation à chaque fois, décisions consignées, OKAY requis), `/plan-and-confirm` (guide, agents de recherche + critic + plan, OKAY obligatoire avant tout code), `/pick-stack` (default, interroge le vrai besoin puis recommande une stack argumentée).
+**Cadrer** : `/demarrer` (guide, mode accompagné en français, petits pas vérifiés, zéro jargon), `/cadrer` (default, interrogatoire produit sans complaisance : une question à la fois, une recommandation à chaque fois, décisions consignées, OKAY requis), `/plan-and-confirm` (guide, agents de recherche + critic + plan, OKAY obligatoire avant tout code), `/pick-stack` (default, interroge le vrai besoin puis recommande une stack argumentée).
 
 **Illustrer** : `/sketch` (guide, montre 3 à 6 options visuelles basse fidélité sur une planche HTML locale AVANT d'écrire du code, vous choisissez, on construit ce que vous avez validé).
 
 **Documenter** : `/read-docs` (guide, récupère la doc à jour des bibliothèques et applique une méthode de lecture au lieu de deviner les API).
 
-**Construire** : `/oneshot` (default, UNE tâche triviale : explorer, coder, tester, stop après 2 échecs), `/motion` (full, animations avec Motion : bonne API, imports vérifiés, propriétés tenues par le GPU, reduced motion), `/create-pr` (full, pull request avec titre et description générés), `/create-issue` (full, issue GitHub avec labels et gabarit).
+**Construire** : `/oneshot` (default, UNE tâche triviale : explorer, coder, tester, stop après 2 échecs), `/batir` (default, construction de bout en bout d'UNE fonctionnalité : analyse, plan court avec OKAY, petits pas vérifiés, puis lint+types, tests, /visual-check et /verdict), `/motion` (full, animations avec Motion : bonne API, imports vérifiés, propriétés tenues par le GPU, reduced motion), `/create-pr` (full, pull request avec titre et description générés), `/create-issue` (full, issue GitHub avec labels et gabarit).
 
-**Vérifier** : `/commit` (guide, commit sous quality gate, stage UNIQUEMENT les fichiers de la conversation), `/deep-review` (default, revue structurelle impitoyable, « correct ne suffit pas »), `/fix-errors` (guide, corrige toutes les erreurs lint et types, séquentiel par défaut), `/visual-check` (default, vérification visuelle dans un navigateur avec captures et rapport).
+**Vérifier** : `/commit` (guide, commit sous quality gate, stage UNIQUEMENT les fichiers de la conversation), `/verdict` (default, revue impitoyable qui se termine par APPROVE ou BLOCK, mode panel experts + recherche web pour les plans et produits), `/fix-errors` (guide, corrige toutes les erreurs lint et types, séquentiel par défaut), `/visual-check` (default, vérification visuelle dans un navigateur avec captures et rapport).
 
 **Ambiant, les rules** : `quality-gate` (guide, source unique de l'audit 4 axes avec glossaire en langage simple), `git-safety` (guide, interdit les commandes destructrices sans accord écrit, sauvegarde d'abord), `stay-in-scope` (guide, jamais au-delà de la demande), `token-efficiency` (guide, agents ou outils directs, jamais de contexte gaspillé), `ship-quality` (default, chaque livrable gère chargement, vide, erreur, succès), `docs-first` (guide, jamais deviner une API), `global-preferences` (default, préférences assumées, à adapter).
 

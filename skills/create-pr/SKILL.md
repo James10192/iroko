@@ -62,6 +62,6 @@ FR : vérifier gh, l'installer soi-même selon l'OS, seule l'authentification (`
 
 ## Next step
 
-Before merging a large change → `/deep-review` on the branch. After merge → back to the next task with `/plan-and-confirm` or `/oneshot`.
+Before merging a large change → `/verdict` on the branch. After merge → back to the next task with `/plan-and-confirm` or `/oneshot`.
 
 User: $ARGUMENTS

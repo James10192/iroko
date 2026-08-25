@@ -105,6 +105,6 @@ Ce skill commit uniquement les fichiers touchés pendant la conversation (jamais
 
 ## Next step
 
-Large or structural change → if installed (with the default pack): `/deep-review` before merging. Ready to merge → if installed (with the full pack): `/create-pr`.
+Large or structural change → if installed (with the default pack): `/verdict` before merging. Ready to merge → if installed (with the full pack): `/create-pr`.
 
 $ARGUMENTS

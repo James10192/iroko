@@ -1,5 +1,5 @@
 ---
-name: grilling
+name: cadrer
 description: >
   Relentless product interview BEFORE building: one question at a time, a recommended
   answer every time, facts looked up in the code instead of asked, every decision logged,
@@ -10,7 +10,7 @@ description: >
 argument-hint: "<the plan, feature or product to grill>"
 ---
 
-# Grilling — the interview that hardens a plan
+# Cadrer — the interview that hardens a plan
 
 A plan that has not been interrogated is a list of wishes. This skill turns it into a
 set of decisions: walk the decision tree branch by branch, resolve the dependencies

@@ -1,6 +1,6 @@
 import type { Component, Pack } from "../types.js";
 
-// iroko v3 manifest — 25 components (7 rules, 13 skills, 4 agents, 1 hook)
+// iroko v3 manifest — 26 components (7 rules, 14 skills, 4 agents, 1 hook)
 // organized around the builder cycle:
 //   CADRER → ILLUSTRER → DOCUMENTER → CONSTRUIRE → VÉRIFIER
 // Rules, agents and hooks are "ambient" (always active).
@@ -104,6 +104,16 @@ export const components: Component[] = [
     path: "skills/plan-and-confirm",
     step: "cadrer",
     pack: "guide",
+  },
+  {
+    name: "grilling",
+    description:
+      "Relentless product interview: one question at a time, a recommendation every time, decisions logged, OKAY required / Interrogatoire produit sans complaisance : une question à la fois, une recommandation à chaque fois, décisions consignées, OKAY requis.",
+    type: "skill",
+    origin: "custom",
+    path: "skills/grilling",
+    step: "cadrer",
+    pack: "default",
   },
   {
     name: "pick-stack",

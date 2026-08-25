@@ -9,6 +9,14 @@ removals/renames and CLI interface changes are MAJOR.
 
 ## [Unreleased]
 
+## [3.4.0] — 2026-08-25
+
+New component (the MINOR bump): the product-framing interview skill for the cadrer step.
+
+### Added
+
+- **Skill `/grilling`** (cadrer, default pack): relentless product interview BEFORE building — one question at a time (never several), a recommended answer with honest trade-offs every time, facts looked up in the code/docs/web instead of asked (only decisions belong to the user), dependency-ordered branches (structural questions before details), every decision AND every rejection logged, inconsistencies challenged explicitly, nothing built until the shared-understanding summary receives an explicit OKAY, decisions persisted (project memory or CADRAGE.md). Positioned before `/pick-stack` and `/plan-and-confirm` in the cycle: grilling settles the what and the why, plan-and-confirm settles the how.
+
 ## [3.3.0] — 2026-08-25
 
 New component (the MINOR bump): a Motion animation skill for the build step.

@@ -1,0 +1,45 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B — Terroir premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--papier:#F4EDE1;--terre:#A4432B;--brousse:#3E4A2E;--encre:#221E18;--ocre:#D9A441}
+*{box-sizing:border-box;margin:0}
+body{font-family:Inter,sans-serif;background:var(--papier);color:var(--encre)}
+header{display:flex;justify-content:space-between;padding:28px 6vw;border-bottom:1px solid #0002;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+.logo{font-family:Fraunces;font-weight:700;font-size:20px;text-transform:none;letter-spacing:0}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:5vw;padding:80px 6vw 60px;align-items:center}
+.kicker{color:var(--terre);font-size:13px;letter-spacing:.2em;text-transform:uppercase}
+h1{font-family:Fraunces;font-weight:400;font-size:clamp(42px,5.4vw,78px);line-height:1.02;margin:18px 0 24px}
+h1 i{color:var(--terre)}
+p.lead{font-size:18px;line-height:1.65;max-width:470px;color:#221e18cc}
+.btn{display:inline-block;margin-top:34px;background:var(--brousse);color:var(--papier);padding:16px 28px;border-radius:2px;font-size:15px;letter-spacing:.05em}
+.link{margin-left:22px;border-bottom:1px solid;font-size:15px}
+.visual{position:relative;aspect-ratio:1;background:var(--brousse);border-radius:50% 50% 4px 4px;overflow:hidden}
+.visual svg{position:absolute;inset:0;width:100%;height:100%}
+.stamp{position:absolute;right:-10px;top:30px;width:130px;height:130px;border-radius:50%;background:var(--ocre);display:grid;place-items:center;text-align:center;font-family:Fraunces;font-size:15px;line-height:1.15;transform:rotate(12deg);animation:tourne 20s linear infinite}
+@keyframes tourne{to{transform:rotate(372deg)}}
+.row{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #0002;margin:0 6vw}
+.row div{padding:30px 24px 40px 0}.row h4{font-family:Fraunces;font-size:24px;font-weight:400;margin-bottom:8px}
+.row .num{font-family:Fraunces;color:var(--terre);font-size:14px}
+@media(max-width:760px){.hero{grid-template-columns:1fr;padding:40px 16px}header{padding:20px 16px}header span{display:none}.row{grid-template-columns:1fr;margin:0 16px}.link{display:block;margin:16px 0 0}}
+</style></head><body>
+<header><div class="logo">Ferme Akwaba</div><span>La ferme · Nos produits · Pour les restaurants · Contact</span></header>
+<section class="hero">
+ <div>
+  <div class="kicker">Aviculture familiale — Bingerville, Côte d'Ivoire</div>
+  <h1>Le goût du poulet <i>d'avant</i>, élevé sans raccourci.</h1>
+  <p class="lead">Nos poulets grandissent 45 jours au rythme naturel, nourris de maïs local. Nos pondeuses donnent des œufs au jaune bien orange, ramassés chaque matin.</p>
+  <a class="btn">Découvrir nos produits</a><a class="link">Offre maquis & restaurants →</a>
+ </div>
+ <div class="visual">
+  <svg viewBox="0 0 400 400"><circle cx="200" cy="420" r="230" fill="#D9A441" opacity=".25"/>
+   <ellipse cx="200" cy="250" rx="95" ry="80" fill="#F4EDE1"/><circle cx="265" cy="170" r="42" fill="#F4EDE1"/>
+   <path d="M255 128 q8-22 18-4 q8-20 16 2 q10-14 12 8" fill="#A4432B"/><path d="M300 172 l24 8 -24 8z" fill="#D9A441"/>
+   <path d="M288 196 q6 18 -4 26 q-10 -8 -4 -26" fill="#A4432B"/><circle cx="276" cy="164" r="5" fill="#221E18"/>
+   <path d="M110 230 q-50 -40 -30 -90 q30 30 50 70z" fill="#e7dccb"/><path d="M180 330 v40 m40 -40 v40" stroke="#D9A441" stroke-width="7"/>
+   <ellipse cx="90" cy="360" rx="22" ry="28" fill="#fff8ec"/><ellipse cx="130" cy="366" rx="20" ry="25" fill="#e9d2b0"/></svg>
+  <div class="stamp">Pondu<br>ce matin<br>★</div>
+ </div>
+</section>
+<div class="row"><div><span class="num">01</span><h4>Poulet de chair</h4><p>Vivant ou prêt à cuire, plumé et vidé à la ferme.</p></div><div><span class="num">02</span><h4>Œufs de pondeuses</h4><p>Au plateau de 30, ou en carton de 12 pour la maison.</p></div><div><span class="num">03</span><h4>Pour les pros</h4><p>Maquis, restaurants, pâtisseries : prix dégressifs et livraison planifiée.</p></div></div>
+</body></html>

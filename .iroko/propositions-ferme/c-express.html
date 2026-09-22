@@ -1,0 +1,50 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>C — Commande express</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFFBF2;--ink:#14231A;--vert:#0F7B45;--or:#FF8A00;--line:#E9E1CF}
+*{box-sizing:border-box;margin:0}body{font-family:Outfit,sans-serif;background:var(--bg);color:var(--ink)}
+.app{max-width:440px;margin:0 auto;padding:18px 16px 120px}
+.top{display:flex;justify-content:space-between;align-items:center}.top b{font-size:20px}
+.pill{background:#E7F5EC;color:var(--vert);border-radius:99px;padding:6px 12px;font-size:13px;font-weight:600}
+h1{font-size:30px;font-weight:800;line-height:1.1;margin:18px 0 6px}.muted{color:#14231a99;font-size:15px}
+.tabs{display:flex;gap:8px;margin:18px 0}.tabs span{padding:9px 14px;border-radius:99px;border:1px solid var(--line);font-size:14px}.tabs .on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.prod{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:14px}
+.prod .h{display:flex;justify-content:space-between;align-items:flex-start}
+.prod h3{font-size:19px}.prix{font-size:22px;font-weight:800;color:var(--vert)}
+.opts{display:flex;gap:6px;margin:10px 0}.opts span{font-size:13px;padding:5px 10px;border-radius:10px;background:#F5F0E4}.opts .on{background:var(--or);color:#fff}
+.qty{display:flex;align-items:center;gap:14px}.qty button{width:40px;height:40px;border-radius:12px;border:0;background:var(--ink);color:#fff;font-size:22px}.qty b{font-size:20px;min-width:24px;text-align:center}
+.tray{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;background:#E8D6B3;padding:10px;border-radius:14px;margin-top:12px}
+.cell{aspect-ratio:1;border-radius:50%;background:#d4bf98;box-shadow:inset 0 2px 3px #0002;display:grid;place-items:center}
+.egg{width:78%;height:92%;border-radius:50% 50% 46% 46%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#fff,#F2DDBE 60%,#E0C194);transform:scale(0);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.cell.full .egg{transform:scale(1)}
+.zone{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px dashed var(--vert);border-radius:16px;padding:12px 14px;font-size:15px}
+.pay{display:flex;gap:6px;margin-top:10px}.pay span{font-size:12px;font-weight:600;padding:6px 10px;border-radius:8px;color:#fff}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:14px 16px 20px;background:linear-gradient(transparent,var(--bg) 30%)}
+.bar a{max-width:408px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;background:#25D366;color:var(--ink);border-radius:18px;padding:16px 18px;font-weight:800;font-size:17px;text-decoration:none}
+.bump{animation:bump .3s}@keyframes bump{50%{transform:scale(1.06)}}
+</style></head><body><div class="app">
+<div class="top"><b>🐓 Ferme Akwaba</b><span class="pill">● Ouvert · livre aujourd'hui</span></div>
+<h1>Commande en 30 secondes.</h1><p class="muted">Choisis, on confirme sur WhatsApp, tu paies à la livraison ou par Mobile Money.</p>
+<div class="tabs"><span class="on">Tout</span><span>Poulets</span><span>Œufs</span><span>Pros</span></div>
+<div class="prod"><div class="h"><div><h3>Poulet de chair</h3><p class="muted">~1,8 kg · 45 jours</p></div><div class="prix">3 500 F</div></div>
+<div class="opts"><span>Vivant</span><span class="on">Prêt à cuire +1 000</span><span>Découpé +1 500</span></div>
+<div class="qty"><button onclick="q('p',-1)">−</button><b id="p">2</b><button onclick="q('p',1)">+</button></div></div>
+<div class="prod"><div class="h"><div><h3>Plateau d'œufs</h3><p class="muted">30 œufs · pondus &lt; 48 h</p></div><div class="prix">2 800 F</div></div>
+<div class="qty" style="margin-top:10px"><button onclick="q('o',-1)">−</button><b id="o">1</b><button onclick="q('o',1)">+</button><span class="muted" id="eggs">30 œufs</span></div>
+<div class="tray" id="tray"></div></div>
+<div class="zone"><span>🛵 Livraison · <b>Cocody</b></span><span>1 000 F</span></div>
+<div class="pay"><span style="background:#1DC8F2">Wave</span><span style="background:#FF7900">Orange Money</span><span style="background:#FFCC00;color:#000">MTN MoMo</span><span style="background:#555">Cash</span></div>
+</div>
+<div class="bar"><a id="cta"><span>💬 Commander sur WhatsApp</span><span id="tot"></span></a></div>
+<script>
+const st={p:2,o:1},P={p:4500,o:2800},tray=document.getElementById('tray');
+for(let i=0;i<30;i++)tray.insertAdjacentHTML('beforeend','<div class="cell"><div class="egg"></div></div>');
+function fill(n){[...tray.children].forEach((c,i)=>setTimeout(()=>c.classList.toggle('full',i<n),i*25))}
+function render(){for(const k in st)document.getElementById(k).textContent=st[k];
+ document.getElementById('eggs').textContent=st.o*30+' œufs';
+ const t=st.p*P.p+st.o*P.o+1000;document.getElementById('tot').textContent=t.toLocaleString('fr-FR')+' F';
+ const c=document.getElementById('cta');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');fill(st.o?30:0)}
+function q(k,d){st[k]=Math.max(0,st[k]+d);render()}
+window.q=q;render();
+</script></body></html>

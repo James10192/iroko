@@ -1,0 +1,56 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A — Wax & Marché</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--or:#F77F00;--vert:#0B8A4B;--creme:#FFF6E9;--noir:#1B1410;--jaune:#FFC43D}
+*{box-sizing:border-box;margin:0}
+body{font-family:'DM Sans',sans-serif;background:var(--creme);color:var(--noir)}
+.wax{position:absolute;inset:0;opacity:.95;background-color:var(--or);
+background-image:
+radial-gradient(circle at 25% 25%, var(--jaune) 0 9px, transparent 10px),
+radial-gradient(circle at 75% 75%, var(--vert) 0 14px, var(--creme) 15px 19px, transparent 20px),
+conic-gradient(from 45deg at 50% 50%, var(--noir) 0 25%, transparent 0 50%, var(--noir) 0 75%, transparent 0);
+background-size:64px 64px,64px 64px,32px 32px;background-blend-mode:normal}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 5vw;background:var(--noir);color:var(--creme)}
+.logo{font-family:'Bricolage Grotesque';font-weight:800;font-size:22px}.logo b{color:var(--jaune)}
+nav a{color:var(--creme);margin-left:22px;text-decoration:none;font-size:15px}
+.hero{position:relative;display:grid;grid-template-columns:1.1fr .9fr;min-height:620px}
+.left{padding:70px 5vw;position:relative;z-index:1}
+.tag{display:inline-block;background:var(--vert);color:#fff;padding:6px 14px;border-radius:99px;font-weight:600;font-size:14px}
+h1{font-family:'Bricolage Grotesque';font-weight:800;font-size:clamp(44px,6vw,86px);line-height:.95;margin:20px 0;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--or)}
+.sub{font-size:19px;max-width:520px;line-height:1.5}
+.ctas{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+.btn{padding:16px 24px;border-radius:14px;font-weight:600;text-decoration:none;font-size:17px;border:3px solid var(--noir)}
+.wa{background:#25D366;color:var(--noir);box-shadow:5px 5px 0 var(--noir)}
+.ghost{background:var(--creme);color:var(--noir)}
+.right{position:relative;overflow:hidden;border-left:6px solid var(--noir)}
+.card{position:absolute;background:var(--creme);border:3px solid var(--noir);border-radius:20px;padding:18px 22px;box-shadow:8px 8px 0 var(--noir);width:250px}
+.card h3{font-family:'Bricolage Grotesque';font-size:22px}.card .p{font-family:'Bricolage Grotesque';font-weight:800;font-size:34px;color:var(--vert)}
+.card small{opacity:.7}
+.c1{top:70px;left:40px;transform:rotate(-4deg)}.c2{top:300px;left:150px;transform:rotate(3deg)}
+.emoji{font-size:44px}
+.strip{background:var(--noir);color:var(--jaune);font-family:'Bricolage Grotesque';font-weight:800;font-size:22px;padding:14px 0;white-space:nowrap;overflow:hidden}
+.strip span{display:inline-block;animation:defile 18s linear infinite}
+@keyframes defile{to{transform:translateX(-50%)}}
+.zones{padding:50px 5vw;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.zones b{font-family:'Bricolage Grotesque';font-size:24px;margin-right:12px}
+.z{border:2px solid var(--noir);border-radius:99px;padding:8px 16px;background:#fff}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.right{min-height:470px;border-left:0;border-top:6px solid var(--noir)}nav{display:none}.left{padding:40px 16px}.c1{left:16px}.c2{left:auto;right:16px;top:240px}}
+</style></head><body>
+<header><div class="logo">Ferme <b>Akwaba</b> 🐓</div><nav><a>Nos produits</a><a>Prix</a><a>Livraison</a><a>La ferme</a></nav></header>
+<section class="hero">
+ <div class="left">
+  <span class="tag">🇨🇮 Élevé à Bingerville · livré à Abidjan</span>
+  <h1>Poulet bien <em>choco</em>,<br>œufs tout frais.</h1>
+  <p class="sub">Poulets de chair et œufs de pondeuses, directement de notre poulailler à ta cuisine. Pas d'intermédiaire, pas de « poulet congelé ».</p>
+  <div class="ctas"><a class="btn wa">💬 Commander sur WhatsApp</a><a class="btn ghost">Voir les prix</a></div>
+ </div>
+ <div class="right"><div class="wax"></div>
+  <div class="card c1"><div class="emoji">🐔</div><h3>Poulet de chair</h3><div class="p">3 500 F</div><small>vivant · ~1,8 kg</small></div>
+  <div class="card c2"><div class="emoji">🥚</div><h3>Plateau de 30 œufs</h3><div class="p">2 800 F</div><small>pondus il y a moins de 48 h</small></div>
+ </div>
+</section>
+<div class="strip"><span>🐓 FRAIS DU JOUR · 🥚 PLATEAU LIVRÉ · 🛵 COCODY · YOPOUGON · ABOBO · MARCORY · 💚 WAVE · ORANGE MONEY · MTN MOMO · 🐓 FRAIS DU JOUR · 🥚 PLATEAU LIVRÉ · 🛵 COCODY · YOPOUGON · ABOBO · MARCORY · 💚 WAVE · ORANGE MONEY · MTN MOMO ·&nbsp;</span></div>
+<div class="zones"><b>On livre à :</b><span class="z">Cocody</span><span class="z">Bingerville</span><span class="z">Yopougon</span><span class="z">Abobo</span><span class="z">Marcory</span><span class="z">Koumassi</span><span class="z">Plateau</span><span class="z">Port-Bouët</span></div>
+</body></html>

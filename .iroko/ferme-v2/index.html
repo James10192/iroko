@@ -53,6 +53,15 @@ p{margin:0}
 .notch[aria-expanded="true"]::after{rotate:-45deg}
 .cmd{display:inline-flex;align-items:center;gap:10px;background:var(--poussin);color:var(--encre);text-decoration:none;font-weight:700;padding:13px 20px;border-radius:8px;font-size:17px;transition:transform .2s}
 .cmd:hover{transform:translateY(-2px)}
+.top-r{display:flex;align-items:center;gap:8px}
+.cmd{position:relative}
+.cmd .n{position:absolute;top:-7px;right:-7px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--vert);color:var(--creme);font-size:12px;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px var(--brousse)}
+.cmd .n[hidden]{display:none}
+.menu-btn{display:none;width:46px;height:46px;border-radius:10px;border:0;background:var(--vert);cursor:pointer;place-items:center;position:relative}
+.menu-btn span{display:block;width:20px;height:2px;background:var(--creme);box-shadow:0 -6px 0 var(--creme),0 6px 0 var(--creme);transition:.3s}
+.menu-btn[aria-expanded="true"] span{background:transparent;box-shadow:none}
+.menu-btn[aria-expanded="true"]::before,.menu-btn[aria-expanded="true"]::after{content:"";position:absolute;width:20px;height:2px;background:var(--creme);rotate:45deg}
+.menu-btn[aria-expanded="true"]::after{rotate:-45deg}
 .cmd svg{width:20px;height:20px}
 .menu{position:fixed;inset:0;z-index:35;background:var(--vert);display:grid;place-items:center;clip-path:circle(0 at 50% 0);transition:clip-path .7s cubic-bezier(.7,0,.2,1),visibility 0s .7s;visibility:hidden}
 .menu.open{clip-path:circle(150% at 50% 0);visibility:visible;transition:clip-path .7s cubic-bezier(.7,0,.2,1)}
@@ -64,6 +73,7 @@ p{margin:0}
 .hero{position:relative;min-height:100svh;display:grid;place-items:center;overflow:hidden;background:var(--brousse);padding-block:120px 110px}
 #motif{position:absolute;inset:0;width:100%;height:100%}
 .hero-in{position:relative;display:grid;justify-items:center;gap:26px;text-align:center;padding-inline:var(--gutter)}
+.season .short,.btn .short,.send .short{display:none}
 .season{display:inline-flex;align-items:center;gap:10px;background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.45);color:var(--poussin);border-radius:999px;padding:7px 16px;font-size:15px;font-weight:600;text-decoration:none}
 .season i{width:8px;height:8px;border-radius:50%;background:var(--poussin);box-shadow:0 0 0 0 rgba(245,200,66,.6);animation:pulse 2s infinite}
 @keyframes pulse{70%{box-shadow:0 0 0 10px rgba(245,200,66,0)}100%{box-shadow:0 0 0 0 rgba(245,200,66,0)}}
@@ -100,6 +110,7 @@ p{margin:0}
 .add{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:10px 16px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;color:var(--encre);transition:transform .25s}
 .add:hover{transform:scale(1.05)}
 .add svg{width:14px;height:14px}
+.add .s{display:none}
 .rows li.on .row{padding-left:14px}
 .rows li.on .row-detail{max-height:140px;opacity:1}
 .rows .illus{position:static;display:inline-block;margin-top:14px}
@@ -178,7 +189,7 @@ p{margin:0}
 .egg-total{text-align:right;line-height:1;color:var(--encre-doux);font-size:15px;max-width:15ch;justify-self:end}
 .egg-total b{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-weight:600;font-size:36px;color:var(--vert);font-variant-numeric:tabular-nums;display:inline-block;margin-right:5px}
 .egg-total small{display:block;margin-top:6px;font-size:14px;line-height:1.3;font-weight:600;color:var(--mais-fonce)}
-.egg-sub{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.egg-sub{display:flex;justify-content:space-between;align-items:center;gap:14px}
 .egg-sub.loose{padding-top:12px;border-top:1px dashed var(--trait)}
 .sub-t{display:block;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--vert)}
 .egg-price{font-size:15px;color:var(--mais-fonce);font-weight:700;font-variant-numeric:tabular-nums}
@@ -208,7 +219,7 @@ p{margin:0}
 .field input:focus,.field select:focus{border-color:var(--vert);outline:none;box-shadow:0 0 0 3px rgba(10,77,42,.18)}
 .hint{grid-column:1/-1;font-size:15px;color:var(--vert);font-weight:600}
 .feast{grid-column:1/-1;font-size:14px;color:var(--encre-doux);background:#FFF4D6;border-left:3px solid var(--poussin);padding:8px 12px}
-.total{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:17px}
+.total{display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap;font-size:17px}
 .total strong{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-size:40px;color:var(--vert);font-variant-numeric:tabular-nums;white-space:nowrap}
 .bubble{background:#DCF8C6;color:#1F2B22;border-radius:12px 12px 12px 2px;padding:14px 16px;font-size:15px;line-height:1.5;white-space:pre-line}
 .bubble small{display:block;font-size:12px;color:#5B6B60;margin-bottom:4px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:normal}
@@ -261,8 +272,27 @@ p{margin:0}
   body{font-size:17px}
   .brand{font-size:16px;gap:8px}.brand svg{width:24px;height:28px}
   .brand .full{display:none}
-  .notch{width:84px;height:44px}.notch span{width:26px}
-  .cmd{padding:10px 14px;font-size:15px}
+  .notch{display:none}
+  .menu-btn{display:grid}
+  .cmd{width:46px;height:46px;padding:0;justify-content:center;border-radius:10px}
+  .cmd .t{display:none}
+  .season .long,.btn .long,.send .long{display:none}.season .short,.btn .short,.send .short{display:inline}
+  .sub-t{font-size:12px;letter-spacing:.07em;white-space:nowrap}
+  .hero-in{gap:22px}
+  .prices{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:420px}
+  .price{flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px;text-align:left;font-size:14px}
+  .ctas{display:grid;grid-template-columns:1fr auto;gap:10px;width:100%;max-width:420px}
+  .btn-jaune{justify-content:center}
+  .btn-ligne{width:56px;height:56px;padding:0;justify-content:center;border-radius:10px}
+  .btn-ligne .t{display:none}.btn-ligne svg{width:24px;height:24px}
+  .add{width:46px;height:46px;padding:0;justify-content:center}
+  .add .t{display:none}.add svg{width:16px;height:16px}
+  .add[data-add="pro"]{width:auto;padding:0 14px;gap:4px}.add[data-add="pro"] .s{display:inline}
+  .num{height:125vh}
+  .fresh{padding-top:48px}
+  .send a.wa{flex:1}
+  #copy{width:54px;padding:0}#copy .t{display:none}
+  .egg-total b{font-size:30px}
   .hero{padding-block:110px 70px}
   .row{grid-template-columns:1fr auto;padding:22px 0}
   .row-price{grid-column:1;grid-row:2;text-align:left}
@@ -276,10 +306,13 @@ p{margin:0}
   .facts{grid-template-columns:1fr;gap:10px}.facts div{display:grid;grid-template-columns:110px 1fr;align-items:baseline;gap:12px}.facts dt{font-size:24px}.facts dd{margin:0}
   .fields{grid-template-columns:1fr}
   .tray{grid-template-columns:repeat(6,1fr)}
-  .shape{justify-self:center;max-width:400px}
+  .shape{justify-self:center;max-width:400px;width:calc(100% - 28px)}
   .foot-grid{grid-template-columns:1fr 1fr}
 }
-@media (max-width:420px){ .cmd .t{font-size:14px} .price{font-size:15px} }
+@media (max-width:520px){
+  .foot-grid{grid-template-columns:1fr;gap:24px}
+}
+
 @media (prefers-reduced-motion:reduce){
   .num{height:auto}.num-stage{position:relative;height:auto;padding-block:90px}
   .big{font-size:50vw}.num-cap{position:static;margin-top:24px}
@@ -292,6 +325,7 @@ p{margin:0}
     <symbol id="i-arrow" viewBox="0 0 12 12"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-plus" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
     <symbol id="i-basket" viewBox="0 0 24 24"><path d="M3 9h18l-2 11H5L3 9Zm4 0 4-6m6 6-4-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
     <symbol id="i-check" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m6 10.5 2.6 2.5L14 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-wa" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8 0-1.4.7-2 1-2.3.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.9 2.1c.1.1.1.3 0 .5l-.3.5-.4.5c-.1.1-.3.3-.1.6.1.3.6 1.1 1.4 1.8 1 .9 1.8 1.1 2.1 1.3.3.1.4.1.6-.1l.8-1c.2-.3.4-.2.6-.1l2 .9c.3.1.5.2.5.3.1.2.1.7-.1 1.2Z" fill="currentColor"/></symbol>
     <symbol id="s-fleur" viewBox="-50 -50 100 100"><g><ellipse cx="0" cy="-24" rx="13" ry="24"/><ellipse cx="0" cy="24" rx="13" ry="24"/><ellipse cx="-24" cy="0" rx="24" ry="13"/><ellipse cx="24" cy="0" rx="24" ry="13"/></g></symbol>
@@ -308,7 +342,10 @@ p{margin:0}
     <span><span class="full">Ferme </span>Akwaba</span>
   </a>
   <button class="notch" id="notch" aria-expanded="false" aria-controls="menu" aria-label="Ouvrir le menu"><span></span></button>
-  <a class="cmd" href="#commande"><svg aria-hidden="true"><use href="#i-basket"/></svg><span class="t">Commander</span></a>
+  <div class="top-r">
+    <a class="cmd" href="#commande" aria-label="Commander"><svg aria-hidden="true"><use href="#i-basket"/></svg><span class="t">Commander</span><span class="n" id="cmdN" aria-hidden="true">0</span></a>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu" aria-label="Ouvrir le menu"><span></span></button>
+  </div>
 </header>
 
 <nav class="menu" id="menu" aria-label="Menu principal">
@@ -325,16 +362,16 @@ p{margin:0}
   <section class="hero" aria-label="Accueil">
     <canvas id="motif" aria-hidden="true"></canvas>
     <div class="hero-in">
-      <a class="season" href="#commande" data-feast><i aria-hidden="true"></i>Fêtes de fin d'année : réservations ouvertes jusqu'au 10 décembre</a>
+      <a class="season" href="#commande" data-feast><i aria-hidden="true"></i><span class="long">Fêtes de fin d'année : réservations ouvertes jusqu'au 10 décembre</span><span class="short">Fêtes : réserve avant le 10 déc.</span></a>
       <h1 id="titre"><span class="w"><span>Et</span></span> <span class="w"><span>si</span></span> <span class="w"><span>ton</span></span> <span class="w"><span>poulet</span></span> <span class="w"><span>était</span></span> <span class="w"><span>abattu</span></span> <span class="w"><span class="acc" id="acc">ce&nbsp;matin</span></span> <span class="w"><span>?</span></span></h1>
       <p class="hero-sub">Poulets de chair et œufs frais de notre ferme de Bingerville, livrés dans ta commune. Jamais congelés.</p>
       <div class="prices" aria-label="Prix">
-        <span class="price">Poulet de chair <b>3 500 F</b></span>
-        <span class="price">Plateau de 30 œufs <b>2 800 F</b></span>
+        <span class="price"><span>Poulet de chair</span> <b>3 500 F</b></span>
+        <span class="price"><span>Plateau de 30 œufs</span> <b>2 800 F</b></span>
       </div>
       <div class="ctas">
-        <a class="btn btn-jaune" href="#commande"><svg aria-hidden="true"><use href="#i-basket"/></svg>Composer ma commande</a>
-        <a class="btn btn-ligne" id="heroWa" href="https://wa.me/2250700000000" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-wa"/></svg>Écrire sur WhatsApp</a>
+        <a class="btn btn-jaune" href="#commande"><svg aria-hidden="true"><use href="#i-basket"/></svg><span class="long">Composer ma commande</span><span class="short">Commander</span></a>
+        <a class="btn btn-ligne" id="heroWa" aria-label="Écrire sur WhatsApp" href="https://wa.me/2250700000000" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-wa"/></svg><span class="t">Écrire sur WhatsApp</span></a>
       </div>
     </div>
   </section>
@@ -353,7 +390,7 @@ p{margin:0}
           <div class="row">
             <button class="row-name" data-i="0" aria-expanded="true" aria-controls="d0">Poulet de chair</button>
             <span class="row-price">3 500 F livré<small>3 000 F à la ferme</small></span>
-            <button class="add" data-add="poulet" style="background:var(--mais)"><svg aria-hidden="true"><use href="#i-plus"/></svg>Ajouter</button>
+            <button class="add" data-add="poulet" aria-label="Ajouter un poulet" style="background:var(--mais)"><svg aria-hidden="true"><use href="#i-plus"/></svg><span class="t">Ajouter</span></button>
             <p class="row-detail" id="d0">Pièce d'environ 1,8 kg, vivante ou prête à cuire (+500 F : plumée, vidée, emballée à la ferme le matin même).</p>
           </div>
         </li>
@@ -361,7 +398,7 @@ p{margin:0}
           <div class="row">
             <button class="row-name" data-i="1" aria-expanded="false" aria-controls="d1">Œufs de pondeuses</button>
             <span class="row-price">2 800 F le plateau<small>ou 100 F l'œuf</small></span>
-            <button class="add" data-add="oeufs" style="background:var(--poussin)"><svg aria-hidden="true"><use href="#i-plus"/></svg>Ajouter</button>
+            <button class="add" data-add="oeufs" aria-label="Ajouter un plateau d'œufs" style="background:var(--poussin)"><svg aria-hidden="true"><use href="#i-plus"/></svg><span class="t">Ajouter</span></button>
             <p class="row-detail" id="d1">Au plateau de 30, ou à l'unité : tu choisis tes œufs un par un dans le panier. La date de ponte est tamponnée sur chaque plateau : tu sais ce que tu achètes.</p>
           </div>
         </li>
@@ -369,7 +406,7 @@ p{margin:0}
           <div class="row">
             <button class="row-name" data-i="2" aria-expanded="false" aria-controls="d2">Maquis, fêtes, funérailles</button>
             <span class="row-price">dès 10 pièces<small>3 200 F le poulet · 2 500 F le plateau</small></span>
-            <button class="add" data-add="pro" style="background:#7FC4D6"><svg aria-hidden="true"><use href="#i-plus"/></svg>10 poulets</button>
+            <button class="add" data-add="pro" aria-label="Passer à 10 poulets au prix pro" style="background:#7FC4D6"><svg aria-hidden="true"><use href="#i-plus"/></svg><span class="t">10 poulets</span><span class="s" aria-hidden="true">10</span></button>
             <p class="row-detail" id="d2">Le prix pro s'applique tout seul dans le panier dès 10 poulets ou 10 plateaux. Livraison planifiée pour les maquis chaque semaine.</p>
           </div>
         </li>
@@ -488,7 +525,7 @@ p{margin:0}
             <select id="creneau"><option>Matin (8 h – 12 h)</option><option>Après-midi (13 h – 17 h)</option></select>
           </label>
           <label class="field full" for="repere">Quartier et repère
-            <input id="repere" autocomplete="street-address" placeholder="Angré 8e tranche, après la pharmacie">
+            <input id="repere" autocomplete="street-address" placeholder="Angré 8e tranche, pharmacie">
           </label>
           <label class="field full" for="paiement">Paiement à la livraison
             <select id="paiement"><option>Wave</option><option>Orange Money</option><option>MTN MoMo</option><option>Moov Money</option><option>Espèces</option></select>
@@ -498,8 +535,8 @@ p{margin:0}
         <div class="total"><span id="totalLabel">Total à la livraison</span><strong id="total">0 F</strong></div>
         <div class="bubble" aria-live="polite"><small>Ton message WhatsApp</small><span id="msg"></span></div>
         <div class="send">
-          <a class="wa" id="waLink" href="https://wa.me/2250700000000" target="_blank" rel="noopener"><svg width="22" height="22" aria-hidden="true"><use href="#i-wa"/></svg>Envoyer sur WhatsApp</a>
-          <button type="button" id="copy">Copier</button>
+          <a class="wa" id="waLink" href="https://wa.me/2250700000000" target="_blank" rel="noopener"><svg width="22" height="22" aria-hidden="true"><use href="#i-wa"/></svg><span class="long">Envoyer sur WhatsApp</span><span class="short">Envoyer</span></a>
+          <button type="button" id="copy" aria-label="Copier le message"><svg width="20" height="20" aria-hidden="true"><use href="#i-copy"/></svg><span class="t">Copier</span></button>
         </div>
         <ul class="trust">
           <li><svg aria-hidden="true"><use href="#i-check"/></svg><span>Tu vois ton poulet avant de payer.</span></li>
@@ -577,7 +614,7 @@ p{margin:0}
     const d = new Date(); d.setHours(12);
     let n = (jour - d.getDay() + 7) % 7; if (n === 0) n = 7;       // jamais le jour même
     d.setDate(d.getDate() + n);
-    return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+    return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'short' });
   }
 
   /* ---------- Défilement doux ---------- */
@@ -596,17 +633,21 @@ p{margin:0}
   }));
 
   /* ---------- Menu ---------- */
-  const notch = $('notch'), menu = $('menu');
-  function closeMenu(focusBack){ if (!menu.classList.contains('open')) return; menu.classList.remove('open'); notch.setAttribute('aria-expanded','false'); notch.setAttribute('aria-label','Ouvrir le menu'); if (focusBack) notch.focus(); }
-  notch.addEventListener('click', () => {
-    const o = menu.classList.toggle('open');
-    notch.setAttribute('aria-expanded', String(o)); notch.setAttribute('aria-label', o ? 'Fermer le menu' : 'Ouvrir le menu');
+  const menu = $('menu'), togglers = [$('notch'), $('menuBtn')];
+  const visibleToggler = () => togglers.find(t => t.offsetParent !== null) || togglers[0];
+  function setMenu(o){
+    menu.classList.toggle('open', o);
+    togglers.forEach(t => { t.setAttribute('aria-expanded', String(o)); t.setAttribute('aria-label', o ? 'Fermer le menu' : 'Ouvrir le menu'); });
+  }
+  function closeMenu(focusBack){ if (!menu.classList.contains('open')) return; setMenu(false); if (focusBack) visibleToggler().focus(); }
+  togglers.forEach(t => t.addEventListener('click', () => {
+    const o = !menu.classList.contains('open'); setMenu(o);
     if (o) setTimeout(() => menu.querySelector('a').focus(), 350);
-  });
+  }));
   addEventListener('keydown', e => {
     if (e.key === 'Escape') closeMenu(true);
     if (e.key === 'Tab' && menu.classList.contains('open')) {
-      const f = [notch, ...menu.querySelectorAll('a')], i = f.indexOf(document.activeElement);
+      const f = [visibleToggler(), ...menu.querySelectorAll('a')], i = f.indexOf(document.activeElement);
       e.preventDefault(); f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
     }
   });
@@ -683,13 +724,13 @@ p{margin:0}
   sel.value = 'Cocody';
   $('rounds').innerHTML = TOURNEES.map(t => `<dt data-j="${t.jour}">${JOURS[t.jour][0].toUpperCase() + JOURS[t.jour].slice(1)}</dt><dd data-j="${t.jour}">${t.communes.join(', ')}</dd>`).join('')
     + `<dt data-j="ferme">Samedi</dt><dd data-j="ferme">Retrait à la ferme, 8 h – 11 h</dd>`;
-  $('footRounds').innerHTML = TOURNEES.map(t => `<li>${JOURS[t.jour][0].toUpperCase() + JOURS[t.jour].slice(1)} : ${t.communes.slice(0, 3).join(', ')}…</li>`).join('');
+  $('footRounds').innerHTML = TOURNEES.map(t => `<li><b>${JOURS[t.jour][0].toUpperCase() + JOURS[t.jour].slice(1)}</b> : ${t.communes.join(', ')}</li>`).join('');
 
   function fillQuand(){
     const keep = quand.value;
     const jour = sel.value === 'ferme' ? 6 : communeTournee[sel.value].jour;
     quand.innerHTML = '';
-    quand.add(new Option(`Prochaine tournée : ${prochain(jour)}`, 'tournee'));
+    quand.add(new Option(`Tournée du ${prochain(jour)}`, 'tournee'));
     FETES.forEach((f, i) => quand.add(new Option(`Fêtes : ${f}`, 'fete-' + i)));
     quand.value = [...quand.options].some(o => o.value === keep) ? keep : 'tournee';
   }
@@ -810,7 +851,7 @@ p{margin:0}
     if (oe) parts.push(oe + ($('abo').checked ? ' chaque semaine (abonnement)' : ''));
     const nom = $('prenom').value.trim(), rep = $('repere').value.trim();
     const quandTxt = ferme ? (fete ? `retrait à la ferme pour le ${FETES[+quand.value.split('-')[1]]}` : 'retrait à la ferme samedi')
-      : fete ? `livraison le ${FETES[+quand.value.split('-')[1]]}` : `livraison ${quand.options[quand.selectedIndex].text.replace('Prochaine tournée : ', 'le ')}`;
+      : fete ? `livraison le ${FETES[+quand.value.split('-')[1]]}` : `livraison ${quand.options[quand.selectedIndex].text.replace('Tournée du ', 'le ')}`;
     const msg = parts.length
       ? [`Bonjour Ferme Akwaba${nom ? `, c'est ${nom}` : ''}.`,
          `Je voudrais ${parts.join(' et ')}.`,
@@ -821,7 +862,9 @@ p{margin:0}
     const href = `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
     $('waLink').href = href;
     $('barTotal').textContent = F(total);
-    $('barItems').textContent = parts.length ? parts.join(' · ') : 'Panier vide';
+    const court = [st.p ? `${st.p} poulet${st.p > 1 ? 's' : ''}` : '', st.o ? `${st.o} plateau${st.o > 1 ? 'x' : ''}` : '', u ? `${u} œuf${u > 1 ? 's' : ''}` : ''].filter(Boolean);
+    $('barItems').textContent = court.length ? court.join(' · ') : 'Panier vide';
+    const nArt = st.p + st.o + u; $('cmdN').textContent = nArt; $('cmdN').hidden = !nArt;
 
     lastO = st.o;
   }
@@ -865,7 +908,7 @@ p{margin:0}
   const tl = gsap.timeline({ scrollTrigger: { trigger: '#zero', start: 'top top', end: 'bottom bottom', scrub: 1 } });
   tl.to('#numCap', { opacity: 0, y: -24, duration: .6 }, .5)
     .fromTo('#big', { scale: .92 }, { scale: 9, ease: 'power2.in', duration: 2.4 }, .5)
-    .to('#big', { opacity: 0, duration: .5 }, 2.5);
+    .to('#big', { opacity: 0, duration: .3 }, 2.6);
 
   gsap.to('#freshImg', { yPercent: 8, ease: 'none', scrollTrigger: { trigger: '.fresh', start: 'top bottom', end: 'bottom top', scrub: true } });
   gsap.from('#day li', { y: 40, opacity: 0, duration: .8, stagger: .15, ease: 'power3.out', scrollTrigger: { trigger: '#day', start: 'top 80%' } });

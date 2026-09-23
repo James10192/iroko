@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>D — Ferme vivante</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,500&family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nuit:#10231A; --nuit2:#0B1A13; --vert:#0B6B3A; --or:#F77F00; --soleil:#FFC43D;
+  --creme:#FFF6E6; --ink:#15120E; --ciel:#FFD9A0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html.lenis{height:auto}.lenis.lenis-smooth{scroll-behavior:auto}
+body{font-family:Outfit,sans-serif;background:var(--nuit);color:var(--creme);overflow-x:hidden}
+.serif{font-family:Fraunces,serif;font-style:italic;font-weight:500}
+
+/* header */
+header{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:22px 5vw;pointer-events:none}
+header>*{pointer-events:auto}
+.logo{font-weight:800;font-size:19px;display:flex;gap:8px;align-items:center;color:var(--creme);background:var(--nuit);padding:10px 16px;border-radius:10px}
+.notch{position:absolute;left:50%;top:0;transform:translateX(-50%);width:190px;height:54px;background:var(--vert);border-radius:0 0 100px 100px;display:grid;place-items:center}
+.notch i{display:block;width:34px;height:2px;background:var(--creme);box-shadow:0 8px 0 var(--creme),0 -8px 0 var(--creme)}
+.wa{background:var(--soleil);color:var(--ink);font-weight:700;padding:13px 20px;border-radius:10px;text-decoration:none;font-size:15px}
+
+/* 1. nuit */
+#nuit{position:relative;height:100vh;display:grid;place-items:center;overflow:hidden;background:var(--nuit)}
+.motif{position:absolute;inset:-10%;opacity:.55}
+.motif svg{width:100%;height:100%}
+#nuit h1{position:relative;font-weight:500;font-size:clamp(34px,5.2vw,74px);line-height:1.08;text-align:center;max-width:1000px;padding:0 16px}
+#nuit h1 .serif{color:var(--or);font-size:1.12em}
+.word{display:inline-block;overflow:hidden;vertical-align:top}.word>span{display:inline-block}
+.hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);width:44px;height:56px;border-radius:50% 50% 46% 46%/60% 60% 40% 40%;background:var(--creme)}
+
+/* 2. aube : révélation par l'œuf */
+#aube{position:relative;height:420vh}
+.stage{position:sticky;top:0;height:100vh;overflow:hidden;background:var(--nuit)}
+.scene{position:absolute;inset:0;clip-path:ellipse(9vmin 12vmin at 50% 52%);background:linear-gradient(#2A1B3D,#F77F00 70%,#FFC43D)}
+.soleil{position:absolute;left:50%;top:78%;width:34vmin;height:34vmin;margin-left:-17vmin;border-radius:50%;background:radial-gradient(circle,#FFF3C4,#FFC43D 60%,#F77F00)}
+.collines{position:absolute;inset:auto 0 0 0;height:44vh}
+.collines svg{width:100%;height:100%;display:block}
+.coq{position:absolute;left:12vw;bottom:24vh;width:clamp(120px,15vw,210px);transform-origin:50% 100%}
+.aube-txt{position:absolute;right:6vw;top:32vh;max-width:500px;color:var(--ink);background:#FFF6E6d9;padding:26px 28px;border-radius:22px}
+.aube-txt h2{font-weight:700;font-size:clamp(30px,4.2vw,60px);line-height:1.05}
+.aube-txt p{margin-top:16px;font-size:clamp(16px,1.4vw,20px);line-height:1.5;opacity:.85}
+.float{position:absolute;will-change:transform;pointer-events:none}
+
+/* 3. produits en défilement horizontal */
+#produits{position:relative;background:var(--creme);color:var(--ink);overflow:hidden}
+.ptitle{position:absolute;top:13vh;left:6vw;font-size:clamp(28px,3.4vw,48px);font-weight:700;z-index:2}
+.ptitle .serif{color:var(--or)}
+.track{display:flex;gap:4vw;height:100vh;align-items:center;padding:14vh 6vw 0;width:max-content}
+.card{width:min(420px,78vw);height:min(520px,62vh);border-radius:28px;padding:30px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;flex:none}
+.card h3{font-size:30px;font-weight:800;line-height:1.05}
+.card .prix{font-size:44px;font-weight:800}
+.card small{display:block;font-size:15px;opacity:.75;margin-top:4px}
+.c-poulet{background:var(--or);color:var(--ink)}
+.c-oeuf{background:var(--vert);color:var(--creme)}
+.c-pro{background:var(--ink);color:var(--creme)}
+.c-liv{background:var(--soleil);color:var(--ink)}
+.tray{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;background:#0005;padding:10px;border-radius:16px}
+.cell{aspect-ratio:1;border-radius:50%;background:#0003;display:grid;place-items:center}
+.egg{width:78%;height:94%;border-radius:50% 50% 46% 46%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#fff,#F3E0C3 60%,#DDBF92);transform:scale(0)}
+.zones{display:flex;flex-wrap:wrap;gap:8px}.zones span{border:2px solid var(--ink);border-radius:99px;padding:6px 12px;font-weight:500}
+
+/* 4. appel à l'action vivant */
+#cta{background:var(--nuit);padding:18vh 0 14vh;overflow:hidden;position:relative}
+.marquee{white-space:nowrap;font-size:clamp(64px,12vw,190px);font-weight:800;line-height:1;will-change:transform}
+.marquee span{display:inline-block;padding-right:.4em}
+.marquee .serif{color:var(--or)}
+.cta-btn{display:block;width:max-content;margin:9vh auto 0;background:#25D366;color:var(--ink);font-weight:800;font-size:clamp(18px,2vw,24px);padding:22px 36px;border-radius:999px;text-decoration:none}
+footer{text-align:center;padding:30px 16px 50px;background:var(--nuit);opacity:.7;font-size:14px}
+
+@media(max-width:760px){
+  .notch{display:none}.wa{padding:10px 14px;font-size:13px}.logo{font-size:16px}
+  .aube-txt{left:16px;right:16px;top:16vh}.coq{left:6vw;bottom:22vh}
+}
+@media (prefers-reduced-motion:reduce){ .scene{clip-path:none} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🐓 Ferme Akwaba</div>
+  <div class="notch"><i></i></div>
+  <a class="wa" href="#cta">Commander</a>
+</header>
+
+<!-- 1. La nuit -->
+<section id="nuit">
+  <div class="motif" id="motif"></div>
+  <h1 id="h1">Et si ton poulet avait grandi à <span class="serif">30 minutes</span> de chez toi ?</h1>
+  <div class="hint" id="hint"></div>
+</section>
+
+<!-- 2. L'aube, révélée par un œuf -->
+<section id="aube">
+  <div class="stage" id="stage">
+    <div class="scene" id="scene">
+      <div class="soleil" id="soleil"></div>
+      <div class="collines">
+        <svg viewBox="0 0 1440 400" preserveAspectRatio="none">
+          <path d="M0 180 C240 90 420 220 720 150 S1200 60 1440 170 V400 H0Z" fill="#6E8B3D"/>
+          <path d="M0 260 C300 180 520 300 860 230 S1300 190 1440 250 V400 H0Z" fill="#0B6B3A"/>
+        </svg>
+      </div>
+      <svg class="coq" id="coq" viewBox="0 0 200 220">
+        <g fill="#15120E">
+          <path d="M60 120 C60 70 95 55 120 70 C128 40 150 30 160 45 C150 50 150 60 158 66 C176 70 186 84 176 92 L160 92 C165 120 150 160 110 168 C80 172 60 150 60 120Z"/>
+          <path d="M60 120 C30 110 10 70 22 40 C40 70 45 60 40 30 C62 60 66 50 64 24 C82 60 80 95 72 110Z"/>
+          <path d="M150 38 C150 20 162 16 166 26 C172 14 184 18 180 32 C188 30 190 42 180 46Z" fill="#C8102E"/>
+          <path d="M100 166 L96 205 L84 212 M120 164 L124 205 L136 212" stroke="#15120E" stroke-width="7" fill="none" stroke-linecap="round"/>
+        </g>
+        <g id="coq-tete"></g>
+      </svg>
+      <div class="aube-txt" id="aubeTxt">
+        <h2>Chaque matin à 5 h, le coq chante. On ramasse les œufs.</h2>
+        <p>À 8 h ils sont en route vers Cocody, Yopougon ou Marcory. Tu les casses le soir même : le jaune est bien orange, il tient debout dans la poêle.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Les produits -->
+<section id="produits">
+  <div class="ptitle">Deux produits, <span class="serif">zéro intermédiaire.</span></div>
+  <div class="track" id="track">
+    <article class="card c-poulet">
+      <div><h3>Poulet de chair</h3><small>45 jours · environ 1,8 kg · vivant ou prêt à cuire</small></div>
+      <svg viewBox="0 0 200 160" width="70%"><ellipse cx="95" cy="95" rx="70" ry="52" fill="#FFF6E6"/><circle cx="150" cy="55" r="30" fill="#FFF6E6"/><path d="M140 26 q6-16 12-2 q6-14 12 2 q8-10 8 6" fill="#C8102E"/><path d="M178 58 l18 6 -18 6z" fill="#FFC43D"/><circle cx="156" cy="50" r="4" fill="#15120E"/></svg>
+      <div><div class="prix">3 500 F</div><small>+1 000 F prêt à cuire</small></div>
+    </article>
+    <article class="card c-oeuf">
+      <div><h3>Plateau de 30 œufs</h3><small>Pondus il y a moins de 48 h</small></div>
+      <div class="tray" id="tray"></div>
+      <div><div class="prix">2 800 F</div><small>Dégressif dès 5 plateaux</small></div>
+    </article>
+    <article class="card c-pro">
+      <div><h3>Maquis, restaurants, pâtissiers</h3><small>Livraison planifiée chaque semaine</small></div>
+      <div class="prix serif" style="color:var(--soleil);font-size:64px">−10 %</div>
+      <div><small>À partir de 10 poulets ou 10 plateaux par semaine</small></div>
+    </article>
+    <article class="card c-liv">
+      <div><h3>On livre chez toi</h3><small>Payé à la livraison, Wave, Orange Money ou MTN MoMo</small></div>
+      <div class="zones"><span>Cocody</span><span>Bingerville</span><span>Yopougon</span><span>Abobo</span><span>Marcory</span><span>Koumassi</span><span>Plateau</span></div>
+      <div><div class="prix">dès 500 F</div></div>
+    </article>
+  </div>
+</section>
+
+<!-- 4. Appel à l'action -->
+<section id="cta">
+  <div class="marquee" id="mq"><span>Frais du jour <span class="serif">·</span> Poulet bien choco <span class="serif">·</span> Œufs tout frais <span class="serif">·</span></span><span>Frais du jour <span class="serif">·</span> Poulet bien choco <span class="serif">·</span> Œufs tout frais <span class="serif">·</span></span></div>
+  <a class="cta-btn" href="#">💬 Commander sur WhatsApp</a>
+</section>
+<footer>Ferme Akwaba · Bingerville, Côte d'Ivoire · prototype</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Défilement doux, synchronisé avec GSAP
+const lenis = new Lenis({ lerp: 0.09 });
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add(t => lenis.raf(t * 1000));
+gsap.ticker.lagSmoothing(0);
+
+// Motif de fond : plumes et feuilles façon wax, qui respirent
+const shapes = [
+  'M0 -40 C22 -20 22 20 0 40 C-22 20 -22 -20 0 -40Z',                  // feuille
+  'M0 -34 C14 -34 22 -10 22 6 C22 24 12 34 0 34 C-12 34 -22 24 -22 6 C-22 -10 -14 -34 0 -34Z', // œuf
+  'M0 -44 C10 -20 16 10 0 44 C-6 20 -14 -10 0 -44Z M0 -44 L0 44'        // plume
+];
+let motif = '<svg viewBox="0 0 1400 1000" preserveAspectRatio="xMidYMid slice">';
+for (let y = 0; y < 1000; y += 110) for (let x = (y / 110) % 2 ? 55 : 0; x < 1400; x += 110) {
+  const s = shapes[(x + y) % 3], r = Math.round(Math.random() * 360);
+  motif += `<path class="m" d="${s}" transform="translate(${x} ${y}) rotate(${r})" fill="#0A1811"/>`;
+}
+document.getElementById('motif').innerHTML = motif + '</svg>';
+if (!reduce) gsap.utils.toArray('.m').forEach(m => gsap.to(m, {
+  scale: gsap.utils.random(.7, 1.15), duration: gsap.utils.random(2.5, 5), repeat: -1, yoyo: true,
+  ease: 'sine.inOut', transformOrigin: 'center', delay: gsap.utils.random(0, 3)
+}));
+
+// Titre : les mots montent un par un
+const h1 = document.getElementById('h1');
+h1.innerHTML = h1.innerHTML.replace(/(<span class="serif">.*?<\/span>)|([^\s<]+)/g,
+  (m) => `<span class="word"><span>${m}</span></span>`);
+gsap.from('#h1 .word>span', { yPercent: 110, duration: 1, stagger: .06, ease: 'power4.out', delay: .2 });
+gsap.to('#hint', { y: -14, duration: .8, repeat: -1, yoyo: true, ease: 'power1.inOut' });
+gsap.to('#motif', { yPercent: 12, rotate: 4, ease: 'none',
+  scrollTrigger: { trigger: '#nuit', start: 'top top', end: 'bottom top', scrub: true } });
+
+// L'aube : un œuf s'ouvre sur le lever du soleil
+const tl = gsap.timeline({ scrollTrigger: { trigger: '#aube', start: 'top top', end: 'bottom bottom', scrub: 1 } });
+tl.to('#scene', { clipPath: 'ellipse(150vmax 150vmax at 50% 52%)', ease: 'power2.in', duration: 3 })
+  .fromTo('#scene', { background: 'linear-gradient(#2A1B3D,#F77F00 70%,#FFC43D)' },
+          { background: 'linear-gradient(#FFB45A,#FFD9A0 60%,#FFF1D6)', duration: 4 }, 1.5)
+  .fromTo('#soleil', { top: '80%', scale: .6 }, { top: '14%', scale: 1, duration: 4 }, 1.5)
+  .from('#coq', { yPercent: 60, opacity: 0, duration: 1.2 }, 2.4)
+  .to('#coq', { rotate: -8, scaleY: 1.08, duration: .3, yoyo: true, repeat: 3 }, 3.8)
+  .from('#aubeTxt > *', { y: 60, opacity: 0, stagger: .5, duration: 1.2 }, 3.4);
+
+// Plumes et grains de maïs qui volent pendant l'aube, et fuient la souris
+const stage = document.getElementById('stage');
+const floats = [];
+for (let i = 0; i < 14; i++) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const kind = i % 3, col = ['#FFF6E6', '#FFC43D', '#0B6B3A'][kind];
+  el.setAttribute('viewBox', '-50 -50 100 100'); el.classList.add('float');
+  el.style.width = el.style.height = gsap.utils.random(28, 70) + 'px';
+  el.style.left = gsap.utils.random(3, 95) + '%'; el.style.top = gsap.utils.random(5, 90) + '%';
+  el.innerHTML = `<path d="${shapes[kind === 2 ? 0 : kind === 1 ? 1 : 2]}" fill="${col}" stroke="${kind === 0 ? '#E0C9A8' : 'none'}" stroke-width="2"/>`;
+  stage.appendChild(el); floats.push(el);
+  if (!reduce) gsap.to(el, { rotate: gsap.utils.random(-40, 40), y: gsap.utils.random(-30, 30), duration: gsap.utils.random(2, 4), repeat: -1, yoyo: true, ease: 'sine.inOut' });
+}
+tl.from(floats, { scale: 0, opacity: 0, stagger: .08, duration: 1 }, 2)
+  .to(floats, { yPercent: -400, stagger: .03, duration: 3, ease: 'none' }, 4.5);
+const movers = floats.map(el => ({ el, x: gsap.quickTo(el, 'x', { duration: .6, ease: 'power3' }), X: gsap.quickTo(el, 'xPercent', { duration: .6 }) }));
+stage.addEventListener('pointermove', e => movers.forEach(({ el, x }) => {
+  const r = el.getBoundingClientRect(), dx = r.left + r.width / 2 - e.clientX, dy = r.top + r.height / 2 - e.clientY;
+  const d = Math.hypot(dx, dy); x(d < 180 ? (dx / d) * (180 - d) * .6 : 0);
+}));
+
+// Produits : défilement horizontal épinglé
+const track = document.getElementById('track');
+const tray = document.getElementById('tray');
+for (let i = 0; i < 30; i++) tray.insertAdjacentHTML('beforeend', '<div class="cell"><div class="egg"></div></div>');
+const horiz = gsap.to(track, { x: () => -(track.scrollWidth - innerWidth), ease: 'none',
+  scrollTrigger: { trigger: '#produits', pin: true, scrub: 1, end: () => '+=' + (track.scrollWidth - innerWidth), invalidateOnRefresh: true } });
+gsap.utils.toArray('.card').forEach((c, i) => gsap.from(c, { rotate: i % 2 ? 6 : -6, y: 80, ease: 'none',
+  scrollTrigger: { trigger: c, containerAnimation: horiz, start: 'left right', end: 'center center', scrub: true } }));
+gsap.to('#tray .egg', { scale: 1, ease: 'back.out(2)', stagger: { each: .04, from: 'random' },
+  scrollTrigger: { trigger: '.c-oeuf', containerAnimation: horiz, start: 'left 70%', toggleActions: 'play none none reverse' } });
+
+// Bandeau final : il accélère et se penche avec la vitesse du scroll
+const mq = document.getElementById('mq');
+const loop = gsap.to(mq, { xPercent: -50, duration: 16, ease: 'none', repeat: -1 });
+const skew = gsap.quickTo(mq, 'skewX', { duration: .4, ease: 'power3' });
+lenis.on('scroll', ({ velocity }) => {
+  skew(gsap.utils.clamp(-18, 18, -velocity * .6));
+  loop.timeScale(1 + Math.min(Math.abs(velocity) * .15, 5));
+});
+</script>
+</body>
+</html>

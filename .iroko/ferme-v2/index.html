@@ -169,10 +169,21 @@ p{margin:0}
 .seg span{display:block;padding:8px 14px;border-radius:999px;border:1.5px solid #CFC5B2;font-size:15px;cursor:pointer;background:#fff}
 .seg input:checked + span{background:var(--vert);border-color:var(--vert);color:var(--creme)}
 .seg input:focus-visible + span{outline:3px solid var(--mais);outline-offset:2px}
-.tray{grid-column:1/-1;display:grid;grid-template-columns:repeat(10,1fr);gap:5px;background:#E6D8BC;padding:10px;border-radius:10px;position:relative}
-.cell{aspect-ratio:1;border-radius:50%;background:#D5C39F;display:grid;place-items:center}
-.egg{width:74%;height:92%;border-radius:50% 50% 46% 46%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#FFFDF8,#F1DFC2 62%,#D9BD93);transform:scale(0)}
-.tray-x{position:absolute;right:-8px;top:-14px;background:var(--poussin);color:var(--encre);font-weight:700;border-radius:999px;padding:3px 10px;font-size:15px;font-variant-numeric:tabular-nums}
+.egg-box{grid-column:1/-1;display:grid;gap:10px}
+.egg-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.egg-count{font-size:15px;color:var(--encre-doux)}
+.egg-count b{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-weight:600;font-size:34px;line-height:1;color:var(--vert);font-variant-numeric:tabular-nums;display:inline-block;min-width:1.6ch;text-align:right;margin-right:4px}
+.egg-price{display:block;font-size:14px;color:var(--mais-fonce);font-weight:700;font-variant-numeric:tabular-nums}
+.chip{background:var(--poussin);color:var(--encre);font-weight:700;border-radius:999px;padding:5px 12px;font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tray{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;background:#E6D8BC;padding:10px 10px 16px;border-radius:10px;position:relative;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;transition:box-shadow .3s}
+.tray.done{box-shadow:0 0 0 4px var(--poussin)}
+.cell{aspect-ratio:1;border-radius:50%;background:#D5C39F;display:grid;place-items:center;border:0;padding:0;margin:0;cursor:pointer;position:relative;font:inherit}
+.cell:focus-visible{outline:3px solid var(--vert);outline-offset:1px;border-radius:50%}
+.egg{width:74%;height:92%;border-radius:50% 50% 46% 46%/60% 60% 40% 40%;background:#F3E9D6;box-shadow:inset 0 0 0 1.5px #CBB38A;transition:background .25s,box-shadow .25s;pointer-events:none}
+@media (hover:hover){.cell:hover .egg{box-shadow:inset 0 0 0 2px var(--mais-fonce)}}
+.cell.on .egg{background:radial-gradient(circle at 34% 28%,#F9E0BF,var(--c,#C27A43) 58%,#8A4B20);box-shadow:0 3px 6px rgba(90,45,12,.35),inset 0 -2px 4px rgba(0,0,0,.14)}
+.plus1{position:absolute;left:50%;top:-4px;translate:-50% 0;font-weight:800;font-size:14px;color:var(--mais-fonce);pointer-events:none;z-index:2}
+.egg-help{font-size:14px;color:var(--encre-doux)}
 .tray-date{position:absolute;left:10px;bottom:-11px;background:var(--creme-2);border:1px dashed var(--mais-fonce);color:var(--mais-fonce);font-size:12px;font-weight:700;letter-spacing:.06em;padding:1px 8px;border-radius:3px;text-transform:uppercase}
 .check{grid-column:1/-1;display:flex;gap:10px;align-items:flex-start;font-size:16px;cursor:pointer;margin-top:6px}
 .check input{width:20px;height:20px;accent-color:var(--vert);margin-top:2px;flex:none}
@@ -260,7 +271,7 @@ p{margin:0}
 @media (prefers-reduced-motion:reduce){
   .num{height:auto}.num-stage{position:relative;height:auto;padding-block:90px}
   .big{font-size:50vw}.num-cap{position:static;margin-top:24px}
-  .egg{transform:none}.season i{animation:none}
+  .season i{animation:none}
 }
 </style>
 
@@ -337,9 +348,9 @@ p{margin:0}
         <li>
           <div class="row">
             <button class="row-name" data-i="1" aria-expanded="false" aria-controls="d1">Œufs de pondeuses</button>
-            <span class="row-price">2 800 F le plateau<small>abonnement possible</small></span>
+            <span class="row-price">2 800 F le plateau<small>ou 100 F l'œuf</small></span>
             <button class="add" data-add="oeufs" style="background:var(--poussin)"><svg aria-hidden="true"><use href="#i-plus"/></svg>Ajouter</button>
-            <p class="row-detail" id="d1">30 œufs, calibre moyen à gros. La date de ponte est tamponnée sur chaque plateau : tu sais ce que tu achètes.</p>
+            <p class="row-detail" id="d1">Au plateau de 30, ou à l'unité : tu choisis tes œufs un par un dans le panier. La date de ponte est tamponnée sur chaque plateau : tu sais ce que tu achètes.</p>
           </div>
         </li>
         <li>
@@ -431,9 +442,16 @@ p{margin:0}
           </fieldset>
         </div>
         <div class="line">
-          <div class="line-name">Plateau de 30 œufs<small id="oeufPrix">2 800 F le plateau</small></div>
-          <div class="step"><button type="button" id="oMoins" aria-label="Retirer un plateau">−</button><output id="oQte" aria-live="polite">1</output><button type="button" id="oPlus" aria-label="Ajouter un plateau">+</button></div>
-          <div class="tray" id="tray" aria-hidden="true"><span class="tray-x" id="trayX">× 1</span><span class="tray-date" id="trayDate">Pondu le …</span></div>
+          <div class="line-name">Œufs frais<small id="oeufPrix">2 800 F le plateau de 30</small></div>
+          <div class="step"><button type="button" id="oMoins" aria-label="Retirer un plateau entier">−</button><output id="oQte" aria-live="polite">1</output><button type="button" id="oPlus" aria-label="Ajouter un plateau entier">+</button></div>
+          <div class="egg-box">
+            <div class="egg-head">
+              <span class="egg-count" aria-live="polite"><b id="eggN">30</b><span id="eggWord">œufs</span><span class="egg-price" id="eggPrice">à l'unité : 100 F l'œuf</span></span>
+              <span class="chip" id="trayX">1 plateau</span>
+            </div>
+            <div class="tray" id="tray" role="group" aria-label="Plateau : touche les œufs pour en prendre à l'unité"><span class="tray-date" id="trayDate">Pondu le …</span></div>
+            <p class="egg-help">Touche les œufs pour en prendre à l'unité, ou glisse le doigt pour en choisir plusieurs. À 30, le plateau se complète au prix plateau.</p>
+          </div>
           <label class="check" for="abo"><input type="checkbox" id="abo"><span>Chaque semaine, le jour de ma tournée<small>Abonnement sans engagement : tu arrêtes par un simple message.</small></span></label>
         </div>
         <p class="saving" id="saving" hidden></p>
@@ -659,9 +677,61 @@ p{margin:0}
     quand.value = [...quand.options].some(o => o.value === keep) ? keep : 'tournee';
   }
 
+  /* Le plateau interactif : on touche un œuf, il se remplit en roux et se compte */
+  const UNIT = 100;
+  const loose = new Set();
   const tray = $('tray');
-  for (let i = 0; i < 30; i++) tray.insertAdjacentHTML('beforeend', '<div class="cell"><div class="egg"></div></div>');
-  const eggs = [...tray.querySelectorAll('.egg')];
+  const ROUX = ['#C27A43', '#B86E38', '#CC8650', '#B5733F', '#C4804C', '#BA7440'];
+  for (let i = 0; i < 30; i++) tray.insertAdjacentHTML('beforeend',
+    `<button type="button" class="cell" data-i="${i}" aria-pressed="false" aria-label="Œuf ${i + 1}" tabindex="${i ? -1 : 0}"><span class="egg" style="--c:${ROUX[(i * 7) % ROUX.length]}"></span></button>`);
+  const cells = [...tray.querySelectorAll('.cell')], eggs = cells.map(c => c.firstChild);
+  const anim = hasGsap && !reduce;
+  let busy = false, painting = null;
+  function float(cell, t){
+    if (!anim) return;
+    const s = document.createElement('span'); s.className = 'plus1'; s.textContent = t; cell.appendChild(s);
+    gsap.fromTo(s, { y: 0, opacity: 1 }, { y: -30, opacity: 0, duration: .75, ease: 'power2.out', onComplete: () => s.remove() });
+  }
+  function setEgg(i, on){
+    if (busy || loose.has(i) === on) return;
+    on ? loose.add(i) : loose.delete(i);
+    const c = cells[i]; c.classList.toggle('on', on); c.setAttribute('aria-pressed', String(on));
+    if (anim) gsap.fromTo(eggs[i], { scaleX: on ? 1.2 : .9, scaleY: on ? .76 : 1.1 }, { scaleX: 1, scaleY: 1, duration: .6, ease: 'elastic.out(1,.38)' });
+    float(c, on ? '+1' : '−1');
+    try { navigator.vibrate && navigator.vibrate(8); } catch {}
+    if (loose.size === 30) complete(); else render();
+  }
+  function clearTray(){ loose.clear(); cells.forEach(c => { c.classList.remove('on'); c.setAttribute('aria-pressed', 'false'); }); }
+  function complete(){
+    busy = true; painting = null; render();
+    const fin = () => { clearTray(); st.o++; busy = false; tray.classList.remove('done'); render(); toast('Plateau complet : ' + F(PRIX.plateau) + ' au lieu de ' + F(30 * UNIT)); };
+    if (!anim) return fin();
+    tray.classList.add('done');
+    gsap.timeline({ onComplete: fin })
+      .to(eggs, { scale: 1.16, duration: .16, yoyo: true, repeat: 1, ease: 'power1.out', stagger: { each: .018, from: 'center' } })
+      .to('#trayX', { scale: 1.3, duration: .2, yoyo: true, repeat: 1, ease: 'power2.out' }, '-=.2');
+  }
+  tray.addEventListener('pointerdown', e => {
+    const c = e.target.closest('.cell'); if (!c || busy) return;
+    const i = +c.dataset.i; painting = !loose.has(i); setEgg(i, painting);
+  });
+  tray.addEventListener('pointermove', e => {
+    if (painting === null || busy) return;
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const c = el && el.closest && el.closest('.cell');
+    if (c && tray.contains(c)) setEgg(+c.dataset.i, painting);
+  });
+  ['pointerup', 'pointercancel'].forEach(t => addEventListener(t, () => painting = null));
+  tray.addEventListener('keydown', e => {
+    const i = cells.indexOf(document.activeElement); if (i < 0) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setEgg(i, !loose.has(i)); return; }
+    const cols = getComputedStyle(tray).gridTemplateColumns.split(' ').length;
+    const d = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: cols, ArrowUp: -cols }[e.key];
+    if (!d) return;
+    e.preventDefault();
+    const n = Math.min(29, Math.max(0, i + d));
+    cells[i].tabIndex = -1; cells[n].tabIndex = 0; cells[n].focus();
+  });
   const hier = new Date(Date.now() - 864e5).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
   $('trayDate').textContent = 'Pondu le ' + hier;
 
@@ -673,14 +743,19 @@ p{margin:0}
     const pro = { p: st.p >= PRO.seuil, o: st.o >= PRO.seuil };
     const pu = PRIX[prep] - (pro.p ? PRO.poulet : 0) - (ferme ? FERME.poulet : 0);
     const po = PRIX.plateau - (pro.o ? PRO.plateau : 0) - (ferme ? FERME.plateau : 0);
-    const frais = ferme || !(st.p || st.o) ? 0 : communeTournee[c].frais;
-    const total = st.p * pu + st.o * po + frais;
+    const u = loose.size;
+    const frais = ferme || !(st.p || st.o || u) ? 0 : communeTournee[c].frais;
+    const total = st.p * pu + st.o * po + u * UNIT + frais;
     const eco = (pro.p ? st.p * PRO.poulet : 0) + (pro.o ? st.o * PRO.plateau : 0);
 
     $('pQte').textContent = st.p; $('oQte').textContent = st.o;
     $('pouletPrix').textContent = F(pu) + ' pièce' + (pro.p ? ' · prix pro' : '');
-    $('oeufPrix').textContent = F(po) + ' le plateau' + (pro.o ? ' · prix pro' : '');
-    $('trayX').textContent = '× ' + st.o;
+    $('oeufPrix').textContent = F(po) + ' le plateau de 30' + (pro.o ? ' · prix pro' : '');
+    const nOeufs = st.o * 30 + u, eggN = $('eggN');
+    $('eggWord').textContent = nOeufs > 1 ? 'œufs' : 'œuf';
+    if (eggN.textContent !== String(nOeufs)) { eggN.textContent = nOeufs; if (anim) gsap.fromTo(eggN, { scale: 1.3, transformOrigin: '100% 60%' }, { scale: 1, duration: .45, ease: 'back.out(3)' }); }
+    $('eggPrice').textContent = u ? `dont ${u} à l'unité : ${F(u * UNIT)}` : `à l'unité : ${F(UNIT)} l'œuf`;
+    $('trayX').textContent = st.o ? `${st.o} plateau${st.o > 1 ? 'x' : ''}` : 'à l\'unité';
     $('saving').hidden = !eco; $('saving').textContent = `Prix pro appliqué : tu économises ${F(eco)}.`;
     $('total').textContent = F(total);
     $('totalLabel').textContent = fete ? 'Total (acompte déduit à la livraison)' : 'Total à la livraison';
@@ -693,7 +768,8 @@ p{margin:0}
 
     const parts = [];
     if (st.p) parts.push(`${st.p} poulet${st.p > 1 ? 's' : ''} ${PREP[prep][st.p > 1 ? 1 : 0]}`);
-    if (st.o) parts.push(`${st.o} plateau${st.o > 1 ? 'x' : ''} d'œufs${$('abo').checked ? ' chaque semaine (abonnement)' : ''}`);
+    const oe = [st.o ? `${st.o} plateau${st.o > 1 ? 'x' : ''} d'œufs` : '', u ? `${u} œuf${u > 1 ? 's' : ''} à l'unité` : ''].filter(Boolean).join(' plus ');
+    if (oe) parts.push(oe + ($('abo').checked ? ' chaque semaine (abonnement)' : ''));
     const nom = $('prenom').value.trim(), rep = $('repere').value.trim();
     const quandTxt = ferme ? (fete ? `retrait à la ferme pour le ${FETES[+quand.value.split('-')[1]]}` : 'retrait à la ferme samedi')
       : fete ? `livraison le ${FETES[+quand.value.split('-')[1]]}` : `livraison ${quand.options[quand.selectedIndex].text.replace('Prochaine tournée : ', 'le ')}`;
@@ -702,18 +778,14 @@ p{margin:0}
          `Je voudrais ${parts.join(' et ')}.`,
          `${ferme ? '' : `${c}${rep ? `, ${rep}` : ''}. `}${quandTxt[0].toUpperCase() + quandTxt.slice(1)}, ${$('creneau').value.toLowerCase()}.`,
          `Paiement : ${$('paiement').value}. Total : ${F(total)}.${fete ? ' Je réserve pour les fêtes.' : ''}`].join('\n')
-      : 'Ajoute au moins un poulet ou un plateau.';
+      : 'Ajoute au moins un poulet ou quelques œufs.';
     $('msg').textContent = msg;
     const href = `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
     $('waLink').href = href;
     $('barTotal').textContent = F(total);
     $('barItems').textContent = parts.length ? parts.join(' · ') : 'Panier vide';
 
-    const full = st.o > 0;
-    if ((lastO > 0) !== full || lastO === -1) {
-      if (hasGsap && !reduce) gsap.to(eggs, { scale: full ? 1 : 0, duration: .45, ease: full ? 'back.out(2.2)' : 'power2.in', stagger: { each: .018, from: full ? 'random' : 'end' } });
-      else eggs.forEach(e => e.style.transform = `scale(${full ? 1 : 0})`);
-    } else if (hasGsap && !reduce && full && st.o !== lastO) gsap.fromTo('#trayX', { scale: 1.35 }, { scale: 1, duration: .4, ease: 'back.out(3)' });
+    if (anim && st.o !== lastO && lastO !== -1) gsap.fromTo('#trayX', { scale: 1.3 }, { scale: 1, duration: .4, ease: 'back.out(3)' });
     lastO = st.o;
   }
   const bump = (k, d) => { st[k] = Math.max(0, Math.min(200, st[k] + d)); render(); };
@@ -766,6 +838,9 @@ p{margin:0}
 
   gsap.from('.farm-card', { y: 70, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: '.farm', start: 'top 80%' } });
   if (matchMedia('(min-width: 861px)').matches) gsap.fromTo('.farm-photo img', { clipPath: 'ellipse(0% 100% at 100% 50%)' }, { clipPath: 'ellipse(92% 100% at 100% 50%)', duration: 1.4, ease: 'power3.inOut', scrollTrigger: { trigger: '.farm', start: 'top 65%' } });
+
+  ScrollTrigger.create({ trigger: '#tray', start: 'top 85%', once: true, onEnter: () =>
+    gsap.to(eggs, { y: -7, duration: .22, yoyo: true, repeat: 1, ease: 'power1.out', stagger: { each: .025, from: 'start' }, delay: .3 }) });
 
   const outline = $('outline'); outline.style.strokeDasharray = 100; outline.style.strokeDashoffset = 100;
   gsap.to(outline, { strokeDashoffset: 0, duration: 1.8, ease: 'power2.inOut', scrollTrigger: { trigger: '.plate', start: 'top 65%' } });

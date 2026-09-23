@@ -41,7 +41,11 @@ p{margin:0}
 .top > *{pointer-events:auto}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--creme);font-weight:700;font-size:20px;letter-spacing:.03em;text-transform:uppercase;padding:8px 12px 8px 8px;border-radius:8px;transition:background .4s,color .4s}
 .brand svg{width:28px;height:32px;flex:none}
-.top.light .brand{color:var(--encre);background:rgba(251,247,239,.92)}
+.top::before{content:"";position:absolute;inset:0;background:rgba(22,36,27,.94);opacity:0;transition:opacity .35s,background .35s;box-shadow:0 1px 0 rgba(244,236,221,.12);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);pointer-events:none;z-index:-1}
+.top{padding-bottom:12px}
+.top.solid::before{opacity:1}
+.top.light::before{background:rgba(251,247,239,.95);box-shadow:0 1px 0 var(--trait)}
+.top.light .brand{color:var(--encre)}
 .notch{position:absolute;left:50%;top:0;translate:-50% 0;width:200px;height:56px;border:0;background:var(--vert);border-radius:0 0 110px 110px;cursor:pointer;display:grid;place-items:center;padding-top:env(safe-area-inset-top,0px)}
 .notch span{display:block;width:38px;height:2px;background:var(--creme);box-shadow:0 -9px 0 var(--creme),0 9px 0 var(--creme);transition:.3s}
 .notch[aria-expanded="true"] span{background:transparent;box-shadow:none}
@@ -161,7 +165,8 @@ p{margin:0}
 .line-name small{display:block;font-weight:400;font-size:15px;color:var(--encre-doux)}
 .step{display:flex;align-items:center;gap:6px}
 .step button{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--vert);background:transparent;color:var(--vert);font-size:22px;line-height:1;cursor:pointer;font-family:var(--sans)}
-.step button:hover{background:var(--vert);color:var(--creme)}
+.step button:hover:not(:disabled){background:var(--vert);color:var(--creme)}
+.step button:disabled{opacity:.3;cursor:not-allowed}
 .step output{min-width:30px;text-align:center;font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
 .seg{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;border:0;margin:0;padding:0}
 .seg label{position:relative}
@@ -170,11 +175,18 @@ p{margin:0}
 .seg input:checked + span{background:var(--vert);border-color:var(--vert);color:var(--creme)}
 .seg input:focus-visible + span{outline:3px solid var(--mais);outline-offset:2px}
 .egg-box{grid-column:1/-1;display:grid;gap:10px}
-.egg-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.egg-count{font-size:15px;color:var(--encre-doux)}
-.egg-count b{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-weight:600;font-size:34px;line-height:1;color:var(--vert);font-variant-numeric:tabular-nums;display:inline-block;min-width:1.6ch;text-align:right;margin-right:4px}
-.egg-price{display:block;font-size:14px;color:var(--mais-fonce);font-weight:700;font-variant-numeric:tabular-nums}
-.chip{background:var(--poussin);color:var(--encre);font-weight:700;border-radius:999px;padding:5px 12px;font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.egg-total{text-align:right;line-height:1;color:var(--encre-doux);font-size:15px;max-width:15ch;justify-self:end}
+.egg-total b{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-weight:600;font-size:36px;color:var(--vert);font-variant-numeric:tabular-nums;display:inline-block;margin-right:5px}
+.egg-total small{display:block;margin-top:6px;font-size:14px;line-height:1.3;font-weight:600;color:var(--mais-fonce)}
+.egg-sub{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.egg-sub.loose{padding-top:12px;border-top:1px dashed var(--trait)}
+.sub-t{display:block;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--vert)}
+.egg-price{font-size:15px;color:var(--mais-fonce);font-weight:700;font-variant-numeric:tabular-nums}
+.stack{display:flex;align-items:center;gap:6px;min-height:34px;margin-top:6px}
+.stack .none{font-size:15px;color:#8C8677}
+.tok{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;width:42px;height:30px;padding:3px;background:#E6D8BC;border-radius:5px;box-shadow:0 2px 0 #CDB58C}
+.tok i{border-radius:50% 50% 46% 46%/60% 60% 40% 40%;background:radial-gradient(circle at 34% 28%,#F9E0BF,#C27A43 58%,#8A4B20)}
+.stack .more{font-weight:700;font-size:15px;color:var(--vert);font-variant-numeric:tabular-nums}
 .tray{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;background:#E6D8BC;padding:10px 10px 16px;border-radius:10px;position:relative;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;transition:box-shadow .3s}
 .tray.done{box-shadow:0 0 0 4px var(--poussin)}
 .cell{aspect-ratio:1;border-radius:50%;background:#D5C39F;display:grid;place-items:center;border:0;padding:0;margin:0;cursor:pointer;position:relative;font:inherit}
@@ -242,7 +254,7 @@ p{margin:0}
 .bar-txt span{color:#CFC8B8;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bar a{display:inline-flex;align-items:center;gap:8px;background:var(--poussin);color:var(--encre);text-decoration:none;font-weight:700;padding:12px 16px;border-radius:9px;white-space:nowrap}
 .bar a svg{width:18px;height:18px}
-.toast{position:fixed;z-index:31;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));translate:-50% 0;background:var(--poussin);color:var(--encre);font-weight:700;padding:8px 16px;border-radius:999px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .3s,translate .3s}
+.toast{position:fixed;z-index:31;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));translate:-50% 0;background:var(--poussin);color:var(--encre);font-weight:700;padding:10px 18px;border-radius:999px;font-size:15px;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis;opacity:0;pointer-events:none;transition:opacity .3s,translate .3s}
 .toast.show{opacity:1;translate:-50% -6px}
 
 @media (max-width:860px){
@@ -442,15 +454,19 @@ p{margin:0}
           </fieldset>
         </div>
         <div class="line">
-          <div class="line-name">Œufs frais<small id="oeufPrix">2 800 F le plateau de 30</small></div>
-          <div class="step"><button type="button" id="oMoins" aria-label="Retirer un plateau entier">−</button><output id="oQte" aria-live="polite">1</output><button type="button" id="oPlus" aria-label="Ajouter un plateau entier">+</button></div>
+          <div class="line-name">Œufs frais<small id="oeufPrix">2 800 F le plateau de 30 · 100 F l'œuf</small></div>
+          <div class="egg-total" aria-live="polite"><b id="eggN">30</b><span id="eggWord">œufs</span><small id="eggEq">= 1 plateau</small></div>
           <div class="egg-box">
-            <div class="egg-head">
-              <span class="egg-count" aria-live="polite"><b id="eggN">30</b><span id="eggWord">œufs</span><span class="egg-price" id="eggPrice">à l'unité : 100 F l'œuf</span></span>
-              <span class="chip" id="trayX">1 plateau</span>
+            <div class="egg-sub">
+              <div><span class="sub-t">Plateaux complets</span><div class="stack" id="stack"></div></div>
+              <div class="step"><button type="button" id="oMoins" aria-label="Retirer un plateau complet">−</button><output id="oQte">1</output><button type="button" id="oPlus" aria-label="Ajouter un plateau complet">+</button></div>
             </div>
-            <div class="tray" id="tray" role="group" aria-label="Plateau : touche les œufs pour en prendre à l'unité"><span class="tray-date" id="trayDate">Pondu le …</span></div>
-            <p class="egg-help">Touche les œufs pour en prendre à l'unité, ou glisse le doigt pour en choisir plusieurs. À 30, le plateau se complète au prix plateau.</p>
+            <div class="egg-sub loose">
+              <span class="sub-t">À l'unité</span>
+              <span class="egg-price" id="eggPrice">touche les œufs ci-dessous</span>
+            </div>
+            <div class="tray" id="tray" role="group" aria-label="Œufs à l'unité : touche un œuf pour le prendre"><span class="tray-date" id="trayDate">Pondu le …</span></div>
+            <p class="egg-help">Touche un œuf pour le prendre, glisse le doigt pour en choisir plusieurs. Arrivé à 30, ça devient un plateau complet, moins cher.</p>
           </div>
           <label class="check" for="abo"><input type="checkbox" id="abo"><span>Chaque semaine, le jour de ma tournée<small>Abonnement sans engagement : tu arrêtes par un simple message.</small></span></label>
         </div>
@@ -641,6 +657,7 @@ p{margin:0}
   const top = $('top'), bar = $('bar');
   const light = [...document.querySelectorAll('.farm,.order,.plate')];
   function onScroll(){
+    top.classList.toggle('solid', scrollY > innerHeight * .6);
     top.classList.toggle('light', light.some(s => { const r = s.getBoundingClientRect(); return r.top <= 44 && r.bottom >= 44; }));
     const h = hero.getBoundingClientRect(), o = $('commande').getBoundingClientRect();
     const show = h.bottom < innerHeight * .4 && !(o.top < innerHeight * .9 && o.bottom > innerHeight * .3);
@@ -701,6 +718,24 @@ p{margin:0}
     try { navigator.vibrate && navigator.vibrate(8); } catch {}
     if (loose.size === 30) complete(); else render();
   }
+  const stack = $('stack'); let shown = -1;
+  function renderStack(){
+    if (st.o === shown) return;
+    const grew = shown >= 0 && st.o > shown;
+    shown = st.o;
+    const n = Math.min(st.o, 5);
+    stack.innerHTML = st.o ? Array.from({ length: n }, () => '<span class="tok" aria-hidden="true">' + '<i></i>'.repeat(6) + '</span>').join('')
+      + (st.o > 5 ? `<span class="more">+${st.o - 5}</span>` : '') : '<span class="none">aucun</span>';
+    stack.setAttribute('aria-label', st.o ? `${st.o} plateau${st.o > 1 ? 'x' : ''} complet${st.o > 1 ? 's' : ''}` : 'aucun plateau');
+    if (!anim) return;
+    const toks = stack.querySelectorAll('.tok'), last = toks[toks.length - 1];
+    if (grew && last) {
+      const a = tray.getBoundingClientRect(), b = last.getBoundingClientRect();
+      gsap.fromTo(last, { x: a.left + a.width / 2 - (b.left + b.width / 2), y: a.top + a.height / 2 - (b.top + b.height / 2), scale: 3.2, rotate: -12, opacity: .2 },
+        { x: 0, y: 0, scale: 1, rotate: 0, opacity: 1, duration: .75, ease: 'power3.out' });
+      gsap.fromTo(last, { scale: 1 }, { scale: 1.18, duration: .15, yoyo: true, repeat: 1, delay: .75 });
+    }
+  }
   function clearTray(){ loose.clear(); cells.forEach(c => { c.classList.remove('on'); c.setAttribute('aria-pressed', 'false'); }); }
   function complete(){
     busy = true; painting = null; render();
@@ -709,7 +744,7 @@ p{margin:0}
     tray.classList.add('done');
     gsap.timeline({ onComplete: fin })
       .to(eggs, { scale: 1.16, duration: .16, yoyo: true, repeat: 1, ease: 'power1.out', stagger: { each: .018, from: 'center' } })
-      .to('#trayX', { scale: 1.3, duration: .2, yoyo: true, repeat: 1, ease: 'power2.out' }, '-=.2');
+      .to('#tray', { scale: .97, duration: .15, yoyo: true, repeat: 1, ease: 'power2.out' }, '-=.1');
   }
   tray.addEventListener('pointerdown', e => {
     const c = e.target.closest('.cell'); if (!c || busy) return;
@@ -754,8 +789,11 @@ p{margin:0}
     const nOeufs = st.o * 30 + u, eggN = $('eggN');
     $('eggWord').textContent = nOeufs > 1 ? 'œufs' : 'œuf';
     if (eggN.textContent !== String(nOeufs)) { eggN.textContent = nOeufs; if (anim) gsap.fromTo(eggN, { scale: 1.3, transformOrigin: '100% 60%' }, { scale: 1, duration: .45, ease: 'back.out(3)' }); }
-    $('eggPrice').textContent = u ? `dont ${u} à l'unité : ${F(u * UNIT)}` : `à l'unité : ${F(UNIT)} l'œuf`;
-    $('trayX').textContent = st.o ? `${st.o} plateau${st.o > 1 ? 'x' : ''}` : 'à l\'unité';
+    $('eggPrice').textContent = u ? `${u} œuf${u > 1 ? 's' : ''} · ${F(u * UNIT)}` : 'touche les œufs ci-dessous';
+    const pl = `${st.o} plateau${st.o > 1 ? 'x' : ''}`;
+    $('eggEq').textContent = !nOeufs ? 'ajoute un plateau ou touche un œuf' : st.o && u ? `= ${pl} + ${u} à l'unité` : st.o ? `= ${pl}` : `à l'unité`;
+    $('oMoins').disabled = !st.o;
+    renderStack();
     $('saving').hidden = !eco; $('saving').textContent = `Prix pro appliqué : tu économises ${F(eco)}.`;
     $('total').textContent = F(total);
     $('totalLabel').textContent = fete ? 'Total (acompte déduit à la livraison)' : 'Total à la livraison';
@@ -785,7 +823,6 @@ p{margin:0}
     $('barTotal').textContent = F(total);
     $('barItems').textContent = parts.length ? parts.join(' · ') : 'Panier vide';
 
-    if (anim && st.o !== lastO && lastO !== -1) gsap.fromTo('#trayX', { scale: 1.3 }, { scale: 1, duration: .4, ease: 'back.out(3)' });
     lastO = st.o;
   }
   const bump = (k, d) => { st[k] = Math.max(0, Math.min(200, st[k] + d)); render(); };

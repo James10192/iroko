@@ -115,26 +115,24 @@ p{margin:0}
 .rows li.on .row-detail{max-height:140px;opacity:1}
 .rows .illus{position:static;display:inline-block;margin-top:14px}
 
-/* ---------- 3. Zéro jour au congélateur ---------- */
-.num{position:relative;height:190vh;background:var(--brousse)}
-.num-stage{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;place-items:center}
-.big{font-family:var(--serif);font-variation-settings:"SOFT" 100,"WONK" 0;font-weight:600;color:var(--mais);font-size:min(78vw,82vh);line-height:.78;will-change:transform;transform-origin:50% 50%}
-.num-cap{position:absolute;left:0;right:0;bottom:9vh;text-align:center;padding-inline:var(--gutter);font-size:clamp(20px,2.2vw,30px);max-width:32ch;margin-inline:auto}
+/* ---------- 3. Zéro jour au congélateur, puis la fraîcheur dans le trou du zéro ---------- */
+.num{position:relative;height:330vh;background:var(--brousse)}
+.num-stage{position:sticky;top:0;height:100svh;overflow:hidden}
+.zero-photo{position:absolute;inset:0;background:url(img/eleveur-poulet.webp) center 30%/cover no-repeat;will-change:transform}
+.zero-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,27,20,.92) 0%,rgba(16,27,20,.72) 50%,rgba(16,27,20,.3) 100%);opacity:0}
+.zero-svg{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+.num-cap{position:absolute;left:0;right:0;bottom:calc(120px + env(safe-area-inset-bottom,0px));text-align:center;padding-inline:var(--gutter);font-size:clamp(20px,2.2vw,30px);max-width:32ch;margin-inline:auto}
 .num-cap b{font-weight:600;color:var(--poussin)}
-
-/* ---------- 4. Fraîcheur : la journée d'un poulet livré ---------- */
-.fresh{position:relative;overflow:hidden;background:var(--brousse);padding-block:clamp(110px,14vw,190px) clamp(70px,9vw,120px)}
-.fresh-img{position:absolute;inset:-8% 0;background:url(img/eleveur-poulet.webp) center 30%/cover no-repeat;will-change:transform}
-.fresh::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,27,20,.92) 0%,rgba(16,27,20,.7) 50%,rgba(16,27,20,.25) 100%)}
-.fresh .wrap{position:relative;z-index:1}
-.fresh h2{font-size:clamp(38px,5vw,76px);max-width:13ch}
-.fresh h2 .acc{color:var(--poussin)}
-.day{list-style:none;margin:clamp(34px,5vw,60px) 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,300px));gap:18px}
-.day li{border-top:2px solid var(--poussin);padding-top:16px}
-.day time{display:block;font-family:var(--serif);font-variation-settings:"SOFT" 100;font-size:clamp(28px,2.6vw,38px);color:var(--poussin);font-variant-numeric:tabular-nums;line-height:1}
-.day p{margin-top:10px;color:#E6DFCF;font-size:17px}
-.cluster{position:absolute;right:3vw;top:14%;z-index:1;width:min(28vw,320px);aspect-ratio:1}
+.zero-content{position:absolute;inset:0;display:grid;align-content:center;padding-block:96px calc(120px + env(safe-area-inset-bottom,0px))}
+.zero-content h2{font-size:clamp(36px,4.6vw,72px);max-width:13ch}
+.zero-content h2 .acc{color:var(--poussin)}
+.day{list-style:none;margin:clamp(26px,4vw,52px) 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,300px));gap:18px}
+.day li{border-top:2px solid var(--poussin);padding-top:14px}
+.day time{display:block;font-family:var(--serif);font-variation-settings:"SOFT" 100;font-size:clamp(26px,2.4vw,36px);color:var(--poussin);font-variant-numeric:tabular-nums;line-height:1}
+.day p{margin-top:8px;color:#E6DFCF;font-size:17px}
+.cluster{position:absolute;right:3vw;top:16%;width:min(26vw,300px);aspect-ratio:1;pointer-events:none}
 .cluster svg{position:absolute;overflow:visible}
+.num-stage .illus{bottom:auto;top:84px}
 
 /* ---------- 5. La ferme ---------- */
 .farm{background:var(--feuille);padding-block:clamp(70px,9vw,130px);color:var(--encre)}
@@ -268,6 +266,12 @@ p{margin:0}
 .toast{position:fixed;z-index:31;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));translate:-50% 0;background:var(--poussin);color:var(--encre);font-weight:700;padding:10px 18px;border-radius:999px;font-size:15px;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis;opacity:0;pointer-events:none;transition:opacity .3s,translate .3s}
 .toast.show{opacity:1;translate:-50% -6px}
 
+@media (max-width:1100px){
+  .facts dt{font-size:24px}
+}
+@media (min-width:561px) and (max-width:860px){
+  .basket{max-width:620px;width:100%;justify-self:center}
+}
 @media (max-width:860px){
   body{font-size:17px}
   .brand{font-size:16px;gap:8px}.brand svg{width:24px;height:28px}
@@ -288,8 +292,13 @@ p{margin:0}
   .add{width:46px;height:46px;padding:0;justify-content:center}
   .add .t{display:none}.add svg{width:16px;height:16px}
   .add[data-add="pro"]{width:auto;padding:0 14px;gap:4px}.add[data-add="pro"] .s{display:inline}
-  .num{height:125vh}
-  .fresh{padding-top:48px}
+  .num{height:300vh}
+  .zero-content{align-content:end;padding-top:84px}
+  .zero-content h2{font-size:clamp(32px,9vw,44px)}
+  .day{margin-top:22px;gap:14px}
+  .day p{font-size:15px;margin-top:4px}
+  .day time{font-size:24px}
+  .zero-shade{background:linear-gradient(0deg,rgba(16,27,20,.95) 45%,rgba(16,27,20,.5))}
   .send a.wa{flex:1}
   #copy{width:54px;padding:0}#copy .t{display:none}
   .egg-total b{font-size:30px}
@@ -297,25 +306,31 @@ p{margin:0}
   .row{grid-template-columns:1fr auto;padding:22px 0}
   .row-price{grid-column:1;grid-row:2;text-align:left}
   .add{grid-column:2;grid-row:1/3;align-self:center}
-  .day{grid-template-columns:1fr;gap:22px}
-  .cluster{width:34vw;right:-6vw;top:8%;opacity:.85}
-  .fresh::after{background:linear-gradient(0deg,rgba(16,27,20,.94) 30%,rgba(16,27,20,.55))}
+  .day{grid-template-columns:1fr}
+  .cluster{width:30vw;right:-4vw;top:12%;opacity:.9}
   .farm-card,.order .wrap,.plate .wrap{grid-template-columns:1fr}
   .farm-photo{order:-1;min-height:260px}
   .farm-photo img{clip-path:ellipse(120% 96% at 50% 0%)}
   .facts{grid-template-columns:1fr;gap:10px}.facts div{display:grid;grid-template-columns:110px 1fr;align-items:baseline;gap:12px}.facts dt{font-size:24px}.facts dd{margin:0}
   .fields{grid-template-columns:1fr}
-  .tray{grid-template-columns:repeat(6,1fr)}
+}
+@media (max-width:860px){
   .shape{justify-self:center;max-width:400px;width:calc(100% - 28px)}
   .foot-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+  .tray{grid-template-columns:repeat(6,1fr)}
 }
 @media (max-width:520px){
   .foot-grid{grid-template-columns:1fr;gap:24px}
 }
 
+.no-anim .num{height:auto}.no-anim .num-stage{position:relative;height:auto;min-height:100svh}
+.no-anim .zero-svg,.no-anim .num-cap{display:none}.no-anim .zero-shade{opacity:1}.no-anim .zero-content{position:relative;min-height:100svh}
 @media (prefers-reduced-motion:reduce){
-  .num{height:auto}.num-stage{position:relative;height:auto;padding-block:90px}
-  .big{font-size:50vw}.num-cap{position:static;margin-top:24px}
+  .num{height:auto}.num-stage{position:relative;height:auto;min-height:100svh}
+  .zero-svg,.num-cap{display:none}.zero-shade{opacity:1}
+  .zero-content{position:relative;min-height:100svh}
   .season i{animation:none}
 }
 </style>
@@ -351,7 +366,7 @@ p{margin:0}
 <nav class="menu" id="menu" aria-label="Menu principal">
   <ul>
     <li><a href="#produits">Nos produits</a></li>
-    <li><a href="#fraicheur">Fraîcheur</a></li>
+    <li><a href="#zero">Fraîcheur</a></li>
     <li><a href="#ferme">La ferme</a></li>
     <li><a href="#commande">Commander</a></li>
   </ul>
@@ -415,34 +430,35 @@ p{margin:0}
     </div>
   </section>
 
-  <!-- 3. Zéro jour au congélateur -->
-  <section class="num" id="zero" aria-label="Zéro jour au congélateur">
+  <!-- 3. Zéro jour au congélateur : la photo est déjà dans le trou du zéro -->
+  <section class="num" id="zero" aria-label="Zéro jour au congélateur, du poulailler à ta marmite">
     <div class="num-stage">
-      <div class="big" id="big" aria-hidden="true">0</div>
+      <div class="zero-photo" id="zeroPhoto" role="img" aria-label="Photo d'illustration : un éleveur sourit, un poulet dans les mains, dans un bâtiment d'élevage"></div>
+      <div class="zero-shade" id="zeroShade"></div>
+      <svg class="zero-svg" id="zeroSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <g id="zg">
+          <path fill="#16241B" fill-rule="evenodd" d="M-3000 -3000H3100V3100H-3000Z M38.18 46.08A12 26 -10 1 0 61.82 41.92A12 26 -10 1 0 38.18 46.08Z"/>
+          <path fill="#E9771C" fill-rule="evenodd" d="M27 44A23 34 0 1 0 73 44A23 34 0 1 0 27 44Z M38.18 46.08A12 26 -10 1 0 61.82 41.92A12 26 -10 1 0 38.18 46.08Z"/>
+        </g>
+      </svg>
       <p class="num-cap" id="numCap"><b>0 jour</b> au congélateur. Le poulet importé en a passé des semaines.</p>
+      <div class="zero-content wrap" id="zeroContent">
+        <h2>Du poulailler à ta marmite, <span class="acc">le même jour.</span></h2>
+        <ol class="day" id="day">
+          <li><time>5 h 30</time><p>On attrape les poulets commandés la veille. Pas un de plus.</p></li>
+          <li><time>8 h</time><p>Plumés, vidés, pesés et emballés à la ferme, au frais.</p></li>
+          <li><time>11 h</time><p>Livrés dans ta commune, le jour de sa tournée.</p></li>
+        </ol>
+      </div>
+      <div class="cluster" id="cluster" aria-hidden="true">
+        <svg style="left:8%;top:30%;width:34%;height:34%;color:#F5C842"><use href="#s-fleur" fill="currentColor"/></svg>
+        <svg style="left:48%;top:4%;width:26%;height:26%;color:#C9E6A0"><use href="#s-feuille" fill="currentColor"/></svg>
+        <svg style="left:60%;top:36%;width:30%;height:30%;color:#F4ECDD"><use href="#s-oeuf" fill="currentColor"/></svg>
+        <svg style="left:30%;top:62%;width:24%;height:24%;color:#E9771C"><use href="#s-plume" fill="currentColor"/></svg>
+        <svg style="left:0%;top:4%;width:18%;height:18%;color:#E9771C"><use href="#s-grain" fill="currentColor"/></svg>
+      </div>
+      <span class="illus" id="zeroIllus">Photo d'illustration</span>
     </div>
-  </section>
-
-  <!-- 4. Fraîcheur -->
-  <section class="fresh" id="fraicheur" aria-label="Fraîcheur">
-    <div class="fresh-img" id="freshImg" role="img" aria-label="Photo d'illustration : un éleveur sourit, un poulet dans les mains, dans un bâtiment d'élevage"></div>
-    <div class="wrap">
-      <h2>Du poulailler à ta marmite, <span class="acc">le même jour.</span></h2>
-      <ol class="day" id="day">
-        <li><time>5 h 30</time><p>On attrape les poulets commandés la veille. Pas un de plus.</p></li>
-        <li><time>8 h</time><p>Plumés, vidés, pesés et emballés à la ferme, au frais.</p></li>
-        <li><time>11 h</time><p>Livrés dans ta commune, le jour de sa tournée.</p></li>
-      </ol>
-    </div>
-    <div class="cluster" id="cluster" aria-hidden="true">
-      <svg style="left:8%;top:30%;width:34%;height:34%;color:#F5C842"><use href="#s-fleur" fill="currentColor"/></svg>
-      <svg style="left:48%;top:4%;width:26%;height:26%;color:#C9E6A0"><use href="#s-feuille" fill="currentColor"/></svg>
-      <svg style="left:60%;top:36%;width:30%;height:30%;color:#F4ECDD"><use href="#s-oeuf" fill="currentColor"/></svg>
-      <svg style="left:30%;top:62%;width:24%;height:24%;color:#E9771C"><use href="#s-plume" fill="currentColor"/></svg>
-      <svg style="left:0%;top:4%;width:18%;height:18%;color:#E9771C"><use href="#s-grain" fill="currentColor"/></svg>
-      <svg style="left:74%;top:72%;width:18%;height:18%;color:#F5C842"><use href="#s-grain" fill="currentColor"/></svg>
-    </div>
-    <span class="illus">Photo d'illustration</span>
   </section>
 
   <!-- 5. La ferme -->
@@ -510,10 +526,10 @@ p{margin:0}
         <p class="saving" id="saving" hidden></p>
 
         <div class="fields">
-          <label class="field" for="commune">Livraison
+          <label class="field full" for="commune">Livraison
             <select id="commune"></select>
           </label>
-          <label class="field" for="quand">Quand
+          <label class="field full" for="quand">Quand
             <select id="quand"></select>
           </label>
           <p class="hint" id="hint"></p>
@@ -895,6 +911,7 @@ p{margin:0}
   $('proWa').href = `https://wa.me/${WA}?text=${encodeURIComponent('Bonjour Ferme Akwaba, je prépare un événement et je voudrais un devis pour une grosse commande.')}`;
   render(); onScroll();
 
+  if (!hasGsap) document.documentElement.classList.add('no-anim');
   if (!hasGsap || reduce) return;
 
   /* ---------- Animations ---------- */
@@ -904,16 +921,27 @@ p{margin:0}
 
   rows.forEach((li, i) => ScrollTrigger.create({ trigger: li, start: 'top 60%', end: 'bottom 60%', onToggle: s => s.isActive && activate(i) }));
 
-  /* On plonge dans le trou du zéro */
-  const tl = gsap.timeline({ scrollTrigger: { trigger: '#zero', start: 'top top', end: 'bottom bottom', scrub: 1 } });
-  tl.to('#numCap', { opacity: 0, y: -24, duration: .6 }, .5)
-    .fromTo('#big', { scale: .92 }, { scale: 9, ease: 'power2.in', duration: 2.4 }, .5)
-    .to('#big', { opacity: 0, duration: .3 }, 2.6);
-
-  gsap.to('#freshImg', { yPercent: 8, ease: 'none', scrollTrigger: { trigger: '.fresh', start: 'top bottom', end: 'bottom top', scrub: true } });
-  gsap.from('#day li', { y: 40, opacity: 0, duration: .8, stagger: .15, ease: 'power3.out', scrollTrigger: { trigger: '#day', start: 'top 80%' } });
+  /* On plonge dans le trou du zéro : la photo qu'on y voit devient la scène suivante */
   const petals = gsap.utils.toArray('#cluster svg');
-  gsap.from(petals, { scale: 0, rotate: -90, transformOrigin: '50% 50%', duration: 1.1, ease: 'back.out(1.8)', stagger: .09, scrollTrigger: { trigger: '.fresh', start: 'top 55%' } });
+  const zeroStart = () => {
+    if (innerWidth < innerHeight) return 1;                       // portrait : le zéro est calé sur la largeur
+    const u = innerHeight / 100;                                   // paysage : 1 unité = 1 % de la hauteur
+    return Math.min(1, (innerHeight - 210 - 44 * u) / (34 * u));   // garder la légende au-dessus de la barre
+  };
+  gsap.set('#zg', { scale: zeroStart(), svgOrigin: '50 44' });
+  gsap.set('#zeroContent h2, #day li, #cluster, #zeroIllus', { opacity: 0 });
+  const tl = gsap.timeline({ scrollTrigger: { trigger: '#zero', start: 'top top', end: 'bottom bottom', scrub: 1, invalidateOnRefresh: true } });
+  tl.to('#numCap', { opacity: 0, y: -20, duration: .4 }, .3)
+    .fromTo('#zg', { scale: zeroStart }, { scale: 14, svgOrigin: '50 44', ease: 'power2.in', duration: 2 }, .3)
+    .fromTo('#zeroPhoto', { scale: 1.35 }, { scale: 1, ease: 'power1.out', duration: 2.2 }, .3)
+    .set('#zeroSvg', { autoAlpha: 0 }, 2.3)
+    .fromTo('#zeroShade', { opacity: 0 }, { opacity: 1, duration: .5 }, 2.1)
+    .fromTo('#zeroContent h2', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: .6 }, 2.4)
+
+    .fromTo('#cluster', { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, transformOrigin: '70% 30%', duration: .7, ease: 'back.out(1.8)' }, 2.6)
+    .fromTo('#zeroIllus', { opacity: 0 }, { opacity: 1, duration: .3 }, 2.4)
+    .to({}, { duration: 1.2 });
+  gsap.utils.toArray('#day li').forEach((li, i) => tl.fromTo(li, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: .6, immediateRender: true }, 2.8 + i * .3));
   petals.forEach((p, i) => gsap.to(p, { rotate: i % 2 ? 10 : -10, y: i % 2 ? -8 : 8, duration: 2.6 + i * .3, ease: 'sine.inOut', repeat: -1, yoyo: true, transformOrigin: '50% 50%' }));
 
   gsap.from('.farm-card', { y: 70, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: '.farm', start: 'top 80%' } });

@@ -5,16 +5,17 @@
 <style>
 :root{
   color-scheme: light;
-  --brousse:#16241B;      /* nuit de brousse : fond du récit */
-  --brousse-2:#101B14;    /* motif ton sur ton */
-  --vert:#0A4D2A;         /* vert Akwaba : marque */
+  --brousse:#16241B;      /* nuit de brousse */
+  --vert:#0A4D2A;         /* vert Akwaba */
   --creme:#F4ECDD;        /* crème coton */
   --creme-2:#FBF7EF;
-  --mais:#E9771C;         /* orange maïs : mot d'accent */
+  --mais:#E9771C;         /* orange maïs, sur fonds sombres */
+  --mais-fonce:#B4510B;   /* orange maïs lisible sur fonds clairs */
   --poussin:#F5C842;      /* jaune poussin : action */
-  --feuille:#C9E6A0;      /* vert feuille : section commande */
+  --feuille:#C9E6A0;      /* vert feuille */
   --encre:#14201A;
   --encre-doux:#3B4A40;
+  --trait:#D8CEBB;
   --wa:#25D366;
   --sans:"Urbanist", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --serif:"Fraunces", "Iowan Old Style", Georgia, serif;
@@ -32,189 +33,244 @@ p{margin:0}
 .acc{font-family:var(--serif);font-variation-settings:"SOFT" 100,"WONK" 1;font-weight:500;letter-spacing:-.01em}
 .wrap{max-width:var(--max);margin-inline:auto;padding-inline:var(--gutter)}
 :focus-visible{outline:3px solid var(--poussin);outline-offset:3px;border-radius:6px}
+.nb{white-space:nowrap}
+.illus{position:absolute;z-index:2;right:12px;bottom:12px;font-size:12px;letter-spacing:.04em;background:rgba(16,27,20,.72);color:#E9E2D2;padding:3px 8px;border-radius:4px}
 
 /* ---------- En-tête ---------- */
-.top{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;justify-content:space-between;align-items:flex-start;padding:calc(20px + env(safe-area-inset-top,0px)) var(--gutter) 0;pointer-events:none}
+.top{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;justify-content:space-between;align-items:flex-start;padding:calc(18px + env(safe-area-inset-top,0px)) var(--gutter) 0;pointer-events:none}
 .top > *{pointer-events:auto}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--creme);font-weight:700;font-size:22px;letter-spacing:.02em;text-transform:uppercase;transition:color .4s}
-.brand svg{width:30px;height:34px}
-.top.light .brand{color:var(--encre)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--creme);font-weight:700;font-size:20px;letter-spacing:.03em;text-transform:uppercase;padding:8px 12px 8px 8px;border-radius:8px;transition:background .4s,color .4s}
+.brand svg{width:28px;height:32px;flex:none}
+.top.light .brand{color:var(--encre);background:rgba(251,247,239,.92)}
 .notch{position:absolute;left:50%;top:0;translate:-50% 0;width:200px;height:56px;border:0;background:var(--vert);border-radius:0 0 110px 110px;cursor:pointer;display:grid;place-items:center;padding-top:env(safe-area-inset-top,0px)}
 .notch span{display:block;width:38px;height:2px;background:var(--creme);box-shadow:0 -9px 0 var(--creme),0 9px 0 var(--creme);transition:.3s}
 .notch[aria-expanded="true"] span{background:transparent;box-shadow:none}
 .notch[aria-expanded="true"]::before,.notch[aria-expanded="true"]::after{content:"";position:absolute;width:30px;height:2px;background:var(--creme);rotate:45deg}
 .notch[aria-expanded="true"]::after{rotate:-45deg}
-.cmd{display:inline-flex;align-items:center;gap:10px;background:var(--poussin);color:var(--encre);text-decoration:none;font-weight:600;padding:14px 22px;border-radius:8px;font-size:17px;transition:transform .2s}
+.cmd{display:inline-flex;align-items:center;gap:10px;background:var(--poussin);color:var(--encre);text-decoration:none;font-weight:700;padding:13px 20px;border-radius:8px;font-size:17px;transition:transform .2s}
 .cmd:hover{transform:translateY(-2px)}
 .cmd svg{width:20px;height:20px}
-.menu{position:fixed;inset:0;z-index:35;background:var(--vert);display:grid;place-items:center;clip-path:circle(0 at 50% 0);transition:clip-path .7s cubic-bezier(.7,0,.2,1);visibility:hidden}
-.menu.open{clip-path:circle(150% at 50% 0);visibility:visible}
+.menu{position:fixed;inset:0;z-index:35;background:var(--vert);display:grid;place-items:center;clip-path:circle(0 at 50% 0);transition:clip-path .7s cubic-bezier(.7,0,.2,1),visibility 0s .7s;visibility:hidden}
+.menu.open{clip-path:circle(150% at 50% 0);visibility:visible;transition:clip-path .7s cubic-bezier(.7,0,.2,1)}
 .menu ul{list-style:none;margin:0;padding:0;text-align:center;display:grid;gap:10px}
 .menu a{font-family:var(--serif);font-variation-settings:"SOFT" 100,"WONK" 1;font-size:clamp(34px,6vw,64px);text-decoration:none;color:var(--creme)}
 .menu a:hover{color:var(--poussin)}
 
-/* ---------- 1. La question ---------- */
-.hero{position:relative;min-height:100svh;display:grid;place-items:center;overflow:hidden;background:var(--brousse);padding-block:120px 90px}
+/* ---------- 1. Ouverture : produit, prix, action ---------- */
+.hero{position:relative;min-height:100svh;display:grid;place-items:center;overflow:hidden;background:var(--brousse);padding-block:120px 110px}
 #motif{position:absolute;inset:0;width:100%;height:100%}
-.hero h1{position:relative;font-size:clamp(38px,5.4vw,80px);font-weight:500;text-align:center;max-width:15ch;margin-inline:auto;padding-inline:16px}
-.hero h1 .acc{color:var(--mais);font-size:1.12em;display:inline-block}
-.w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em;margin-bottom:-.08em}
+.hero-in{position:relative;display:grid;justify-items:center;gap:26px;text-align:center;padding-inline:var(--gutter)}
+.season{display:inline-flex;align-items:center;gap:10px;background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.45);color:var(--poussin);border-radius:999px;padding:7px 16px;font-size:15px;font-weight:600;text-decoration:none}
+.season i{width:8px;height:8px;border-radius:50%;background:var(--poussin);box-shadow:0 0 0 0 rgba(245,200,66,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 10px rgba(245,200,66,0)}100%{box-shadow:0 0 0 0 rgba(245,200,66,0)}}
+.hero h1{font-size:clamp(40px,5.6vw,84px);font-weight:500;max-width:14ch}
+.hero h1 .acc{color:var(--mais);font-size:1.1em;display:inline-block}
+.w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.1em;margin-bottom:-.1em}
 .w > span{display:inline-block}
-.down{position:absolute;bottom:28px;left:50%;translate:-50% 0;width:52px;height:52px;border-radius:50%;background:var(--creme);display:grid;place-items:center;text-decoration:none}
-.down svg{width:18px;height:18px}
+.hero-sub{font-size:clamp(17px,1.5vw,21px);color:#E3DCCB;max-width:44ch}
+.prices{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.price{display:flex;align-items:baseline;gap:10px;border:1px solid rgba(244,236,221,.3);border-radius:8px;padding:10px 16px;font-size:16px;color:#E3DCCB}
+.price b{font-size:22px;color:var(--creme);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ctas{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;border-radius:8px;padding:16px 24px;font-size:17px;transition:transform .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn svg{width:20px;height:20px}
+.btn-jaune{background:var(--poussin);color:var(--encre)}
+.btn-ligne{border:1.5px solid rgba(244,236,221,.55);color:var(--creme)}
 
-/* ---------- 2. Le chiffre ---------- */
-.num{position:relative;height:260vh;background:var(--brousse)}
+/* ---------- 2. Ce qui sort de la ferme ---------- */
+.prod{position:relative;overflow:hidden;background:var(--brousse);padding-block:clamp(90px,11vw,150px) clamp(60px,8vw,110px)}
+.prod-bg{position:absolute;inset:0}
+.prod-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.08);transition:opacity .9s ease,transform 1.6s ease}
+.prod-bg img.on{opacity:1;transform:scale(1)}
+.prod::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,27,20,.9),rgba(16,27,20,.62) 60%,rgba(16,27,20,.42))}
+.prod .wrap{position:relative;z-index:1}
+.prod h2{font-size:clamp(40px,5vw,72px);color:var(--poussin);text-align:center;margin-bottom:clamp(36px,5vw,70px)}
+.rows{list-style:none;margin:0;padding:0;border-top:1px solid rgba(244,236,221,.28)}
+.rows li{border-bottom:1px solid rgba(244,236,221,.28)}
+.row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px 24px;padding:26px 0;transition:padding .35s}
+.row-name{font-family:var(--serif);font-variation-settings:"SOFT" 100,"WONK" 1;font-size:clamp(24px,2.6vw,36px);line-height:1.1;cursor:pointer;background:none;border:0;color:inherit;text-align:left;padding:0}
+.row-detail{grid-column:1/-1;font-size:16px;color:#DDD6C6;max-width:62ch;max-height:0;overflow:hidden;opacity:0;transition:max-height .45s,opacity .45s}
+.row-price{font-weight:600;font-size:clamp(16px,1.4vw,20px);font-variant-numeric:tabular-nums;text-align:right;line-height:1.3}
+.row-price small{display:block;font-weight:400;font-size:14px;color:#CFC8B8}
+.add{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:10px 16px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;color:var(--encre);transition:transform .25s}
+.add:hover{transform:scale(1.05)}
+.add svg{width:14px;height:14px}
+.rows li.on .row{padding-left:14px}
+.rows li.on .row-detail{max-height:140px;opacity:1}
+.rows .illus{position:static;display:inline-block;margin-top:14px}
+
+/* ---------- 3. Zéro jour au congélateur ---------- */
+.num{position:relative;height:190vh;background:var(--brousse)}
 .num-stage{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;place-items:center}
-.big{font-family:var(--serif);font-variation-settings:"SOFT" 100,"WONK" 0;font-weight:600;color:var(--mais);font-size:min(62vw,70vh);line-height:.8;letter-spacing:-.05em;will-change:transform;transform-origin:50% 52%}
-.num-cap{position:absolute;left:0;right:0;bottom:12vh;text-align:center;padding-inline:var(--gutter);font-size:clamp(20px,2.2vw,30px);max-width:34ch;margin-inline:auto}
+.big{font-family:var(--serif);font-variation-settings:"SOFT" 100,"WONK" 0;font-weight:600;color:var(--mais);font-size:min(78vw,82vh);line-height:.78;will-change:transform;transform-origin:50% 50%}
+.num-cap{position:absolute;left:0;right:0;bottom:9vh;text-align:center;padding-inline:var(--gutter);font-size:clamp(20px,2.2vw,30px);max-width:32ch;margin-inline:auto}
 .num-cap b{font-weight:600;color:var(--poussin)}
-.num-after{position:absolute;inset:0;display:grid;place-items:center;background:var(--mais);color:var(--encre);opacity:0;padding-inline:var(--gutter)}
-.num-after p{font-size:clamp(28px,4vw,58px);max-width:18ch;text-align:center;line-height:1.1;text-wrap:balance;font-weight:500}
-.num-after .acc{color:var(--creme)}
 
-/* ---------- 3. Conviction ---------- */
-.belief{position:relative;min-height:100svh;overflow:hidden;display:flex;align-items:flex-end;background:var(--brousse)}
-.belief-img{position:absolute;inset:-8% 0;background:url(img/eleveur-poulet.webp) center 30%/cover no-repeat;will-change:transform}
-.belief::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,27,20,.86) 0%,rgba(16,27,20,.55) 45%,rgba(16,27,20,0) 75%),linear-gradient(0deg,rgba(16,27,20,.7),transparent 45%)}
-.belief .wrap{position:relative;z-index:1;width:100%;padding-block:0 14vh}
-.belief h2{font-size:clamp(40px,5.6vw,84px);max-width:12ch}
-.belief h2 .acc{color:var(--poussin)}
-.belief p{margin-top:22px;max-width:44ch;font-size:clamp(17px,1.4vw,20px);color:#E9E2D2}
-.cluster{position:absolute;right:3vw;bottom:8vh;z-index:1;width:min(34vw,380px);aspect-ratio:1}
+/* ---------- 4. Fraîcheur : la journée d'un poulet livré ---------- */
+.fresh{position:relative;overflow:hidden;background:var(--brousse);padding-block:clamp(110px,14vw,190px) clamp(70px,9vw,120px)}
+.fresh-img{position:absolute;inset:-8% 0;background:url(img/eleveur-poulet.webp) center 30%/cover no-repeat;will-change:transform}
+.fresh::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,27,20,.92) 0%,rgba(16,27,20,.7) 50%,rgba(16,27,20,.25) 100%)}
+.fresh .wrap{position:relative;z-index:1}
+.fresh h2{font-size:clamp(38px,5vw,76px);max-width:13ch}
+.fresh h2 .acc{color:var(--poussin)}
+.day{list-style:none;margin:clamp(34px,5vw,60px) 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,300px));gap:18px}
+.day li{border-top:2px solid var(--poussin);padding-top:16px}
+.day time{display:block;font-family:var(--serif);font-variation-settings:"SOFT" 100;font-size:clamp(28px,2.6vw,38px);color:var(--poussin);font-variant-numeric:tabular-nums;line-height:1}
+.day p{margin-top:10px;color:#E6DFCF;font-size:17px}
+.cluster{position:absolute;right:3vw;top:14%;z-index:1;width:min(28vw,320px);aspect-ratio:1}
 .cluster svg{position:absolute;overflow:visible}
 
-/* ---------- 4. La ferme ---------- */
-.farm{background:var(--feuille);padding-block:clamp(70px,10vw,140px);color:var(--encre)}
-.farm-card{display:grid;grid-template-columns:1.05fr 1fr;background:var(--creme);border-radius:6px;overflow:hidden;min-height:440px}
+/* ---------- 5. La ferme ---------- */
+.farm{background:var(--feuille);padding-block:clamp(70px,9vw,130px);color:var(--encre)}
+.farm-card{display:grid;grid-template-columns:1.05fr 1fr;background:var(--creme);border-radius:6px;overflow:hidden;min-height:420px}
 .farm-txt{padding:clamp(28px,5vw,72px);display:flex;flex-direction:column;gap:20px;justify-content:center}
 .eyebrow{font-size:14px;text-transform:uppercase;letter-spacing:.14em;font-weight:600;color:var(--vert)}
 .farm h2{font-size:clamp(32px,3.4vw,48px)}
-.farm h2 .acc{color:var(--mais)}
+.farm h2 .acc{color:var(--mais-fonce)}
 .farm-txt p{color:var(--encre-doux);max-width:46ch;font-size:clamp(17px,1.35vw,20px)}
-.facts{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:8px 34px;margin-top:6px}
-.facts dt{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-size:34px;color:var(--vert);line-height:1;font-variant-numeric:tabular-nums}
-.facts dd{margin:4px 0 0;font-size:14px;color:var(--encre-doux);max-width:14ch}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 24px;margin:6px 0 0}
+.facts dt{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-size:30px;color:var(--vert);line-height:1}
+.facts dd{margin:6px 0 0;font-size:15px;color:var(--encre-doux)}
 .btn-dark{align-self:flex-start;background:var(--encre);color:var(--creme);text-decoration:none;padding:15px 24px;border-radius:6px;font-weight:600;margin-top:6px}
 .farm-photo{position:relative;min-height:320px}
 .farm-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;clip-path:ellipse(92% 100% at 100% 50%)}
 
-/* ---------- 5. Ce qui sort de la ferme ---------- */
-.prod{position:relative;overflow:hidden;background:var(--brousse);padding-block:clamp(90px,12vw,160px) clamp(60px,8vw,110px)}
-.prod-bg{position:absolute;inset:0}
-.prod-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.08);transition:opacity .9s ease,transform 1.6s ease}
-.prod-bg img.on{opacity:1;transform:scale(1)}
-.prod::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,27,20,.88),rgba(16,27,20,.55) 60%,rgba(16,27,20,.35))}
-.prod .wrap{position:relative;z-index:1}
-.prod h2{font-size:clamp(40px,5vw,72px);color:var(--poussin);text-align:center;margin-bottom:clamp(40px,6vw,80px)}
-.rows{list-style:none;margin:0;padding:0;border-top:1px solid rgba(244,236,221,.28)}
-.rows li{border-bottom:1px solid rgba(244,236,221,.28)}
-.row{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:grid;grid-template-columns:1fr auto 34px;align-items:center;gap:20px;padding:30px 0;transition:padding .35s}
-.row:focus-visible{outline:3px solid var(--poussin)}
-.row-name{font-family:var(--serif);font-variation-settings:"SOFT" 100,"WONK" 1;font-size:clamp(24px,2.6vw,36px);line-height:1.1}
-.row-detail{display:block;font-family:var(--sans);font-size:16px;color:#D8D1C0;margin-top:6px;max-width:52ch;max-height:0;overflow:hidden;opacity:0;transition:max-height .45s,opacity .45s}
-.row-price{font-weight:600;font-size:clamp(17px,1.5vw,21px);font-variant-numeric:tabular-nums;white-space:nowrap}
-.dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;justify-self:end;transition:transform .35s}
-.dot svg{width:12px;height:12px}
-.rows li.on .row{padding-left:18px}
-.rows li.on .row-detail{max-height:120px;opacity:1}
-.rows li.on .dot{transform:scale(1.25) rotate(-45deg)}
-
 /* ---------- 6. Commande ---------- */
-.order{background:var(--feuille);color:var(--encre);padding-block:clamp(70px,10vw,140px);position:relative;overflow:hidden}
-.order .wrap{display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(30px,6vw,90px);align-items:start}
-.order h2{font-size:clamp(38px,4.6vw,66px);color:var(--vert)}
-.order h2 .acc{color:var(--mais)}
-.order-intro p{margin-top:20px;font-size:clamp(17px,1.4vw,20px);color:var(--encre-doux);max-width:40ch}
-.pay{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
-.pay span{font-size:14px;font-weight:600;border:1.5px solid var(--vert);color:var(--vert);border-radius:999px;padding:6px 14px}
-.basket{background:var(--creme-2);border:2px solid var(--vert);border-radius:6px;padding:clamp(22px,3vw,36px);display:grid;gap:22px}
+.order{background:var(--creme);color:var(--encre);padding-block:clamp(70px,9vw,130px)}
+.order .wrap{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(30px,5vw,80px);align-items:start}
+.order h2{font-size:clamp(38px,4.4vw,64px);color:var(--vert);margin-top:14px}
+.order h2 .acc{color:var(--mais-fonce)}
+.order-intro > p{margin-top:18px;font-size:clamp(17px,1.35vw,20px);color:var(--encre-doux);max-width:40ch}
+.rounds{margin-top:34px;border-top:1px solid var(--trait)}
+.rounds h3{font-size:15px;text-transform:uppercase;letter-spacing:.14em;font-weight:600;color:var(--vert);margin:18px 0 8px}
+.rounds dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:0 18px}
+.rounds dt,.rounds dd{margin:0;padding:10px 0;border-bottom:1px solid var(--trait)}
+.rounds dt{font-weight:700;color:var(--vert)}
+.rounds dd{color:var(--encre-doux)}
+.rounds dd.on,.rounds dt.on{background:rgba(201,230,160,.5)}
+.rounds dt.on{box-shadow:-10px 0 0 rgba(201,230,160,.5)}
+.pro-line{margin-top:26px;padding:18px 20px;background:var(--vert);color:var(--creme);border-radius:6px}
+.pro-line b{color:var(--poussin)}
+.pro-line a{display:inline-block;margin-top:8px;font-weight:700;color:var(--poussin)}
+
+.basket{background:var(--creme-2);border:2px solid var(--vert);border-radius:6px;padding:clamp(20px,3vw,34px);display:grid;gap:20px}
 .basket h3{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-size:30px;color:var(--vert);text-align:center}
-.line{display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:center;padding-bottom:20px;border-bottom:1px solid #DCD3C1}
-.line-name{font-weight:600;font-size:19px}
+.line{display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:center;padding-bottom:18px;border-bottom:1px solid var(--trait)}
+.line-name{font-weight:700;font-size:19px}
 .line-name small{display:block;font-weight:400;font-size:15px;color:var(--encre-doux)}
 .step{display:flex;align-items:center;gap:6px}
-.step button{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--vert);background:transparent;color:var(--vert);font-size:22px;line-height:1;cursor:pointer;font-family:var(--sans)}
+.step button{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--vert);background:transparent;color:var(--vert);font-size:22px;line-height:1;cursor:pointer;font-family:var(--sans)}
 .step button:hover{background:var(--vert);color:var(--creme)}
 .step output{min-width:30px;text-align:center;font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
-.seg{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.seg{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;border:0;margin:0;padding:0}
 .seg label{position:relative}
 .seg input{position:absolute;opacity:0}
-.seg span{display:block;padding:8px 14px;border-radius:999px;border:1.5px solid #CFC5B2;font-size:15px;cursor:pointer}
+.seg span{display:block;padding:8px 14px;border-radius:999px;border:1.5px solid #CFC5B2;font-size:15px;cursor:pointer;background:#fff}
 .seg input:checked + span{background:var(--vert);border-color:var(--vert);color:var(--creme)}
 .seg input:focus-visible + span{outline:3px solid var(--mais);outline-offset:2px}
 .tray{grid-column:1/-1;display:grid;grid-template-columns:repeat(10,1fr);gap:5px;background:#E6D8BC;padding:10px;border-radius:10px;position:relative}
 .cell{aspect-ratio:1;border-radius:50%;background:#D5C39F;display:grid;place-items:center}
 .egg{width:74%;height:92%;border-radius:50% 50% 46% 46%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#FFFDF8,#F1DFC2 62%,#D9BD93);transform:scale(0)}
-.tray-x{position:absolute;right:-10px;top:-14px;background:var(--mais);color:#fff;font-weight:700;border-radius:999px;padding:3px 10px;font-size:15px;font-variant-numeric:tabular-nums}
-.where{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
-.where select{font:inherit;font-size:17px;padding:10px 12px;border-radius:6px;border:1.5px solid #CFC5B2;background:#fff;color:var(--encre)}
-.total{display:flex;justify-content:space-between;align-items:baseline;font-size:18px}
-.total strong{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-size:40px;color:var(--vert);font-variant-numeric:tabular-nums}
-.bubble{background:#DCF8C6;color:#1F2B22;border-radius:12px 12px 12px 2px;padding:14px 16px;font-size:15px;line-height:1.45;position:relative}
-.bubble small{display:block;font-size:12px;color:#5B6B60;margin-bottom:4px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.tray-x{position:absolute;right:-8px;top:-14px;background:var(--poussin);color:var(--encre);font-weight:700;border-radius:999px;padding:3px 10px;font-size:15px;font-variant-numeric:tabular-nums}
+.tray-date{position:absolute;left:10px;bottom:-11px;background:var(--creme-2);border:1px dashed var(--mais-fonce);color:var(--mais-fonce);font-size:12px;font-weight:700;letter-spacing:.06em;padding:1px 8px;border-radius:3px;text-transform:uppercase}
+.check{grid-column:1/-1;display:flex;gap:10px;align-items:flex-start;font-size:16px;cursor:pointer;margin-top:6px}
+.check input{width:20px;height:20px;accent-color:var(--vert);margin-top:2px;flex:none}
+.check small{display:block;color:var(--encre-doux);font-size:14px}
+.saving{grid-column:1/-1;font-size:15px;font-weight:600;color:var(--vert);background:rgba(201,230,160,.55);border-radius:6px;padding:6px 10px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:grid;gap:6px;font-size:15px;font-weight:600;color:var(--encre-doux)}
+.field.full{grid-column:1/-1}
+.field input,.field select{font:inherit;font-size:17px;font-weight:500;padding:11px 12px;border-radius:6px;border:1.5px solid #CFC5B2;background:#fff;color:var(--encre);width:100%}
+.field input:focus,.field select:focus{border-color:var(--vert);outline:none;box-shadow:0 0 0 3px rgba(10,77,42,.18)}
+.hint{grid-column:1/-1;font-size:15px;color:var(--vert);font-weight:600}
+.feast{grid-column:1/-1;font-size:14px;color:var(--encre-doux);background:#FFF4D6;border-left:3px solid var(--poussin);padding:8px 12px}
+.total{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:17px}
+.total strong{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-size:40px;color:var(--vert);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bubble{background:#DCF8C6;color:#1F2B22;border-radius:12px 12px 12px 2px;padding:14px 16px;font-size:15px;line-height:1.5;white-space:pre-line}
+.bubble small{display:block;font-size:12px;color:#5B6B60;margin-bottom:4px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:normal}
 .send{display:flex;gap:10px;flex-wrap:wrap}
 .send a,.send button{flex:1 1 auto;display:inline-flex;justify-content:center;align-items:center;gap:10px;font:inherit;font-weight:700;border-radius:8px;padding:15px 18px;text-decoration:none;cursor:pointer}
-.send a{background:var(--wa);color:#0B2913;border:0}
+.send a.wa{background:var(--wa);color:#0B2913;border:0}
 .send button{background:transparent;border:1.5px solid var(--vert);color:var(--vert);flex:0 0 auto}
+.trust{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:15px;color:var(--encre-doux)}
+.trust li{display:flex;gap:10px;align-items:flex-start}
+.trust svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--vert)}
+.trust .tel{color:var(--encre);font-weight:700}
 .note{font-size:13px;color:var(--encre-doux);text-align:center}
 
 /* ---------- 7. L'assiette ---------- */
-.plate{background:var(--creme-2);color:var(--encre);padding-block:clamp(80px,11vw,150px)}
+.plate{background:var(--creme-2);color:var(--encre);padding-block:clamp(70px,9vw,130px)}
 .plate .wrap{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(30px,6vw,90px);align-items:center}
-.plate blockquote{margin:0;font-family:var(--serif);font-variation-settings:"SOFT" 100,"WONK" 1;font-size:clamp(28px,3.1vw,44px);line-height:1.18;color:var(--encre)}
-.plate blockquote .acc{color:var(--mais)}
+.plate blockquote{margin:0;font-family:var(--serif);font-variation-settings:"SOFT" 100,"WONK" 1;font-size:clamp(28px,3.1vw,44px);line-height:1.18}
+.plate blockquote .acc{color:var(--mais-fonce)}
 .plate figcaption{margin-top:22px;font-size:17px;color:var(--encre-doux);max-width:46ch}
-.plate figcaption b{color:var(--mais);font-weight:600}
-.shape{position:relative;aspect-ratio:4/4.4;max-width:520px;justify-self:end;width:100%}
+.plate figcaption b{color:var(--mais-fonce);font-weight:700}
+.shape{position:relative;aspect-ratio:4/4.4;max-width:500px;justify-self:end;width:100%}
 .shape img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;clip-path:polygon(18% 0,100% 6%,94% 72%,60% 100%,4% 86%,0 30%)}
 .shape svg{position:absolute;inset:-14px;width:calc(100% + 28px);height:calc(100% + 28px);overflow:visible}
 
 /* ---------- 8. Pied de page ---------- */
-.foot{background:var(--vert);color:var(--creme);padding-block:clamp(70px,9vw,120px) 36px;position:relative;overflow:hidden}
-.foot .foot-big{color:var(--creme);font-family:var(--serif);font-variation-settings:"SOFT" 100,"WONK" 1;font-size:clamp(46px,8vw,120px);line-height:.95;margin-bottom:clamp(40px,6vw,80px)}
+.foot{background:var(--vert);color:var(--creme);padding-block:clamp(70px,9vw,120px) calc(110px + env(safe-area-inset-bottom,0px))}
+.foot .foot-big{color:var(--creme);font-family:var(--serif);font-variation-settings:"SOFT" 100,"WONK" 1;font-size:clamp(44px,7.5vw,112px);line-height:.95;margin-bottom:clamp(40px,6vw,80px)}
 .foot-big .acc{color:var(--poussin)}
 .foot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;padding-top:34px;border-top:1px solid rgba(244,236,221,.25)}
 .foot h4{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:var(--feuille);font-weight:600}
 .foot p,.foot li{font-size:16px;color:#E3DCCB}
 .foot ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
-.tel{font-variant-numeric:tabular-nums;user-select:all}
+.tel{font-variant-numeric:tabular-nums;user-select:all;white-space:nowrap}
 .credits{margin-top:50px;font-size:12px;line-height:1.6;color:#B9C8B8}
 .credits a{color:#D9E6D5}
 .proto{display:inline-block;background:var(--poussin);color:var(--encre);font-weight:700;font-size:12px;padding:2px 8px;border-radius:4px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
 
+/* ---------- Barre panier flottante ---------- */
+.bar{position:fixed;z-index:30;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));translate:-50% 140%;width:min(560px,calc(100% - 32px));display:flex;align-items:center;gap:14px;background:var(--encre);color:var(--creme);border-radius:14px;padding:10px 10px 10px 18px;box-shadow:0 14px 40px rgba(0,0,0,.35);transition:translate .5s cubic-bezier(.2,.8,.2,1)}
+.bar.show{translate:-50% 0}
+.bar-txt{flex:1;min-width:0;font-size:15px;line-height:1.3}
+.bar-txt b{display:block;width:max-content;font-size:18px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar-txt span{color:#CFC8B8;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar a{display:inline-flex;align-items:center;gap:8px;background:var(--poussin);color:var(--encre);text-decoration:none;font-weight:700;padding:12px 16px;border-radius:9px;white-space:nowrap}
+.bar a svg{width:18px;height:18px}
+.toast{position:fixed;z-index:31;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));translate:-50% 0;background:var(--poussin);color:var(--encre);font-weight:700;padding:8px 16px;border-radius:999px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .3s,translate .3s}
+.toast.show{opacity:1;translate:-50% -6px}
+
 @media (max-width:860px){
   body{font-size:17px}
-  .brand{font-size:17px}.brand svg{width:24px;height:28px}
+  .brand{font-size:16px;gap:8px}.brand svg{width:24px;height:28px}
   .brand .full{display:none}
-  .notch{width:92px;height:46px}.notch span{width:28px}
-  .cmd{padding:11px 14px;font-size:15px}.cmd .t{display:none}
+  .notch{width:84px;height:44px}.notch span{width:26px}
+  .cmd{padding:10px 14px;font-size:15px}
+  .hero{padding-block:110px 70px}
+  .row{grid-template-columns:1fr auto;padding:22px 0}
+  .row-price{grid-column:1;grid-row:2;text-align:left}
+  .add{grid-column:2;grid-row:1/3;align-self:center}
+  .day{grid-template-columns:1fr;gap:22px}
+  .cluster{width:34vw;right:-6vw;top:8%;opacity:.85}
+  .fresh::after{background:linear-gradient(0deg,rgba(16,27,20,.94) 30%,rgba(16,27,20,.55))}
   .farm-card,.order .wrap,.plate .wrap{grid-template-columns:1fr}
-  .farm-photo{order:-1;min-height:280px}
+  .farm-photo{order:-1;min-height:260px}
   .farm-photo img{clip-path:ellipse(120% 96% at 50% 0%)}
-  .facts{grid-template-columns:repeat(3,1fr);gap:8px 16px}.facts dt{font-size:28px}
-  .row{grid-template-columns:1fr 28px;gap:6px 14px}
-  .row-price{grid-column:1;grid-row:2;font-size:16px;color:var(--poussin)}
-  .dot{grid-column:2;grid-row:1}
-  .cluster{width:46vw;right:-4vw;bottom:auto;top:14vh;opacity:.9}
-  .belief::after{background:linear-gradient(0deg,rgba(16,27,20,.92) 10%,rgba(16,27,20,.35) 70%,rgba(16,27,20,.2))}
-  .shape{justify-self:center;max-width:420px}
-  .foot-grid{grid-template-columns:1fr 1fr}
+  .facts{grid-template-columns:1fr;gap:10px}.facts div{display:grid;grid-template-columns:110px 1fr;align-items:baseline;gap:12px}.facts dt{font-size:24px}.facts dd{margin:0}
+  .fields{grid-template-columns:1fr}
   .tray{grid-template-columns:repeat(6,1fr)}
+  .shape{justify-self:center;max-width:400px}
+  .foot-grid{grid-template-columns:1fr 1fr}
 }
+@media (max-width:420px){ .cmd .t{font-size:14px} .price{font-size:15px} }
 @media (prefers-reduced-motion:reduce){
-  .num{height:auto}.num-stage{position:relative;height:auto;padding-block:80px}
-  .big{font-size:40vw}.num-cap{position:static;margin-top:20px}.num-after{display:none}
-  .egg{transform:none}
+  .num{height:auto}.num-stage{position:relative;height:auto;padding-block:90px}
+  .big{font-size:50vw}.num-cap{position:static;margin-top:24px}
+  .egg{transform:none}.season i{animation:none}
 }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="i-arrow" viewBox="0 0 12 12"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
     <symbol id="i-basket" viewBox="0 0 24 24"><path d="M3 9h18l-2 11H5L3 9Zm4 0 4-6m6 6-4-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m6 10.5 2.6 2.5L14 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-wa" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8 0-1.4.7-2 1-2.3.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.9 2.1c.1.1.1.3 0 .5l-.3.5-.4.5c-.1.1-.3.3-.1.6.1.3.6 1.1 1.4 1.8 1 .9 1.8 1.1 2.1 1.3.3.1.4.1.6-.1l.8-1c.2-.3.4-.2.6-.1l2 .9c.3.1.5.2.5.3.1.2.1.7-.1 1.2Z" fill="currentColor"/></symbol>
-    <!-- formes du motif et des bouquets : fleur, feuille, œuf, plume, grain -->
     <symbol id="s-fleur" viewBox="-50 -50 100 100"><g><ellipse cx="0" cy="-24" rx="13" ry="24"/><ellipse cx="0" cy="24" rx="13" ry="24"/><ellipse cx="-24" cy="0" rx="24" ry="13"/><ellipse cx="24" cy="0" rx="24" ry="13"/></g></symbol>
     <symbol id="s-feuille" viewBox="-50 -50 100 100"><path d="M0-48C30-22 30 22 0 48-30 22-30-22 0-48Z"/></symbol>
     <symbol id="s-oeuf" viewBox="-50 -50 100 100"><path d="M0-46C20-46 34-12 34 10 34 34 18 46 0 46S-34 34-34 10C-34-12-20-46 0-46Z"/></symbol>
@@ -225,7 +281,7 @@ p{margin:0}
 
 <header class="top" id="top">
   <a class="brand" href="#debut" aria-label="Ferme Akwaba, retour en haut">
-    <svg viewBox="0 0 30 34" aria-hidden="true"><path d="M15 1C23 1 29 13 29 21c0 7-6 12-14 12S1 28 1 21C1 13 7 1 15 1Z" fill="var(--poussin)"/><path d="M15 9c4 5 4 12 0 18-4-6-4-13 0-18Z" fill="var(--vert)"/></svg>
+    <svg viewBox="0 0 30 34" aria-hidden="true"><path d="M15 1C23 1 29 13 29 21c0 7-6 12-14 12S1 28 1 21C1 13 7 1 15 1Z" fill="#F5C842"/><path d="M15 9c4 5 4 12 0 18-4-6-4-13 0-18Z" fill="#0A4D2A"/></svg>
     <span><span class="full">Ferme </span>Akwaba</span>
   </a>
   <button class="notch" id="notch" aria-expanded="false" aria-controls="menu" aria-label="Ouvrir le menu"><span></span></button>
@@ -234,100 +290,118 @@ p{margin:0}
 
 <nav class="menu" id="menu" aria-label="Menu principal">
   <ul>
-    <li><a href="#ferme">La ferme</a></li>
     <li><a href="#produits">Nos produits</a></li>
+    <li><a href="#fraicheur">Fraîcheur</a></li>
+    <li><a href="#ferme">La ferme</a></li>
     <li><a href="#commande">Commander</a></li>
-    <li><a href="#contact">Nous trouver</a></li>
   </ul>
 </nav>
 
 <main id="debut">
-  <!-- 1. La question -->
+  <!-- 1. Ouverture : ce qu'on vend, combien, comment commander -->
   <section class="hero" aria-label="Accueil">
     <canvas id="motif" aria-hidden="true"></canvas>
-    <h1 id="titre"><span class="w"><span>Et</span></span> <span class="w"><span>si</span></span> <span class="w"><span>ton</span></span> <span class="w"><span>poulet</span></span> <span class="w"><span>venait</span></span> <span class="w"><span>d'une</span></span> <span class="w"><span class="acc" id="acc">ferme</span></span> <span class="w"><span>que</span></span> <span class="w"><span>tu</span></span> <span class="w"><span>connais</span></span> <span class="w"><span>?</span></span></h1>
-    <a class="down" href="#chiffre" aria-label="Découvrir la ferme"><svg viewBox="0 0 12 12" style="rotate:90deg;color:var(--encre)"><use href="#i-arrow"/></svg></a>
-  </section>
-
-  <!-- 2. Le chiffre -->
-  <section class="num" id="chiffre" aria-label="45 jours d'élevage">
-    <div class="num-stage">
-      <div class="big" id="big" aria-hidden="true">45</div>
-      <p class="num-cap" id="numCap"><b>45 jours</b> : le temps qu'on laisse à chaque poulet de chair pour grandir. Pas de raccourci.</p>
-      <div class="num-after" id="numAfter"><p>Un poulet qui prend son temps, ça se sent <span class="acc">dans la sauce.</span></p></div>
+    <div class="hero-in">
+      <a class="season" href="#commande" data-feast><i aria-hidden="true"></i>Fêtes de fin d'année : réservations ouvertes jusqu'au 10 décembre</a>
+      <h1 id="titre"><span class="w"><span>Et</span></span> <span class="w"><span>si</span></span> <span class="w"><span>ton</span></span> <span class="w"><span>poulet</span></span> <span class="w"><span>était</span></span> <span class="w"><span>abattu</span></span> <span class="w"><span class="acc" id="acc">ce&nbsp;matin</span></span> <span class="w"><span>?</span></span></h1>
+      <p class="hero-sub">Poulets de chair et œufs frais de notre ferme de Bingerville, livrés dans ta commune. Jamais congelés.</p>
+      <div class="prices" aria-label="Prix">
+        <span class="price">Poulet de chair <b>3 500 F</b></span>
+        <span class="price">Plateau de 30 œufs <b>2 800 F</b></span>
+      </div>
+      <div class="ctas">
+        <a class="btn btn-jaune" href="#commande"><svg aria-hidden="true"><use href="#i-basket"/></svg>Composer ma commande</a>
+        <a class="btn btn-ligne" id="heroWa" href="https://wa.me/2250700000000" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-wa"/></svg>Écrire sur WhatsApp</a>
+      </div>
     </div>
   </section>
 
-  <!-- 3. Conviction -->
-  <section class="belief" aria-label="Notre conviction">
-    <div class="belief-img" id="beliefImg" role="img" aria-label="Un éleveur sourit, un poulet dans les mains, au milieu du bâtiment d'élevage"></div>
+  <!-- 2. Les produits : on peut ajouter directement -->
+  <section class="prod" id="produits" aria-label="Nos produits">
+    <div class="prod-bg" aria-hidden="true">
+      <img src="img/batiment-chair.webp" alt="" class="on">
+      <img data-src="img/pondeuses-allee.webp" alt="">
+      <img data-src="img/vente-caisses.webp" alt="">
+    </div>
     <div class="wrap">
-      <h2>On croit qu'un bon poulet, <span class="acc">ça se mérite.</span></h2>
-      <p>Maïs local, eau propre, bâtiments aérés, visites du vétérinaire. On élève comme on voudrait manger : sans cachotterie.</p>
+      <h2>Ce qui sort de la ferme</h2>
+      <ul class="rows" id="rows">
+        <li class="on">
+          <div class="row">
+            <button class="row-name" data-i="0" aria-expanded="true" aria-controls="d0">Poulet de chair</button>
+            <span class="row-price">3 500 F livré<small>3 000 F à la ferme</small></span>
+            <button class="add" data-add="poulet" style="background:var(--mais)"><svg aria-hidden="true"><use href="#i-plus"/></svg>Ajouter</button>
+            <p class="row-detail" id="d0">Pièce d'environ 1,8 kg, vivante ou prête à cuire (+500 F : plumée, vidée, emballée à la ferme le matin même).</p>
+          </div>
+        </li>
+        <li>
+          <div class="row">
+            <button class="row-name" data-i="1" aria-expanded="false" aria-controls="d1">Œufs de pondeuses</button>
+            <span class="row-price">2 800 F le plateau<small>abonnement possible</small></span>
+            <button class="add" data-add="oeufs" style="background:var(--poussin)"><svg aria-hidden="true"><use href="#i-plus"/></svg>Ajouter</button>
+            <p class="row-detail" id="d1">30 œufs, calibre moyen à gros. La date de ponte est tamponnée sur chaque plateau : tu sais ce que tu achètes.</p>
+          </div>
+        </li>
+        <li>
+          <div class="row">
+            <button class="row-name" data-i="2" aria-expanded="false" aria-controls="d2">Maquis, fêtes, funérailles</button>
+            <span class="row-price">dès 10 pièces<small>3 200 F le poulet · 2 500 F le plateau</small></span>
+            <button class="add" data-add="pro" style="background:#7FC4D6"><svg aria-hidden="true"><use href="#i-plus"/></svg>10 poulets</button>
+            <p class="row-detail" id="d2">Le prix pro s'applique tout seul dans le panier dès 10 poulets ou 10 plateaux. Livraison planifiée pour les maquis chaque semaine.</p>
+          </div>
+        </li>
+      </ul>
+      <span class="illus">Photos d'illustration</span>
+    </div>
+  </section>
+
+  <!-- 3. Zéro jour au congélateur -->
+  <section class="num" id="zero" aria-label="Zéro jour au congélateur">
+    <div class="num-stage">
+      <div class="big" id="big" aria-hidden="true">0</div>
+      <p class="num-cap" id="numCap"><b>0 jour</b> au congélateur. Le poulet importé en a passé des semaines.</p>
+    </div>
+  </section>
+
+  <!-- 4. Fraîcheur -->
+  <section class="fresh" id="fraicheur" aria-label="Fraîcheur">
+    <div class="fresh-img" id="freshImg" role="img" aria-label="Photo d'illustration : un éleveur sourit, un poulet dans les mains, dans un bâtiment d'élevage"></div>
+    <div class="wrap">
+      <h2>Du poulailler à ta marmite, <span class="acc">le même jour.</span></h2>
+      <ol class="day" id="day">
+        <li><time>5 h 30</time><p>On attrape les poulets commandés la veille. Pas un de plus.</p></li>
+        <li><time>8 h</time><p>Plumés, vidés, pesés et emballés à la ferme, au frais.</p></li>
+        <li><time>11 h</time><p>Livrés dans ta commune, le jour de sa tournée.</p></li>
+      </ol>
     </div>
     <div class="cluster" id="cluster" aria-hidden="true">
-      <svg style="left:8%;top:30%;width:34%;height:34%;color:var(--poussin)"><use href="#s-fleur" fill="currentColor"/></svg>
-      <svg style="left:48%;top:4%;width:26%;height:26%;color:var(--feuille)"><use href="#s-feuille" fill="currentColor"/></svg>
-      <svg style="left:60%;top:36%;width:30%;height:30%;color:var(--creme)"><use href="#s-oeuf" fill="currentColor"/></svg>
-      <svg style="left:30%;top:62%;width:24%;height:24%;color:var(--mais)"><use href="#s-plume" fill="currentColor"/></svg>
-      <svg style="left:0%;top:4%;width:18%;height:18%;color:var(--mais)"><use href="#s-grain" fill="currentColor"/></svg>
-      <svg style="left:74%;top:72%;width:18%;height:18%;color:var(--poussin)"><use href="#s-grain" fill="currentColor"/></svg>
-      <svg style="left:40%;top:36%;width:14%;height:14%;color:#6FBF4A"><use href="#s-feuille" fill="currentColor"/></svg>
+      <svg style="left:8%;top:30%;width:34%;height:34%;color:#F5C842"><use href="#s-fleur" fill="currentColor"/></svg>
+      <svg style="left:48%;top:4%;width:26%;height:26%;color:#C9E6A0"><use href="#s-feuille" fill="currentColor"/></svg>
+      <svg style="left:60%;top:36%;width:30%;height:30%;color:#F4ECDD"><use href="#s-oeuf" fill="currentColor"/></svg>
+      <svg style="left:30%;top:62%;width:24%;height:24%;color:#E9771C"><use href="#s-plume" fill="currentColor"/></svg>
+      <svg style="left:0%;top:4%;width:18%;height:18%;color:#E9771C"><use href="#s-grain" fill="currentColor"/></svg>
+      <svg style="left:74%;top:72%;width:18%;height:18%;color:#F5C842"><use href="#s-grain" fill="currentColor"/></svg>
     </div>
+    <span class="illus">Photo d'illustration</span>
   </section>
 
-  <!-- 4. La ferme -->
+  <!-- 5. La ferme -->
   <section class="farm" id="ferme" aria-label="La ferme">
     <div class="wrap">
       <article class="farm-card">
         <div class="farm-txt">
           <span class="eyebrow">La ferme · Bingerville</span>
-          <h2>À 30 minutes de Cocody, <span class="acc">pas au bout du monde.</span></h2>
-          <p>Deux bâtiments pour les poulets de chair, un pour les pondeuses. Les œufs sont ramassés chaque matin, triés à la main, posés sur plateau. Tu peux venir voir, le samedi matin.</p>
+          <h2>Elle existe, <span class="acc">viens la voir.</span></h2>
+          <p>Nos bâtiments de poulets de chair et de pondeuses sont à 30 minutes de Cocody. Le samedi matin, on t'ouvre la porte : tu vois les bêtes, tu repars avec ta commande.</p>
           <dl class="facts">
-            <div><dt>1 200</dt><dd>poulets de chair par bande</dd></div>
-            <div><dt>800</dt><dd>pondeuses en production</dd></div>
-            <div><dt>&lt; 48 h</dt><dd>entre la ponte et ta cuisine</dd></div>
+            <div><dt>Le matin</dt><dd>abattage le jour de ta livraison</dd></div>
+            <div><dt>Daté</dt><dd>date de ponte sur chaque plateau</dd></div>
+            <div><dt>Samedi</dt><dd>visites et retrait, 8 h à 11 h</dd></div>
           </dl>
-          <a class="btn-dark" href="#contact">Venir visiter la ferme</a>
+          <a class="btn-dark" href="#commande">Retirer ma commande à la ferme</a>
         </div>
-        <div class="farm-photo"><img src="img/eleveur-poussins.webp" alt="Un éleveur accroupi nourrit des poulets dans un bâtiment lumineux" loading="lazy" width="1024" height="683"></div>
+        <div class="farm-photo"><img src="img/eleveur-poussins.webp" alt="Photo d'illustration : un éleveur accroupi nourrit des poulets" loading="lazy" width="1024" height="683"><span class="illus">Photo d'illustration</span></div>
       </article>
-    </div>
-  </section>
-
-  <!-- 5. Produits -->
-  <section class="prod" id="produits" aria-label="Nos produits">
-    <div class="prod-bg" aria-hidden="true">
-      <img src="img/batiment-chair.webp" alt="" class="on" loading="lazy">
-      <img src="img/pondeuses-allee.webp" alt="" loading="lazy">
-      <img src="img/vente-caisses.webp" alt="" loading="lazy">
-      <img src="img/vendeuse-oeufs.webp" alt="" loading="lazy">
-    </div>
-    <div class="wrap">
-      <h2>Ce qui sort de la ferme</h2>
-      <ul class="rows" id="rows">
-        <li class="on"><button class="row" data-i="0">
-          <span class="row-name">Poulet de chair<span class="row-detail">Environ 1,8 kg. Vivant, ou prêt à cuire : plumé, vidé, emballé à la ferme le matin de la livraison.</span></span>
-          <span class="row-price">dès 3 500 F</span>
-          <span class="dot" style="background:var(--mais);color:var(--encre)"><svg><use href="#i-arrow"/></svg></span>
-        </button></li>
-        <li><button class="row" data-i="1">
-          <span class="row-name">Œufs de pondeuses<span class="row-detail">Plateau de 30, calibre moyen à gros. Jaune bien orange, coquille solide, pondus il y a moins de 48 h.</span></span>
-          <span class="row-price">2 800 F le plateau</span>
-          <span class="dot" style="background:var(--poussin);color:var(--encre)"><svg><use href="#i-arrow"/></svg></span>
-        </button></li>
-        <li><button class="row" data-i="2">
-          <span class="row-name">Maquis, restaurants, pâtissiers<span class="row-detail">Livraison planifiée chaque semaine, facture, prix dégressifs à partir de 10 poulets ou 10 plateaux.</span></span>
-          <span class="row-price">sur devis</span>
-          <span class="dot" style="background:#4DB6CF;color:var(--encre)"><svg><use href="#i-arrow"/></svg></span>
-        </button></li>
-        <li><button class="row" data-i="3">
-          <span class="row-name">Livraison dans Abidjan<span class="row-detail">Bingerville, Cocody, Plateau, Marcory, Koumassi, Yopougon, Abobo, Port-Bouët. Commande avant 10 h, livrée le jour même.</span></span>
-          <span class="row-price">dès 500 F</span>
-          <span class="dot" style="background:var(--feuille);color:var(--encre)"><svg><use href="#i-arrow"/></svg></span>
-        </button></li>
-      </ul>
     </div>
   </section>
 
@@ -335,39 +409,70 @@ p{margin:0}
   <section class="order" id="commande" aria-label="Commander">
     <div class="wrap">
       <div class="order-intro">
-        <span class="eyebrow">Commande en 30 secondes</span>
-        <h2 style="margin-top:14px">Compose ton panier, <span class="acc">on s'occupe du reste.</span></h2>
-        <p>Choisis tes poulets et tes plateaux. Ta commande part sur WhatsApp, on te confirme l'heure de passage. Tu paies à la livraison.</p>
-        <div class="pay" aria-label="Moyens de paiement acceptés"><span>Wave</span><span>Orange Money</span><span>MTN MoMo</span><span>Moov Money</span><span>Espèces</span></div>
+        <span class="eyebrow">Commande en 1 minute</span>
+        <h2>Compose ton panier, <span class="acc">on passe dans ta commune.</span></h2>
+        <p>Chaque commune a son jour de tournée. On regroupe les commandes : c'est comme ça qu'on livre frais sans te faire payer une course entière.</p>
+        <div class="rounds">
+          <h3>Tournées de la semaine</h3>
+          <dl id="rounds"></dl>
+        </div>
+        <div class="pro-line">Mariage, baptême, funérailles, maquis ? <b>Dès 10 poulets, 3 200 F pièce</b>, appliqué automatiquement.<br><a id="proWa" href="https://wa.me/2250700000000" target="_blank" rel="noopener">Parler d'une grosse commande →</a></div>
       </div>
 
-      <form class="basket" id="basket" aria-label="Ton panier">
+      <form class="basket" id="basket" aria-label="Ton panier" novalidate>
         <h3>Ton panier</h3>
         <div class="line">
-          <div class="line-name">Poulet de chair<small id="pouletPrix">4 500 F pièce</small></div>
+          <div class="line-name">Poulet de chair<small id="pouletPrix">4 000 F pièce</small></div>
           <div class="step"><button type="button" id="pMoins" aria-label="Retirer un poulet">−</button><output id="pQte" aria-live="polite">2</output><button type="button" id="pPlus" aria-label="Ajouter un poulet">+</button></div>
-          <div class="seg" role="radiogroup" aria-label="Préparation du poulet">
-            <label><input type="radio" name="prep" id="prep-vivant" value="vivant"><span>Vivant · 3 500 F</span></label>
-            <label><input type="radio" name="prep" id="prep-pret" value="pret" checked><span>Prêt à cuire · 4 500 F</span></label>
-            <label><input type="radio" name="prep" id="prep-decoupe" value="decoupe"><span>Découpé · 5 000 F</span></label>
-          </div>
+          <fieldset class="seg" aria-label="Préparation du poulet">
+            <label><input type="radio" name="prep" id="prep-vivant" value="vivant"><span>Vivant</span></label>
+            <label><input type="radio" name="prep" id="prep-pret" value="pret" checked><span>Prêt à cuire +500 F</span></label>
+            <label><input type="radio" name="prep" id="prep-decoupe" value="decoupe"><span>Découpé +800 F</span></label>
+          </fieldset>
         </div>
         <div class="line">
-          <div class="line-name">Plateau de 30 œufs<small>2 800 F le plateau</small></div>
+          <div class="line-name">Plateau de 30 œufs<small id="oeufPrix">2 800 F le plateau</small></div>
           <div class="step"><button type="button" id="oMoins" aria-label="Retirer un plateau">−</button><output id="oQte" aria-live="polite">1</output><button type="button" id="oPlus" aria-label="Ajouter un plateau">+</button></div>
-          <div class="tray" id="tray" aria-hidden="true"><span class="tray-x" id="trayX">× 1</span></div>
+          <div class="tray" id="tray" aria-hidden="true"><span class="tray-x" id="trayX">× 1</span><span class="tray-date" id="trayDate">Pondu le …</span></div>
+          <label class="check" for="abo"><input type="checkbox" id="abo"><span>Chaque semaine, le jour de ma tournée<small>Abonnement sans engagement : tu arrêtes par un simple message.</small></span></label>
         </div>
-        <div class="where">
-          <label for="commune" class="line-name">Livraison à</label>
-          <select id="commune"></select>
+        <p class="saving" id="saving" hidden></p>
+
+        <div class="fields">
+          <label class="field" for="commune">Livraison
+            <select id="commune"></select>
+          </label>
+          <label class="field" for="quand">Quand
+            <select id="quand"></select>
+          </label>
+          <p class="hint" id="hint"></p>
+          <p class="feast" id="feastNote" hidden>Réservation de fêtes : acompte Wave de 1 000 F par poulet pour bloquer le prix, avant le 10 décembre. Le reste à la livraison.</p>
+          <label class="field" for="prenom">Ton prénom
+            <input id="prenom" autocomplete="given-name" placeholder="Awa">
+          </label>
+          <label class="field" for="creneau">Créneau
+            <select id="creneau"><option>Matin (8 h – 12 h)</option><option>Après-midi (13 h – 17 h)</option></select>
+          </label>
+          <label class="field full" for="repere">Quartier et repère
+            <input id="repere" autocomplete="street-address" placeholder="Angré 8e tranche, après la pharmacie">
+          </label>
+          <label class="field full" for="paiement">Paiement à la livraison
+            <select id="paiement"><option>Wave</option><option>Orange Money</option><option>MTN MoMo</option><option>Moov Money</option><option>Espèces</option></select>
+          </label>
         </div>
-        <div class="total"><span>Total à payer à la livraison</span><strong id="total">0 F</strong></div>
+
+        <div class="total"><span id="totalLabel">Total à la livraison</span><strong id="total">0 F</strong></div>
         <div class="bubble" aria-live="polite"><small>Ton message WhatsApp</small><span id="msg"></span></div>
         <div class="send">
-          <a id="waLink" href="#" target="_blank" rel="noopener"><svg width="22" height="22" aria-hidden="true"><use href="#i-wa"/></svg>Envoyer sur WhatsApp</a>
+          <a class="wa" id="waLink" href="https://wa.me/2250700000000" target="_blank" rel="noopener"><svg width="22" height="22" aria-hidden="true"><use href="#i-wa"/></svg>Envoyer sur WhatsApp</a>
           <button type="button" id="copy">Copier</button>
         </div>
-        <p class="note">Prix indicatifs du prototype. Le numéro WhatsApp est un exemple.</p>
+        <ul class="trust">
+          <li><svg aria-hidden="true"><use href="#i-check"/></svg><span>Tu vois ton poulet avant de payer.</span></li>
+          <li><svg aria-hidden="true"><use href="#i-check"/></svg><span>Aucune avance demandée, sauf pour réserver les fêtes.</span></li>
+          <li><svg aria-hidden="true"><use href="#i-check"/></svg><span>L'éleveur répond lui-même : <span class="tel">+225 07 00 00 00 00</span></span></li>
+        </ul>
+        <p class="note">Prototype : prix, tournées et numéro sont des exemples à valider avec la ferme.</p>
       </form>
     </div>
   </section>
@@ -377,30 +482,35 @@ p{margin:0}
     <div class="wrap">
       <figure style="margin:0">
         <blockquote>Poulet braisé, alloco, riz gras. <span class="acc">Le dimanche commence au poulailler.</span></blockquote>
-        <figcaption>Un poulet qui a eu le temps de grandir a une chair ferme qui tient à la braise et ne rend pas d'eau dans la marmite. <b>C'est toute la différence</b> avec le poulet de congélateur.</figcaption>
+        <figcaption>Un poulet abattu le matin garde une chair ferme : il tient à la braise et ne rend pas d'eau dans la marmite. <b>C'est toute la différence</b> avec le poulet de congélateur.</figcaption>
       </figure>
       <div class="shape">
-        <img src="img/assiette-poulet-alloco.webp" alt="Assiette de poulet grillé, bananes plantain frites et riz" loading="lazy" width="1024" height="768">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon id="outline" pathLength="100" points="18,0 100,6 94,72 60,100 4,86 0,30" fill="none" stroke="var(--mais)" stroke-width="1.1" stroke-linejoin="round"/></svg>
+        <img src="img/assiette-poulet-alloco.webp" alt="Assiette de poulet grillé, alloco et riz" loading="lazy" width="1024" height="768">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon id="outline" pathLength="100" points="18,0 100,6 94,72 60,100 4,86 0,30" fill="none" stroke="#B4510B" stroke-width="1.1" stroke-linejoin="round"/></svg>
       </div>
     </div>
   </section>
 </main>
 
-<!-- 8. Pied de page -->
 <footer class="foot" id="contact">
   <div class="wrap">
     <span class="proto">Prototype</span>
     <p class="foot-big">Frais du jour, <span class="acc">de Bingerville à ta table.</span></p>
     <div class="foot-grid">
-      <div><h4>Commander</h4><p>WhatsApp (exemple)<br><span class="tel">+225 07 00 00 00 00</span></p></div>
-      <div><h4>La ferme</h4><p>Route de Bingerville<br>Visites le samedi, 8 h à 11 h</p></div>
-      <div><h4>On livre à</h4><ul><li>Bingerville · Cocody</li><li>Plateau · Marcory · Koumassi</li><li>Yopougon · Abobo · Port-Bouët</li></ul></div>
+      <div><h4>Commander</h4><p>WhatsApp ou appel (exemple)<br><span class="tel">+225 07 00 00 00 00</span></p></div>
+      <div><h4>La ferme</h4><p>Route de Bingerville<br>Visites et retrait le samedi, 8 h à 11 h</p></div>
+      <div><h4>Tournées</h4><ul id="footRounds"></ul></div>
       <div><h4>Paiement</h4><ul><li>Wave · Orange Money</li><li>MTN MoMo · Moov Money</li><li>Espèces à la livraison</li></ul></div>
     </div>
-    <p class="credits">Photos : USAID Mozambique (domaine public), fishbone1 (<a href="https://www.flickr.com/photos/93687832@N00/4666564871">CC BY 2.0</a>), jadijadi (<a href="https://www.flickr.com/photos/42899700@N05/4756619077">CC BY 2.0</a>), The African Union Mission in Somalia (CC0), Compassionate Action for Animals (<a href="https://www.flickr.com/photos/29313544@N05/53559819726">CC BY-SA 2.0</a>). À remplacer par les photos de la vraie ferme.</p>
+    <p class="credits">Photos d'illustration, à remplacer par celles de la ferme : USAID Mozambique (domaine public), jadijadi (<a href="https://www.flickr.com/photos/42899700@N05/4756619077">CC BY 2.0</a>), The African Union Mission in Somalia (CC0), Compassionate Action for Animals (<a href="https://www.flickr.com/photos/29313544@N05/53559819726">CC BY-SA 2.0</a>).</p>
   </div>
 </footer>
+
+<div class="bar" id="bar" aria-hidden="true">
+  <div class="bar-txt"><b id="barTotal">0 F</b><span id="barItems"></span></div>
+  <a href="#commande" tabindex="-1"><svg aria-hidden="true"><use href="#i-basket"/></svg>Commander</a>
+</div>
+<div class="toast" id="toast" role="status"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
@@ -410,42 +520,81 @@ p{margin:0}
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hasGsap = !!window.gsap;
   if (hasGsap) gsap.registerPlugin(ScrollTrigger);
+  const $ = id => document.getElementById(id);
 
-  /* Défilement doux */
+  /* ---------- Données de la ferme (exemples à valider) ---------- */
+  const WA = '2250700000000';
+  const PRIX = { vivant: 3500, pret: 4000, decoupe: 4300, plateau: 2800 };
+  const PRO = { seuil: 10, poulet: 300, plateau: 300 };          // remise par pièce dès 10
+  const FERME = { poulet: 500, plateau: 300 };                    // remise si retrait à la ferme
+  const TOURNEES = [                                              // jour : 0 = dimanche
+    { communes: ['Yopougon', 'Abobo', 'Adjamé'], jour: 2, frais: 1500 },
+    { communes: ['Cocody', 'Riviera', 'Angré', 'Bingerville', 'Plateau'], jour: 4, frais: 1000 },
+    { communes: ['Marcory', 'Koumassi', 'Treichville', 'Port-Bouët'], jour: 6, frais: 1500 },
+  ];
+  const FETES = ['22 décembre', '23 décembre', '24 décembre'];
+  const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+  const PREP = { vivant: ['vivant', 'vivants'], pret: ['prêt à cuire', 'prêts à cuire'], decoupe: ['découpé', 'découpés'] };
+  const F = n => n.toLocaleString('fr-FR').replace(/[\s  ]/g, ' ') + ' F';
+
+  const communeTournee = {};
+  TOURNEES.forEach(t => t.communes.forEach(c => communeTournee[c] = t));
+  function prochain(jour){
+    const d = new Date(); d.setHours(12);
+    let n = (jour - d.getDay() + 7) % 7; if (n === 0) n = 7;       // jamais le jour même
+    d.setDate(d.getDate() + n);
+    return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  /* ---------- Défilement doux ---------- */
   let lenis = null;
   if (hasGsap && window.Lenis && !reduce) {
-    lenis = new Lenis({ lerp: 0.085 });
+    lenis = new Lenis({ lerp: 0.09 });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add(t => lenis.raf(t * 1000));
     gsap.ticker.lagSmoothing(0);
   }
-  const goTo = (hash) => { const el = document.querySelector(hash); if (!el) return; lenis ? lenis.scrollTo(el, { offset: 0 }) : el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); };
+  const goTo = h => { const el = document.querySelector(h); if (!el) return; lenis ? lenis.scrollTo(el) : el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); };
   document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
-    const h = a.getAttribute('href'); if (h.length < 2) return; e.preventDefault(); closeMenu(); goTo(h);
+    const h = a.getAttribute('href'); if (h.length < 2) return;
+    e.preventDefault(); closeMenu(false); goTo(h);
+    if (a.hasAttribute('data-feast')) { $('quand').value = 'fete-0'; render(); }
   }));
 
-  /* Menu */
-  const notch = document.getElementById('notch'), menu = document.getElementById('menu');
-  function closeMenu(){ menu.classList.remove('open'); notch.setAttribute('aria-expanded','false'); }
-  notch.addEventListener('click', () => { const o = menu.classList.toggle('open'); notch.setAttribute('aria-expanded', String(o)); });
-  addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  /* ---------- Menu ---------- */
+  const notch = $('notch'), menu = $('menu');
+  function closeMenu(focusBack){ if (!menu.classList.contains('open')) return; menu.classList.remove('open'); notch.setAttribute('aria-expanded','false'); notch.setAttribute('aria-label','Ouvrir le menu'); if (focusBack) notch.focus(); }
+  notch.addEventListener('click', () => {
+    const o = menu.classList.toggle('open');
+    notch.setAttribute('aria-expanded', String(o)); notch.setAttribute('aria-label', o ? 'Fermer le menu' : 'Ouvrir le menu');
+    if (o) setTimeout(() => menu.querySelector('a').focus(), 350);
+  });
+  addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeMenu(true);
+    if (e.key === 'Tab' && menu.classList.contains('open')) {
+      const f = [notch, ...menu.querySelectorAll('a')], i = f.indexOf(document.activeElement);
+      e.preventDefault(); f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+    }
+  });
 
-  /* Motif vivant : fleurs, feuilles et œufs ton sur ton qui respirent et s'écartent du doigt */
-  const cv = document.getElementById('motif'), cx = cv.getContext('2d');
-  let W = 0, H = 0, dpr = 1, shapes = [], mx = -9999, my = -9999, running = true;
+  /* ---------- Motif vivant du hero ---------- */
+  const cv = $('motif'), cx = cv.getContext('2d');
+  let W = 0, H = 0, dpr = 1, shapes = [], mx = -9999, my = -9999, running = true, lastW = 0;
   function build(){
-    dpr = Math.min(devicePixelRatio || 1, 2); W = cv.clientWidth; H = cv.clientHeight;
-    cv.width = W * dpr; cv.height = H * dpr; shapes = [];
+    const w = cv.clientWidth; H = cv.clientHeight;
+    dpr = Math.min(devicePixelRatio || 1, 2); cv.width = w * dpr; cv.height = H * dpr;
+    if (w === lastW && shapes.length) return;                   // la barre d'adresse mobile ne redistribue pas le motif
+    lastW = W = w; shapes = [];
     const step = W < 700 ? 74 : 104;
-    for (let y = -step/2, r = 0; y < H + step; y += step * .78, r++)
+    for (let y = -step/2, r = 0; y < H + step * 2; y += step * .78, r++)
       for (let x = (r % 2 ? step/2 : 0) - step/2; x < W + step; x += step)
         shapes.push({ x, y, k: (r * 7 + Math.round(x / step)) % 4, s: step * (.3 + Math.random() * .16), a: Math.random() * 6.28, p: Math.random() * 6.28, ox: 0, oy: 0 });
   }
   function path(k, s){
     cx.beginPath();
     if (k === 0) { for (let i = 0; i < 4; i++) { cx.rotate(Math.PI/2); cx.moveTo(0,0); cx.ellipse(0, -s*.52, s*.26, s*.52, 0, 0, 6.2832); } }
-    else if (k === 1 || k === 3) { cx.moveTo(0,-s); cx.quadraticCurveTo(s*.72,0,0,s); cx.quadraticCurveTo(-s*.72,0,0,-s); }
-    else { cx.ellipse(0, 0, s*.52, s*.7, 0, 0, 6.2832); }
+    else if (k === 2) cx.ellipse(0, 0, s*.52, s*.7, 0, 0, 6.2832);
+    else { cx.moveTo(0,-s); cx.quadraticCurveTo(s*.72,0,0,s); cx.quadraticCurveTo(-s*.72,0,0,-s); }
   }
   function draw(t){
     if (!running) return;
@@ -454,116 +603,171 @@ p{margin:0}
       const dx = o.x - mx, dy = o.y - my, d = Math.hypot(dx, dy) || 1, R = 170;
       const tx = d < R ? dx / d * (R - d) * .45 : 0, ty = d < R ? dy / d * (R - d) * .45 : 0;
       o.ox += (tx - o.ox) * .08; o.oy += (ty - o.oy) * .08;
-      const breathe = reduce ? 1 : 1 + .09 * Math.sin(t * .0011 + o.p);
+      const b = reduce ? 1 : 1 + .09 * Math.sin(t * .0011 + o.p);
       cx.setTransform(dpr,0,0,dpr, (o.x + o.ox) * dpr, (o.y + o.oy) * dpr);
       cx.rotate(o.a + (reduce ? 0 : .12 * Math.sin(t * .0005 + o.p)) + o.ox * .01);
-      cx.scale(breathe, breathe);
+      cx.scale(b, b);
       cx.fillStyle = o.k === 2 ? '#122019' : '#0F1A13';
       path(o.k, o.s); cx.fill();
     }
-    requestAnimationFrame(draw);
+    if (!reduce) requestAnimationFrame(draw);
   }
   build(); addEventListener('resize', build);
-  cv.parentElement.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
-  cv.parentElement.addEventListener('pointerleave', () => { mx = my = -9999; });
+  const hero = cv.parentElement;
+  hero.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+  hero.addEventListener('pointerleave', () => { mx = my = -9999; });
   new IntersectionObserver(([e]) => { const was = running; running = e.isIntersecting; if (running && !was) requestAnimationFrame(draw); }).observe(cv);
   requestAnimationFrame(draw);
 
-  /* En-tête : logo foncé sur les sections claires */
-  const top = document.getElementById('top');
-  const lightSections = [...document.querySelectorAll('.farm,.order,.plate')];
-  function headerTone(){ const y = 40; top.classList.toggle('light', lightSections.some(s => { const r = s.getBoundingClientRect(); return r.top <= y && r.bottom >= y; })); }
-  addEventListener('scroll', headerTone, { passive: true }); headerTone();
+  /* ---------- En-tête et barre panier selon la section ---------- */
+  const top = $('top'), bar = $('bar');
+  const light = [...document.querySelectorAll('.farm,.order,.plate')];
+  function onScroll(){
+    top.classList.toggle('light', light.some(s => { const r = s.getBoundingClientRect(); return r.top <= 44 && r.bottom >= 44; }));
+    const h = hero.getBoundingClientRect(), o = $('commande').getBoundingClientRect();
+    const show = h.bottom < innerHeight * .4 && !(o.top < innerHeight * .9 && o.bottom > innerHeight * .3);
+    bar.classList.toggle('show', show); bar.setAttribute('aria-hidden', String(!show));
+    bar.querySelector('a').tabIndex = show ? 0 : -1;
+  }
+  addEventListener('scroll', onScroll, { passive: true });
 
-  /* Lignes produits : la photo de fond suit la ligne active */
+  /* ---------- Lignes produits ---------- */
   const rows = [...document.querySelectorAll('#rows li')], bgs = [...document.querySelectorAll('.prod-bg img')];
-  function activate(i){ rows.forEach((r, j) => r.classList.toggle('on', i === j)); bgs.forEach((b, j) => b.classList.toggle('on', i === j)); }
-  rows.forEach((li, i) => { const b = li.querySelector('button'); b.addEventListener('mouseenter', () => activate(i)); b.addEventListener('focus', () => activate(i)); b.addEventListener('click', () => activate(i)); });
+  function activate(i){
+    rows.forEach((r, j) => { r.classList.toggle('on', i === j); r.querySelector('.row-name').setAttribute('aria-expanded', String(i === j)); });
+    bgs.forEach((b, j) => { if (i === j && b.dataset.src) { b.src = b.dataset.src; b.removeAttribute('data-src'); } b.classList.toggle('on', i === j); });
+  }
+  rows.forEach((li, i) => { const n = li.querySelector('.row-name'); n.addEventListener('click', () => activate(i)); li.addEventListener('mouseenter', () => activate(i)); });
 
-  /* Panier */
-  const PRIX = { vivant: 3500, pret: 4500, decoupe: 5000, plateau: 2800 };
-  const LIVRAISON = { 'Bingerville': 500, 'Cocody': 1000, 'Riviera': 1000, 'Plateau': 1500, 'Marcory': 1500, 'Koumassi': 1500, 'Abobo': 1500, 'Yopougon': 2000, 'Port-Bouët': 2000 };
-  const PREP = { vivant: 'vivant', pret: 'prêt à cuire', decoupe: 'découpé' };
-  const WA = '2250700000000';
-  const sel = document.getElementById('commune');
-  Object.entries(LIVRAISON).forEach(([c, p]) => sel.add(new Option(`${c} · ${p.toLocaleString('fr-FR')} F`, c)));
-  sel.value = 'Cocody';
+  /* ---------- Panier ---------- */
   const st = { p: 2, o: 1 };
-  const tray = document.getElementById('tray');
+  const sel = $('commune'), quand = $('quand');
+  TOURNEES.flatMap(t => t.communes.map(c => [c, t])).sort((a, b) => a[0].localeCompare(b[0], 'fr'))
+    .forEach(([c, t]) => sel.add(new Option(`${c} · ${F(t.frais)}`, c)));
+  sel.add(new Option('Retrait à la ferme (samedi) · gratuit', 'ferme'));
+  sel.value = 'Cocody';
+  $('rounds').innerHTML = TOURNEES.map(t => `<dt data-j="${t.jour}">${JOURS[t.jour][0].toUpperCase() + JOURS[t.jour].slice(1)}</dt><dd data-j="${t.jour}">${t.communes.join(', ')}</dd>`).join('')
+    + `<dt data-j="ferme">Samedi</dt><dd data-j="ferme">Retrait à la ferme, 8 h – 11 h</dd>`;
+  $('footRounds').innerHTML = TOURNEES.map(t => `<li>${JOURS[t.jour][0].toUpperCase() + JOURS[t.jour].slice(1)} : ${t.communes.slice(0, 3).join(', ')}…</li>`).join('');
+
+  function fillQuand(){
+    const keep = quand.value;
+    const jour = sel.value === 'ferme' ? 6 : communeTournee[sel.value].jour;
+    quand.innerHTML = '';
+    quand.add(new Option(`Prochaine tournée : ${prochain(jour)}`, 'tournee'));
+    FETES.forEach((f, i) => quand.add(new Option(`Fêtes : ${f}`, 'fete-' + i)));
+    quand.value = [...quand.options].some(o => o.value === keep) ? keep : 'tournee';
+  }
+
+  const tray = $('tray');
   for (let i = 0; i < 30; i++) tray.insertAdjacentHTML('beforeend', '<div class="cell"><div class="egg"></div></div>');
   const eggs = [...tray.querySelectorAll('.egg')];
-  const F = n => n.toLocaleString('fr-FR').replace(/ | /g, ' ') + ' F';
+  const hier = new Date(Date.now() - 864e5).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  $('trayDate').textContent = 'Pondu le ' + hier;
+
   let lastO = -1;
   function render(){
+    fillQuand();
     const prep = document.querySelector('input[name=prep]:checked').value;
-    const c = sel.value, liv = (st.p || st.o) ? LIVRAISON[c] : 0;
-    const total = st.p * PRIX[prep] + st.o * PRIX.plateau + liv;
-    document.getElementById('pQte').textContent = st.p;
-    document.getElementById('oQte').textContent = st.o;
-    document.getElementById('pouletPrix').textContent = F(PRIX[prep]) + ' pièce';
-    document.getElementById('trayX').textContent = '× ' + st.o;
-    document.getElementById('total').textContent = F(total);
+    const c = sel.value, ferme = c === 'ferme', fete = quand.value.startsWith('fete');
+    const pro = { p: st.p >= PRO.seuil, o: st.o >= PRO.seuil };
+    const pu = PRIX[prep] - (pro.p ? PRO.poulet : 0) - (ferme ? FERME.poulet : 0);
+    const po = PRIX.plateau - (pro.o ? PRO.plateau : 0) - (ferme ? FERME.plateau : 0);
+    const frais = ferme || !(st.p || st.o) ? 0 : communeTournee[c].frais;
+    const total = st.p * pu + st.o * po + frais;
+    const eco = (pro.p ? st.p * PRO.poulet : 0) + (pro.o ? st.o * PRO.plateau : 0);
+
+    $('pQte').textContent = st.p; $('oQte').textContent = st.o;
+    $('pouletPrix').textContent = F(pu) + ' pièce' + (pro.p ? ' · prix pro' : '');
+    $('oeufPrix').textContent = F(po) + ' le plateau' + (pro.o ? ' · prix pro' : '');
+    $('trayX').textContent = '× ' + st.o;
+    $('saving').hidden = !eco; $('saving').textContent = `Prix pro appliqué : tu économises ${F(eco)}.`;
+    $('total').textContent = F(total);
+    $('totalLabel').textContent = fete ? 'Total (acompte déduit à la livraison)' : 'Total à la livraison';
+    $('feastNote').hidden = !fete;
+    const jour = ferme ? 6 : communeTournee[c].jour;
+    $('hint').textContent = ferme ? 'Tu passes à la ferme samedi entre 8 h et 11 h. Frais de livraison offerts, et on te fait le prix ferme.'
+      : fete ? `Livraison le ${FETES[+quand.value.split('-')[1]]}. Les places de fêtes sont limitées.`
+      : `${c} : tournée le ${JOURS[communeTournee[c].jour]}. Livraison ${F(frais)}.`;
+    document.querySelectorAll('#rounds [data-j]').forEach(el => el.classList.toggle('on', el.dataset.j === (ferme ? 'ferme' : String(jour))));
+
     const parts = [];
-    if (st.p) parts.push(`${st.p} poulet${st.p > 1 ? 's' : ''} ${PREP[prep]}`);
-    if (st.o) parts.push(`${st.o} plateau${st.o > 1 ? 'x' : ''} d'œufs`);
-    const msg = parts.length ? `Bonjour Ferme Akwaba, je voudrais ${parts.join(' et ')}. Livraison à ${c}. Total : ${F(total)}.` : 'Ajoute au moins un poulet ou un plateau.';
-    document.getElementById('msg').textContent = msg;
-    document.getElementById('waLink').href = `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
+    if (st.p) parts.push(`${st.p} poulet${st.p > 1 ? 's' : ''} ${PREP[prep][st.p > 1 ? 1 : 0]}`);
+    if (st.o) parts.push(`${st.o} plateau${st.o > 1 ? 'x' : ''} d'œufs${$('abo').checked ? ' chaque semaine (abonnement)' : ''}`);
+    const nom = $('prenom').value.trim(), rep = $('repere').value.trim();
+    const quandTxt = ferme ? (fete ? `retrait à la ferme pour le ${FETES[+quand.value.split('-')[1]]}` : 'retrait à la ferme samedi')
+      : fete ? `livraison le ${FETES[+quand.value.split('-')[1]]}` : `livraison ${quand.options[quand.selectedIndex].text.replace('Prochaine tournée : ', 'le ')}`;
+    const msg = parts.length
+      ? [`Bonjour Ferme Akwaba${nom ? `, c'est ${nom}` : ''}.`,
+         `Je voudrais ${parts.join(' et ')}.`,
+         `${ferme ? '' : `${c}${rep ? `, ${rep}` : ''}. `}${quandTxt[0].toUpperCase() + quandTxt.slice(1)}, ${$('creneau').value.toLowerCase()}.`,
+         `Paiement : ${$('paiement').value}. Total : ${F(total)}.${fete ? ' Je réserve pour les fêtes.' : ''}`].join('\n')
+      : 'Ajoute au moins un poulet ou un plateau.';
+    $('msg').textContent = msg;
+    const href = `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
+    $('waLink').href = href;
+    $('barTotal').textContent = F(total);
+    $('barItems').textContent = parts.length ? parts.join(' · ') : 'Panier vide';
+
     const full = st.o > 0;
     if ((lastO > 0) !== full || lastO === -1) {
       if (hasGsap && !reduce) gsap.to(eggs, { scale: full ? 1 : 0, duration: .45, ease: full ? 'back.out(2.2)' : 'power2.in', stagger: { each: .018, from: full ? 'random' : 'end' } });
       else eggs.forEach(e => e.style.transform = `scale(${full ? 1 : 0})`);
-    } else if (hasGsap && !reduce && full) gsap.fromTo('#trayX', { scale: 1.35 }, { scale: 1, duration: .4, ease: 'back.out(3)' });
+    } else if (hasGsap && !reduce && full && st.o !== lastO) gsap.fromTo('#trayX', { scale: 1.35 }, { scale: 1, duration: .4, ease: 'back.out(3)' });
     lastO = st.o;
   }
-  const bump = (k, d) => { st[k] = Math.max(0, Math.min(99, st[k] + d)); render(); };
-  document.getElementById('pMoins').onclick = () => bump('p', -1);
-  document.getElementById('pPlus').onclick = () => bump('p', 1);
-  document.getElementById('oMoins').onclick = () => bump('o', -1);
-  document.getElementById('oPlus').onclick = () => bump('o', 1);
-  document.getElementById('basket').addEventListener('change', render);
-  document.getElementById('basket').addEventListener('submit', e => e.preventDefault());
-  document.getElementById('copy').addEventListener('click', async e => {
-    const btn = e.currentTarget, txt = document.getElementById('msg').textContent;
+  const bump = (k, d) => { st[k] = Math.max(0, Math.min(200, st[k] + d)); render(); };
+  $('pMoins').onclick = () => bump('p', -1); $('pPlus').onclick = () => bump('p', 1);
+  $('oMoins').onclick = () => bump('o', -1); $('oPlus').onclick = () => bump('o', 1);
+  const form = $('basket');
+  form.addEventListener('change', render); form.addEventListener('input', render);
+  form.addEventListener('submit', e => e.preventDefault());
+
+  let toastT;
+  function toast(t){ const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 1800); }
+  document.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.add;
+    if (k === 'poulet') bump('p', 1);
+    if (k === 'oeufs') bump('o', 1);
+    if (k === 'pro') { st.p = Math.max(st.p, PRO.seuil); render(); }
+    toast(k === 'pro' ? '10 poulets au prix pro' : k === 'poulet' ? 'Poulet ajouté au panier' : 'Plateau ajouté au panier');
+    if (hasGsap && !reduce) gsap.fromTo('#barTotal', { scale: 1.25, transformOrigin: '0 50%' }, { scale: 1, duration: .5, ease: 'back.out(3)' });
+  }));
+  $('copy').addEventListener('click', async e => {
+    const btn = e.currentTarget, txt = $('msg').textContent;
     try { await navigator.clipboard.writeText(txt); btn.textContent = 'Copié'; }
-    catch { const r = document.createRange(); r.selectNodeContents(document.getElementById('msg')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Sélectionné'; }
+    catch { const r = document.createRange(); r.selectNodeContents($('msg')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Sélectionné'; }
     setTimeout(() => btn.textContent = 'Copier', 1800);
   });
-  render();
+  $('heroWa').href = `https://wa.me/${WA}?text=${encodeURIComponent('Bonjour Ferme Akwaba, je voudrais passer une commande.')}`;
+  $('proWa').href = `https://wa.me/${WA}?text=${encodeURIComponent('Bonjour Ferme Akwaba, je prépare un événement et je voudrais un devis pour une grosse commande.')}`;
+  render(); onScroll();
 
   if (!hasGsap || reduce) return;
 
-  /* Titre : les mots montent, puis le mot d'accent se pose */
-  gsap.from('#titre .w > span', { yPercent: 110, duration: 1.1, ease: 'power4.out', stagger: .055, delay: .15 });
-  gsap.from('#acc', { rotate: -8, scale: .7, duration: 1.4, ease: 'elastic.out(1,.45)', delay: .7 });
+  /* ---------- Animations ---------- */
+  gsap.from('#titre .w > span', { yPercent: 110, duration: 1.1, ease: 'power4.out', stagger: .06, delay: .1 });
+  gsap.from('#acc', { rotate: -8, scale: .7, duration: 1.4, ease: 'elastic.out(1,.45)', delay: .6 });
+  gsap.from('.hero-sub, .prices, .ctas, .season', { y: 18, opacity: 0, duration: .9, ease: 'power3.out', stagger: .08, delay: .5 });
 
-  /* Le chiffre 45 : on plonge dedans */
-  const tl = gsap.timeline({ scrollTrigger: { trigger: '#chiffre', start: 'top top', end: 'bottom bottom', scrub: 1 } });
-  tl.to('#numCap', { opacity: 0, y: -30, duration: .8 }, .4)
-    .fromTo('#big', { scale: .9 }, { scale: 24, ease: 'power3.in', duration: 3 }, .4)
-    .to('#numAfter', { opacity: 1, duration: .5 }, 3.0)
-    .from('#numAfter p', { y: 50, duration: 1 }, 3.0)
-    .to({}, { duration: .8 });
+  rows.forEach((li, i) => ScrollTrigger.create({ trigger: li, start: 'top 60%', end: 'bottom 60%', onToggle: s => s.isActive && activate(i) }));
 
-  /* Conviction : la photo glisse, le bouquet éclot et respire */
-  gsap.to('#beliefImg', { yPercent: 8, ease: 'none', scrollTrigger: { trigger: '.belief', start: 'top bottom', end: 'bottom top', scrub: true } });
+  /* On plonge dans le trou du zéro */
+  const tl = gsap.timeline({ scrollTrigger: { trigger: '#zero', start: 'top top', end: 'bottom bottom', scrub: 1 } });
+  tl.to('#numCap', { opacity: 0, y: -24, duration: .6 }, .5)
+    .fromTo('#big', { scale: .92 }, { scale: 9, ease: 'power2.in', duration: 2.4 }, .5)
+    .to('#big', { opacity: 0, duration: .5 }, 2.5);
+
+  gsap.to('#freshImg', { yPercent: 8, ease: 'none', scrollTrigger: { trigger: '.fresh', start: 'top bottom', end: 'bottom top', scrub: true } });
+  gsap.from('#day li', { y: 40, opacity: 0, duration: .8, stagger: .15, ease: 'power3.out', scrollTrigger: { trigger: '#day', start: 'top 80%' } });
   const petals = gsap.utils.toArray('#cluster svg');
-  gsap.from(petals, { scale: 0, rotate: -90, transformOrigin: '50% 50%', duration: 1.1, ease: 'back.out(1.8)', stagger: .09,
-    scrollTrigger: { trigger: '.belief', start: 'top 45%' } });
+  gsap.from(petals, { scale: 0, rotate: -90, transformOrigin: '50% 50%', duration: 1.1, ease: 'back.out(1.8)', stagger: .09, scrollTrigger: { trigger: '.fresh', start: 'top 55%' } });
   petals.forEach((p, i) => gsap.to(p, { rotate: i % 2 ? 10 : -10, y: i % 2 ? -8 : 8, duration: 2.6 + i * .3, ease: 'sine.inOut', repeat: -1, yoyo: true, transformOrigin: '50% 50%' }));
-  gsap.from('.belief h2, .belief p', { y: 40, opacity: 0, duration: 1, stagger: .15, ease: 'power3.out', scrollTrigger: { trigger: '.belief', start: 'top 40%' } });
 
-  /* La ferme : la carte monte, la photo se dévoile */
-  gsap.from('.farm-card', { y: 80, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: '.farm', start: 'top 75%' } });
-  gsap.fromTo('.farm-photo img', { clipPath: 'ellipse(0% 100% at 100% 50%)' }, { clipPath: 'ellipse(92% 100% at 100% 50%)', duration: 1.4, ease: 'power3.inOut', scrollTrigger: { trigger: '.farm', start: 'top 60%' } });
+  gsap.from('.farm-card', { y: 70, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: '.farm', start: 'top 80%' } });
+  if (matchMedia('(min-width: 861px)').matches) gsap.fromTo('.farm-photo img', { clipPath: 'ellipse(0% 100% at 100% 50%)' }, { clipPath: 'ellipse(92% 100% at 100% 50%)', duration: 1.4, ease: 'power3.inOut', scrollTrigger: { trigger: '.farm', start: 'top 65%' } });
 
-  /* Produits : la ligne au centre de l'écran devient active */
-  rows.forEach((li, i) => ScrollTrigger.create({ trigger: li, start: 'top 58%', end: 'bottom 58%', onToggle: s => s.isActive && activate(i) }));
-
-  /* Assiette : le contour orange se dessine */
-  const outline = document.getElementById('outline');
-  outline.style.strokeDasharray = 100; outline.style.strokeDashoffset = 100;
-  gsap.to(outline, { strokeDashoffset: 0, duration: 1.8, ease: 'power2.inOut', scrollTrigger: { trigger: '.plate', start: 'top 60%' } });
-  gsap.from('.shape img', { scale: 1.12, duration: 1.6, ease: 'power3.out', scrollTrigger: { trigger: '.plate', start: 'top 60%' } });
+  const outline = $('outline'); outline.style.strokeDasharray = 100; outline.style.strokeDashoffset = 100;
+  gsap.to(outline, { strokeDashoffset: 0, duration: 1.8, ease: 'power2.inOut', scrollTrigger: { trigger: '.plate', start: 'top 65%' } });
 })();
 </script>

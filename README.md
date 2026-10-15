@@ -136,6 +136,10 @@ npx @james10192/iroko uninstall   # remove installed components and iroko state 
 npx @james10192/iroko about       # author and links
 ```
 
+## Research foundations
+
+IROKO's long-term direction includes UX/UI, accessibility, usability and maintainability alongside code quality. The [agent harness and UX quality research foundations](./docs/research/agent-harness-ux-quality-foundations.md) distinguish current capabilities, independent evidence, product hypotheses and a scoped COM6301 evaluation proposal. Performance and quality improvements remain hypotheses until tested.
+
 Release notes live in [CHANGELOG.md](./CHANGELOG.md).
 
 Built by [Marcel DJEDJE-LI](https://github.com/James10192).

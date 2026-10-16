@@ -1,0 +1,32 @@
+[
+  {
+    "id": "PRODUCT-001",
+    "statement": "Existing tenant-specific settings must remain isolated between organisations.",
+    "scopes": [
+      "src/settings/*",
+      "src/payments/*"
+    ],
+    "status": "approved",
+    "source": "Example product ADR approved by a human",
+    "rationale": "Avoid accidentally sharing configuration across organisations."
+  },
+  {
+    "id": "UX-002",
+    "statement": "Existing approved navigation flows should be preserved when modifying payment screens.",
+    "scopes": [
+      "src/payments/*"
+    ],
+    "status": "approved",
+    "source": "Example UX product decision",
+    "rationale": "Prevent disruptive changes to established user journeys."
+  },
+  {
+    "id": "DRAFT-003",
+    "statement": "A new experimental receipt layout should be adopted everywhere.",
+    "scopes": [
+      "src/payments/*"
+    ],
+    "status": "draft",
+    "source": "Unapproved proposal"
+  }
+]

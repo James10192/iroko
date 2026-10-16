@@ -8,6 +8,7 @@ import { updateCommand } from "./commands/update.js";
 import { aboutCommand } from "./commands/about.js";
 import { doctorCommand } from "./commands/doctor.js";
 import { uninstallCommand } from "./commands/uninstall.js";
+import { reviewCommand } from "./commands/review.js";
 
 // Check for updates silently on every run (throttled to 1×/24h).
 checkForUpdates();
@@ -57,6 +58,18 @@ program
   .description("Diagnose the environment: node, git, gh, ctx7, dev-browser, MCP")
   .option("--guide", "output in French (sortie en français)")
   .action((opts) => doctorCommand(opts));
+
+program
+  .command("review")
+  .description("Experimental context-aware GitHub pull request review (read-only)")
+  .requiredOption("--repo <owner/name>", "GitHub repository")
+  .requiredOption("--pr <number>", "Pull request number")
+  .option("--decisions <file>", "JSON decisions knowledge file", ".iroko/decisions.json")
+  .option("--model <name>", "OpenAI model (only when AI review is enabled)", "gpt-4o-mini")
+  .option("--baseline", "Run with no project decisions")
+  .option("--offline", "Inspect matching decisions without calling an AI model")
+  .option("--json", "Emit machine-readable report")
+  .action(reviewCommand);
 
 // Default — banner + commands grid + signature line.
 program.action(() => {

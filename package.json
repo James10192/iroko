@@ -19,7 +19,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/cli.ts",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "test:review": "tsx --test src/review/core.test.ts"
   },
   "dependencies": {
     "@clack/prompts": "^1.2.0",

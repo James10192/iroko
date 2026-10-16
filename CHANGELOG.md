@@ -9,6 +9,11 @@ removals/renames and CLI interface changes are MAJOR.
 
 ## [Unreleased]
 
+### Added
+
+- **Experimental `iroko review` (COM6301 research branch):** read-only GitHub PR review with approved project-decision retrieval, bounded AI analysis, offline inspection and reproducible baseline mode. New source tests and evaluation documentation. No automatic PR comments or approvals.
+
+
 ## [4.0.0] — 2026-08-25
 
 Names the target audience understands instantly (the MAJOR bump: two renames), plus the end-to-end build orchestrator.

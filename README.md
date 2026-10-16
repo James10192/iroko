@@ -16,6 +16,10 @@ The iroko is a great sacred tree of West Africa: deep roots hold the ground, and
 npx @james10192/iroko init
 ```
 
+## Experimental research: IROKO Review (COM6301)
+
+A read-only, context-aware GitHub Pull Request review prototype is being developed in [draft PR #11](https://github.com/James10192/iroko/pull/11). It retrieves **approved project decisions** relevant to changed files and generates evidence-linked advisory review findings. The prototype is **not yet part of the published npm release**, does not execute PR code or post comments, and requires supervisor review before being treated as an academic project. See [technical and evaluation documentation](docs/iroko-review/README.md) in the feature branch.
+
 ## Three promises
 
 | Promise | How |

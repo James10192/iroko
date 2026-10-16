@@ -216,7 +216,7 @@ jobs:
             const { readFileSync, existsSync } = require("node:fs");
             const src = readFileSync("src/lib/manifest.ts", "utf8");
             const paths = [...src.matchAll(/^\s*path:\s*"([^"]+)"/gm)].map((m) => m[1]);
-            if (paths.length !== 24) {
+            if (paths.length !== 27) {
               console.error(`Expected 24 manifest paths, found ${paths.length}.`);
               process.exit(1);
             }

@@ -2,7 +2,7 @@
 
 ## Decision: add PR review as an experimental vertical slice
 
-Existing repository: \`James10192/iroko\`, current root CLI v4.0, pre-existing agent skills/rules/hooks. Preserve these: work on a dedicated branch and obtain review before merging.
+Existing repository: `James10192/iroko`, current root CLI v4.0, pre-existing agent skills/rules/hooks. Preserve these: work on a dedicated branch and obtain review before merging.
 
 Sequence:
 
@@ -11,7 +11,7 @@ Sequence:
 3. An AI reviewer receives a short bounded decision context plus untrusted patch text; returns JSON findings.
 4. A validation boundary drops findings referring to unknown paths or invented decision IDs.
 5. CLI renders human-readable report or JSON, and logs token usage. It NEVER auto-comments or approves a PR in this prototype.
-6. For evaluation, \`--baseline\` removes selected decisions while keeping the rest of the pipeline fixed.
+6. For evaluation, `--baseline` removes selected decisions while keeping the rest of the pipeline fixed.
 
 Architectural separation: GitHub adapter (input), decision selection (logic), model adapter (analysis), validation (output), CLI (transport). The review engine is a **read-only observer** of GitHub state, not a code executor.
 

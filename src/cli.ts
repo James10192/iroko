@@ -91,6 +91,7 @@ program.action(() => {
     `     ${ochre(MARK)}  ${ivory("uninstall")} ${graphite("Remove iroko from ~/.claude")}`,
   );
   console.log(
+    `     ${ochre(MARK)}  ${ivory("review")}    ${graphite("Context-aware PR review (experimental)")}`,
     `     ${ochre(MARK)}  ${ivory("about")}     ${graphite("Author & links")}`,
   );
   console.log(

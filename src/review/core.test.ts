@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { selectDecisions, validateFindings } from "./core.js";
-import { parseRepository } from "./github.js";
+import { parseRepository, fetchPullRequestFiles } from "./github.js";
 import type { ChangedFile, Decision } from "./core.js";
 const changed: ChangedFile[] = [{
   filename: "src/payments/receipts.ts",
@@ -43,4 +43,24 @@ test("repository input cannot be arbitrary URL or shell text", () => {
 });
 test("invalid model response fails rather than fabricating review results", () => {
   assert.throws(() => validateFindings({ message: "looks fine" }, changed, [rules[0]]));
+});
+
+test("GitHub adapter requests only read-only PR file metadata", async () => {
+  let calls = 0;
+  const fake = (async (url: unknown, options: unknown) => {
+    calls++;
+    assert.match(String(url), /\/pulls\/11\/files\?/);
+    assert.ok(!(options as { method?: string }).method, "No write method should be used");
+    return new Response(JSON.stringify([{ filename: "src/payments/receipts.ts",
+      status: "modified", patch: "@@ -1 +1 @@\\n-old\\n+new" }]), { status: 200 });
+  }) as typeof fetch;
+  const data = await fetchPullRequestFiles("James10192/iroko", 11, undefined, fake);
+  assert.equal(calls, 1);
+  assert.equal(data.files.length, 1);
+  assert.equal(data.files[0].filename, "src/payments/receipts.ts");
+  assert.deepEqual(data.warnings, []);
+});
+test("GitHub failures propagate instead of fabricating findings", async () => {
+  const fake = (async () => new Response("forbidden", { status: 403 })) as typeof fetch;
+  await assert.rejects(fetchPullRequestFiles("James10192/iroko", 11, undefined, fake), /HTTP 403/);
 });

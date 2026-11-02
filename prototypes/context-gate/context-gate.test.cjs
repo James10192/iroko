@@ -346,7 +346,7 @@ test("base-branch PR verification refuses symlinked candidate policy and scan ro
     process.platform === "win32" ? "junction" : "dir");
   result = run("ci-check.cjs", trusted.env, [trusted.root, candidate.root]);
   assert.equal(result.status, 1);
-  assert.match(result.stderr, /Symlink|symlink/i);
+  assert.match(result.stderr, /Symlink|symlink|escapes project root/i);
 });
 
 

@@ -173,3 +173,36 @@ test("a matching command with narrowed tool matcher is NOT an active write guard
   assert.match(result.stderr, /unsafe IROKO hook/);
   assert.ok(!fs.existsSync(path.join(root, ".iroko/context-gate")));
 });
+
+
+test("installer refuses projects where Claude hooks are disabled", () => {
+  const root = fixture();
+  fs.writeFileSync(path.join(root, ".claude/settings.local.json"),
+    JSON.stringify({disableAllHooks: true}));
+  const result = run(root, "init");
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /disable all hooks/);
+  assert.equal(fs.existsSync(path.join(root, ".iroko/context-gate")), false);
+});
+
+test("installer cannot follow a symlinked local IROKO directory", () => {
+  const root = fixture();
+  const outside = fs.mkdtempSync(path.join(os.tmpdir(), "iroko-outside-install-"));
+  fs.symlinkSync(outside, path.join(root, ".iroko"),
+    process.platform === "win32" ? "junction" : "dir");
+  const result = run(root, "init");
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /symlinked IROKO/);
+  assert.equal(fs.readdirSync(outside).length, 0);
+});
+
+test("installer refuses a symlinked local Claude settings file", () => {
+  const root = fixture();
+  const settings = path.join(root, ".claude/settings.local.json");
+  const outside = path.join(root, "outside-settings.json");
+  fs.writeFileSync(outside, JSON.stringify({permissions:{}}));
+  fs.symlinkSync(outside, settings, "file");
+  const result = run(root, "init");
+  assert.equal(result.status, 1);
+  assert.equal(JSON.parse(fs.readFileSync(outside,"utf8")).hooks, undefined);
+});

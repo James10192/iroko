@@ -304,3 +304,20 @@ test("trusted-base checker refuses to evaluate itself as a candidate checkout", 
   const f = fixture();
   assert.equal(run("ci-check.cjs", f.env, [f.root, f.root]).status, 1);
 });
+
+
+test("SessionStart reinjects project context after a compaction", () => {
+  const f = fixture();
+  const send = (hook_event_name, extra = {}) => run("session.cjs", f.env, [],
+    JSON.stringify({session_id: "fixture-session", hook_event_name, ...extra}));
+  const target = {file_path: path.join(f.root,"src/integrations/new.ts")};
+  assert.equal(send("UserPromptSubmit", {prompt:"Work"}).status, 0);
+  assert.equal(run("post-compact.cjs", f.env, [], JSON.stringify({
+    session_id:"fixture-session", hook_event_name:"PostCompact", trigger:"manual"
+  })).status, 0);
+  assert.equal(hook(f.env,"Write",target).status, 2);
+  const resumed = send("SessionStart", {source:"compact"});
+  assert.equal(resumed.status,0);
+  assert.match(resumed.stdout,/Use provider adapters/);
+  assert.equal(hook(f.env,"Write",target).status, 0);
+});

@@ -79,9 +79,13 @@ function snapshot(root) {
   return { fingerprint, documents, policy };
 }
 
-function stateFile(root) {
+function stateFile(root, sessionId = "") {
   if (process.env.IROKO_CONTEXT_STATE) return path.resolve(process.env.IROKO_CONTEXT_STATE);
-  return path.join(os.tmpdir(), "iroko-context-" + digest(root).slice(0, 24) + ".json");
+  if (!sessionId || typeof sessionId !== "string") {
+    throw new Error("Session identifier is required for persisted context evidence");
+  }
+  const key = digest(root + "\\0" + sessionId).slice(0, 32);
+  return path.join(os.tmpdir(), "iroko-context-" + key + ".json");
 }
 
 function isInScope(relative, scopes) {
@@ -93,9 +97,12 @@ function isInScope(relative, scopes) {
   });
 }
 
-function authorized(root, candidate) {
-  const state = JSON.parse(fs.readFileSync(stateFile(root), "utf8"));
-  if (state.root !== root ||
+function authorized(root, candidate, sessionId) {
+  if (typeof sessionId !== "string" || !sessionId.trim()) {
+    throw new Error("Missing session identifier");
+  }
+  const state = JSON.parse(fs.readFileSync(stateFile(root, sessionId), "utf8"));
+  if (state.root !== root || state.sessionId !== sessionId ||
       !Number.isFinite(state.expiresAt) || Date.now() >= state.expiresAt ||
       typeof state.task !== "string" || !state.task.trim()) {
     throw new Error("Context state is missing, expired or invalid");

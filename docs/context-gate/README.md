@@ -34,8 +34,9 @@ semantic architectural violation.
 
 ## Install locally (after the alpha is merged and released)
 
-**Prerequisites:** Node >=20, an existing project with reviewed architectural
-documents and a carefully prepared `iroko.context.json` file.
+**Prerequisites:** Node >=20, a Git repository with at least one commit,
+reviewed architectural documents and a carefully prepared
+`iroko.context.json` file.
 
 The configuration is per-project, **not** a global rule and does not invent
 the organization's architecture. For example:
@@ -79,6 +80,9 @@ two local hooks into `.claude/settings.local.json`:
 - `UserPromptSubmit`: synchronous context load with `onFailure: block`.
 - `PreToolUse`: scoped tool protection for `Write|Edit|MultiEdit|NotebookEdit|Bash|mcp__.*`,
   also configured `onFailure: block`.
+- `PostCompact`: invalidates the previous write permit after compaction.
+  Because Claude Code does not permit a PostCompact hook to reinject context,
+  the next submitted prompt must reprepare the documents before further writes.
 
 Existing unrelated Claude hooks and permissions are preserved. Re-running
 `context init` is idempotent when the runtime files are unchanged. A modified
@@ -143,6 +147,10 @@ status checks. The current GitHub connector cannot change that setting.
 
 ## Security and usability limitations
 
+- Context compaction can remove earlier instructions from the model's active
+  window; IROKO revokes the current permit on `PostCompact` so that it cannot
+  keep writing on that stale assumption. This intentionally interrupts work
+  until the next preflight-capable prompt.
 - Hook decisions are *not* OS-level filesystem permissions. Never claim a
   complete security guarantee without a controlled runner/sandbox where
   alternative write paths are unavailable.

@@ -70,6 +70,7 @@ test("project installer preserves unrelated settings and is idempotent", () => {
   assert.equal(data.hooks.UserPromptSubmit.length, 1);
   assert.equal(data.hooks.SessionStart.length, 1);
   assert.equal(run(root, "doctor").status, 0);
+  assert.equal(run(root, "verify").status, 0);
 });
 
 test("missing policy must not install hooks or runtime", () => {
@@ -141,4 +142,15 @@ test("Claude Code versions without fail-closed hook support cannot activate the 
   assert.equal(result.status, 1);
   assert.match(result.stderr, /v2\.1\.295/);
   assert.ok(!fs.existsSync(path.join(root, ".iroko/context-gate")));
+});
+
+
+test("the context verify CLI exits unsuccessfully on a broken project decision", () => {
+  const root = fixture();
+  assert.equal(run(root, "init").status, 0);
+  fs.writeFileSync(path.join(root,"src/core/forbidden.ts"),
+    'import foo from "@vendor/sdk";');
+  const result = run(root, "verify");
+  assert.equal(result.status, 1);
+  assert.match(result.stderr + result.stdout, /no-sdk-core/);
 });

@@ -38,7 +38,9 @@ function run(file, env, args = [], input) {
 }
 
 function hook(env, tool_name, tool_input = {}) {
-  return run("hook.cjs", env, [], JSON.stringify({ tool_name, tool_input }));
+  return run("hook.cjs", env, [], JSON.stringify({
+    session_id: "fixture-session", tool_name, tool_input
+  }));
 }
 
 test("missing context blocks writes, but allows explicitly read-only probes", () => {
@@ -54,7 +56,10 @@ test("missing context blocks writes, but allows explicitly read-only probes", ()
 
 test("preparation exposes source evidence, then permits only in-scope file writes", () => {
   const f = fixture();
-  const prepared = run("prepare.cjs", f.env, ["ISSUE-12"]);
+  const prepared = run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit",
+    prompt: "Implement requested feature"
+  }));
   assert.equal(prepared.status, 0, prepared.stderr);
   assert.match(prepared.stdout, /Use provider adapters/);
   assert.equal(hook(f.env, "Write", {
@@ -67,7 +72,10 @@ test("preparation exposes source evidence, then permits only in-scope file write
 
 test("changed decision sources invalidate prepared authorization", () => {
   const f = fixture();
-  assert.equal(run("prepare.cjs", f.env, ["ISSUE-12"]).status, 0);
+  assert.equal(run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit",
+    prompt: "Implement requested feature"
+  })).status, 0);
   fs.appendFileSync(path.join(f.root, "docs/ADR.md"), "New rule.\n");
   assert.equal(hook(f.env, "Write", {
     file_path: path.join(f.root, "src/integrations/new.ts")
@@ -76,7 +84,10 @@ test("changed decision sources invalidate prepared authorization", () => {
 
 test("expired state invalidates authorization", () => {
   const f = fixture();
-  assert.equal(run("prepare.cjs", f.env, ["ISSUE-12"]).status, 0);
+  assert.equal(run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit",
+    prompt: "Implement requested feature"
+  })).status, 0);
   const state = JSON.parse(fs.readFileSync(f.state, "utf8"));
   state.expiresAt = Date.now() - 1;
   fs.writeFileSync(f.state, JSON.stringify(state));
@@ -87,7 +98,10 @@ test("expired state invalidates authorization", () => {
 
 test("shell escape attempts and unknown tool classes are denied", () => {
   const f = fixture();
-  assert.equal(run("prepare.cjs", f.env, ["ISSUE-12"]).status, 0);
+  assert.equal(run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit",
+    prompt: "Implement requested feature"
+  })).status, 0);
   for (const command of [
     "git diff --output=/tmp/written",
     "git status; touch /tmp/written",
@@ -102,7 +116,10 @@ test("shell escape attempts and unknown tool classes are denied", () => {
 
 test("symlinks and paths escaping the project are rejected", () => {
   const f = fixture();
-  assert.equal(run("prepare.cjs", f.env, ["ISSUE-12"]).status, 0);
+  assert.equal(run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit",
+    prompt: "Implement requested feature"
+  })).status, 0);
   assert.equal(hook(f.env, "Write", {
     file_path: path.join(f.root, "..", "escape.ts")
   }).status, 2);
@@ -127,12 +144,43 @@ test("independent verifier detects a forbidden provider SDK in core", () => {
 test("missing required source and malformed policy fail closed", () => {
   const f = fixture();
   fs.rmSync(path.join(f.root, "docs/ADR.md"));
-  assert.equal(run("prepare.cjs", f.env, ["ISSUE-12"]).status, 1);
+  assert.equal(run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit",
+    prompt: "Implement requested feature"
+  })).status, 1);
   assert.equal(hook(f.env, "Write", {
     file_path: path.join(f.root, "src/integrations/new.ts")
   }).status, 2);
   fs.writeFileSync(path.join(f.root, "iroko.context.json"), JSON.stringify({
     schemaVersion: 1, sources: [], writeScopes: ["src/"]
   }));
-  assert.equal(run("prepare.cjs", f.env, ["ISSUE-12"]).status, 1);
+  assert.equal(run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit",
+    prompt: "Implement requested feature"
+  })).status, 1);
+});
+
+test("session-aware gate blocks stale authorizations across sessions", () => {
+  const f = fixture();
+  assert.equal(run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit", prompt: "Work"
+  })).status, 0);
+  assert.equal(run("hook.cjs", f.env, [], JSON.stringify({
+    session_id: "another-session", tool_name: "Write",
+    tool_input: {file_path: path.join(f.root, "src/integrations/new.ts")}
+  })).status, 2);
+  assert.equal(run("hook.cjs", f.env, [], JSON.stringify({
+    tool_name: "Write",
+    tool_input: {file_path: path.join(f.root, "src/integrations/new.ts")}
+  })).status, 2);
+});
+
+test("session hook injects the documented project decisions on every prompt", () => {
+  const f = fixture();
+  const result = run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit", prompt: "Implement"
+  }));
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Use provider adapters/);
+  assert.match(result.stdout, /APPROVED WRITE SCOPES/);
 });

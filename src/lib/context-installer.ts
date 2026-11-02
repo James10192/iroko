@@ -6,6 +6,24 @@ import { fileURLToPath } from "node:url";
 const files = ["core.cjs", "session.cjs", "hook.cjs", "prepare.cjs", "verify.cjs", "post-compact.cjs", "ci-check.cjs"];
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+function claudeHookSupport(): "supported" | "unsupported" | "unverified" {
+  try {
+    const output = execFileSync("claude", ["--version"], {
+      encoding: "utf8", timeout: 5000, stdio: ["ignore", "pipe", "ignore"]
+    }).trim();
+    const match = output.match(/(?:^|\s)v?(\d+)\.(\d+)\.(\d+)(?:\s|$)/);
+    if (!match) return "unverified";
+    const version = match.slice(1).map(Number);
+    if (version[0] > 2 || version[0] === 2 &&
+        (version[1] > 1 || version[1] === 1 && version[2] >= 295)) {
+      return "supported";
+    }
+    return "unsupported";
+  } catch {
+    return "unverified";
+  }
+}
+
 function sourceDirectory(): string {
   const candidates = [
     resolve(__dirname, "..", "prototypes", "context-gate"),
@@ -155,6 +173,13 @@ function installFiles(source: string, target: string): void {
 export function contextInitCommand(): void {
   const project = resolve(process.cwd());
   try {
+    const compatibility = claudeHookSupport();
+    if (compatibility === "unsupported") {
+      throw new Error("Claude Code v2.1.295+ required for fail-closed onFailure hooks");
+    }
+    if (compatibility === "unverified") {
+      console.warn("Claude Code version not verified; ensure v2.1.295+ before using this guard");
+    }
     verifyPolicy(project);
     const target = join(project, ".iroko", "context-gate");
     const settingsFile = join(project, ".claude", "settings.local.json");
@@ -204,6 +229,8 @@ export function contextDoctorCommand(): void {
       readFileSync(installed).equals(readFileSync(join(source, file)));
   });
   const status = { policy, runtime, hooks };
-  console.log(JSON.stringify({project, ...status}, null, 2));
-  if (!Object.values(status).every(Boolean)) process.exitCode = 1;
+  const claudeVersionSupport = claudeHookSupport();
+  console.log(JSON.stringify({project, ...status, claudeVersionSupport}, null, 2));
+  if (!Object.values(status).every(Boolean) ||
+      claudeVersionSupport === "unsupported") process.exitCode = 1;
 }

@@ -124,3 +124,19 @@ test("context doctor detects modified runtime files", () => {
   fs.appendFileSync(path.join(root, ".iroko/context-gate/hook.cjs"), "\\n// modified\\n");
   assert.equal(run(root, "doctor").status, 1);
 });
+
+
+test("Claude Code versions without fail-closed hook support cannot activate the guard", {skip:process.platform==="win32"}, () => {
+  const root = fixture();
+  const bin = fs.mkdtempSync(path.join(os.tmpdir(), "iroko-claude-version-"));
+  const fake = path.join(bin, "claude");
+  fs.writeFileSync(fake, "#!/bin/sh\necho '2.1.294 (Claude Code)'\n", {mode:0o755});
+  const result = spawnSync(process.execPath, [cli, "context", "init"], {
+    cwd:root, encoding:"utf8",
+    env:{...process.env,CLAUDE_PROJECT_DIR:root,HOME:root,
+      PATH:bin+path.delimiter+process.env.PATH}
+  });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /v2\.1\.295/);
+  assert.ok(!fs.existsSync(path.join(root, ".iroko/context-gate")));
+});

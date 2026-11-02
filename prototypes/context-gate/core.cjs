@@ -144,5 +144,5 @@ function authorized(root, candidate, sessionId) {
 
 module.exports = {
   projectRoot, relativePath, readPolicy, snapshot,
-  stateFile, authorized, isInScope
+  stateFile, authorized, isInScope, disallowSensitiveSource
 };

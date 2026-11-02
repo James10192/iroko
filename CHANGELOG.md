@@ -15,7 +15,7 @@ removals/renames and CLI interface changes are MAJOR.
 
 ### Added
 
-- **Experimental Context Gate proof of concept (issue #12)**: opt-in, project-scoped preparation of document evidence, expiring source/commit fingerprint, a fail-closed Claude Code PreToolUse write guard, deterministic project-rule checks, and negative-path tests in a dedicated GitHub Actions workflow. Research prototype only; not installed or enabled by the v4 CLI, not a security sandbox, and no claim of guaranteed model understanding.
+- **Experimental Context Gate (issue #12)**: per-project opt-in CLI commands `iroko context init` and `iroko context doctor`; automatic `UserPromptSubmit` evidence injection with session-bound and expiring source/commit fingerprints; scoped fail-closed `PreToolUse` write guard; independent deterministic policy checks; updated npm packaging, installer smoke and negative-path CI. **Not enabled by regular `iroko init`**, no npm publication yet, not an OS sandbox and no claim of guaranteed model understanding.
 
 ## [4.0.0] — 2026-08-25
 

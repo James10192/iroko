@@ -8,7 +8,7 @@ import { updateCommand } from "./commands/update.js";
 import { aboutCommand } from "./commands/about.js";
 import { doctorCommand } from "./commands/doctor.js";
 import { uninstallCommand } from "./commands/uninstall.js";
-import { contextInitCommand, contextDoctorCommand } from "./lib/context-installer.js";
+import { contextInitCommand, contextDoctorCommand, contextVerifyCommand } from "./lib/context-installer.js";
 
 // Check for updates silently on every run (throttled to 1×/24h).
 checkForUpdates();
@@ -39,6 +39,10 @@ context.command("init")
 context.command("doctor")
   .description("Check project-local context guard installation")
   .action(contextDoctorCommand);
+
+context.command("verify")
+  .description("Run deterministic project-specific policy checks")
+  .action(contextVerifyCommand);
 
 program
   .command("list")

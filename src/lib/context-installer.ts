@@ -95,6 +95,9 @@ function hookDefinition(script: string, block = true) {
 }
 
 const definitions = {
+  SessionStart: {
+    hooks: [hookDefinition("session.cjs", false)],
+  },
   UserPromptSubmit: {
     hooks: [hookDefinition("session.cjs")],
   },

@@ -158,11 +158,16 @@ export function contextDoctorCommand(): void {
       )
     );
   } catch { /* diagnostic only */ }
-  const status = {
-    policy: existsSync(join(project, "iroko.context.json")),
-    runtime: files.every((file) => existsSync(join(project, ".iroko", "context-gate", file))),
-    hooks,
-  };
+  let policy = false;
+  try { verifyPolicy(project); policy = true; }
+  catch { /* diagnostic only */ }
+  const source = sourceDirectory();
+  const runtime = files.every((file) => {
+    const installed = join(project, ".iroko", "context-gate", file);
+    return existsSync(installed) &&
+      readFileSync(installed).equals(readFileSync(join(source, file)));
+  });
+  const status = { policy, runtime, hooks };
   console.log(JSON.stringify({project, ...status}, null, 2));
   if (!Object.values(status).every(Boolean)) process.exitCode = 1;
 }

@@ -147,7 +147,7 @@ test("missing required source and malformed policy fail closed", () => {
   assert.equal(run("session.cjs", f.env, [], JSON.stringify({
     session_id: "fixture-session", hook_event_name: "UserPromptSubmit",
     prompt: "Implement requested feature"
-  })).status, 1);
+  })).status, 2);
   assert.equal(hook(f.env, "Write", {
     file_path: path.join(f.root, "src/integrations/new.ts")
   }).status, 2);
@@ -157,7 +157,7 @@ test("missing required source and malformed policy fail closed", () => {
   assert.equal(run("session.cjs", f.env, [], JSON.stringify({
     session_id: "fixture-session", hook_event_name: "UserPromptSubmit",
     prompt: "Implement requested feature"
-  })).status, 1);
+  })).status, 2);
 });
 
 test("session-aware gate blocks stale authorizations across sessions", () => {

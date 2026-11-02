@@ -44,7 +44,7 @@ function evaluate(event) {
     return;
   }
   if (["Write", "Edit", "MultiEdit", "NotebookEdit"].includes(name)) {
-    authorized(projectRoot(), input.file_path || input.notebook_path);
+    authorized(projectRoot(), input.file_path || input.notebook_path, event.session_id);
     return;
   }
   throw new Error("Unclassified tool requires an explicit policy: " + name);

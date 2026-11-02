@@ -140,7 +140,7 @@ function mergeHooks(settings: Record<string, any>): boolean {
           (Array.isArray((hook as any).args) &&
            (hook as any).args.some((arg: unknown) =>
              typeof arg === "string" && arg.includes(signature))),
-        hook
+        hook, matcher: (entry as any).matcher
       })
     )).filter((v) => v.match);
     if (matches.length > 1) throw new Error("Duplicate IROKO hooks: " + event);
@@ -148,6 +148,7 @@ function mergeHooks(settings: Record<string, any>): boolean {
       const actual = matches[0].hook as any;
       if (actual.command !== "node" ||
           actual.args?.[0] !== desired.hooks[0].args[0] ||
+          (event === "PreToolUse" && matches[0].matcher !== definitions.PreToolUse.matcher) ||
           (["UserPromptSubmit", "PreToolUse"].includes(event) && actual.onFailure !== "block")) {
         throw new Error("Conflicting or unsafe IROKO hook requires manual review: " + event);
       }
@@ -213,7 +214,8 @@ export function contextDoctorCommand(): void {
     hooks = Object.keys(definitions).every((event) => {
       const expected = definitions[event as keyof typeof definitions].hooks[0];
       return (settings.hooks?.[event] || []).some(
-        (entry: {hooks?: Array<{command?: string;args?: string[];onFailure?: string}>}) =>
+        (entry: {matcher?: string;hooks?: Array<{command?: string;args?: string[];onFailure?: string}>}) =>
+          (event !== "PreToolUse" || entry.matcher === definitions.PreToolUse.matcher) &&
           (entry.hooks || []).some((hook) =>
             hook.command === expected.command &&
             hook.args?.[0] === expected.args[0] &&

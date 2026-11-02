@@ -52,6 +52,13 @@ test("project installer preserves unrelated settings and is idempotent", () => {
   assert.equal(data.hooks.UserPromptSubmit.length, 1);
   assert.equal(data.hooks.PostCompact.length, 1);
   assert.equal(data.hooks.UserPromptSubmit[0].hooks[0].onFailure, "block");
+  for (const event of ["UserPromptSubmit", "PreToolUse", "PostCompact"]) {
+    const hook = data.hooks[event].at(-1).hooks[0];
+    assert.equal(hook.command, "node");
+    assert.ok(hook.args?.[0].includes(".iroko/context-gate/"));
+    assert.ok(!hook.args?.[0].includes("node -e"));
+  }
+
   for (const file of ["core.cjs", "session.cjs", "hook.cjs", "verify.cjs", "prepare.cjs", "post-compact.cjs", "ci-check.cjs"]) {
     assert.ok(fs.existsSync(path.join(root, ".iroko/context-gate", file)), file);
   }
@@ -90,4 +97,30 @@ test("existing modified guard runtime is not silently overwritten", () => {
   const result = run(root, "init");
   assert.equal(result.status, 1);
   assert.equal(fs.readFileSync(path.join(runtime, "hook.cjs"), "utf8"), "// user changes");
+});
+
+
+test("incorrect or weakened pre-existing hook wiring is never accepted as active", () => {
+  const root = fixture();
+  const file = path.join(root, ".claude/settings.local.json");
+  fs.writeFileSync(file, JSON.stringify({
+    hooks: {
+      PreToolUse: [{
+        matcher: "Write|Edit", hooks: [{
+          type: "command", command: "node -e malicious",
+          args: ["\${CLAUDE_PROJECT_DIR}/.iroko/context-gate/hook.cjs"]
+        }]
+      }]
+    }
+  }));
+  assert.equal(run(root, "init").status, 1);
+  assert.ok(!fs.existsSync(path.join(root, ".iroko/context-gate")));
+});
+
+test("context doctor detects modified runtime files", () => {
+  const root = fixture();
+  assert.equal(run(root, "init").status, 0);
+  assert.equal(run(root, "doctor").status, 0);
+  fs.appendFileSync(path.join(root, ".iroko/context-gate/hook.cjs"), "\\n// modified\\n");
+  assert.equal(run(root, "doctor").status, 1);
 });

@@ -17,7 +17,14 @@ function check(trustedRoot, candidateRoot) {
   if (base === candidate) throw new Error("Trusted base and candidate must be separate checkouts");
 
   const { policy, raw } = readPolicy(base);
-  const proposed = fs.readFileSync(path.join(candidate, "iroko.context.json"), "utf8");
+  const candidatePolicy = path.join(candidate, "iroko.context.json");
+  // Do not follow symlinks planted in the candidate workspace to pretend
+  // the policy was unchanged (or to read arbitrary runner-side files).
+  if (!fs.lstatSync(candidatePolicy).isFile() ||
+      fs.lstatSync(candidatePolicy).isSymbolicLink()) {
+    throw new Error("Candidate project policy must be an ordinary file, not a symlink");
+  }
+  const proposed = fs.readFileSync(candidatePolicy, "utf8");
   if (proposed !== raw) {
     throw new Error("Candidate policy differs from approved base-branch policy; review separately");
   }

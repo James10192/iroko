@@ -50,9 +50,10 @@ test("project installer preserves unrelated settings and is idempotent", () => {
   assert.deepEqual(data.permissions.deny, ["Bash(sudo *)"]);
   assert.equal(data.hooks.PreToolUse.length, 2);
   assert.equal(data.hooks.UserPromptSubmit.length, 1);
+  assert.equal(data.hooks.SessionStart.length, 1);
   assert.equal(data.hooks.PostCompact.length, 1);
   assert.equal(data.hooks.UserPromptSubmit[0].hooks[0].onFailure, "block");
-  for (const event of ["UserPromptSubmit", "PreToolUse", "PostCompact"]) {
+  for (const event of ["SessionStart", "UserPromptSubmit", "PreToolUse", "PostCompact"]) {
     const hook = data.hooks[event].at(-1).hooks[0];
     assert.equal(hook.command, "node");
     assert.ok(hook.args?.[0].includes(".iroko/context-gate/"));
@@ -67,6 +68,7 @@ test("project installer preserves unrelated settings and is idempotent", () => {
   data = JSON.parse(fs.readFileSync(settingsFile, "utf8"));
   assert.equal(data.hooks.PreToolUse.length, 2);
   assert.equal(data.hooks.UserPromptSubmit.length, 1);
+  assert.equal(data.hooks.SessionStart.length, 1);
   assert.equal(run(root, "doctor").status, 0);
 });
 

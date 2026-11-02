@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [master]
 
+# Superseded branch builds should not occupy runners needed for the HEAD
+# commit. Merge approval always applies to the newest SHA only.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 # CHANGELOG.md is the source of truth for versioning.
 # This workflow blocks the merge/push if any version source disagrees with CHANGELOG.
 

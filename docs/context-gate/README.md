@@ -76,8 +76,11 @@ Until publication, development-branch testing can use:
 Do **not** run `npx @james10192/iroko` expecting unreleased features.
 
 The installer copies the small runtime to `.iroko/context-gate/` and **merges**
-three local hooks into `.claude/settings.local.json`:
+four local hooks into `.claude/settings.local.json`:
 
+- `SessionStart`: automatically injects current approved context on session
+  start, resume, clear or compact; the subsequent pre-tool guard still blocks
+  writes if preparation failed.
 - `UserPromptSubmit`: synchronous context load with `onFailure: block`.
 - `PreToolUse`: scoped tool protection for `Write|Edit|MultiEdit|NotebookEdit|Bash|mcp__.*`,
   also configured `onFailure: block`.
@@ -85,8 +88,8 @@ three local hooks into `.claude/settings.local.json`:
   than a shell command, avoiding shell quoting differences across platforms.
   An existing hook wired without `onFailure: "block"` is refused rather than trusted.
 - `PostCompact`: invalidates the previous write permit after compaction.
-  Because Claude Code does not permit a PostCompact hook to reinject context,
-  the next submitted prompt must reprepare the documents before further writes.
+  `SessionStart(source=compact)` then re-injects approved decisions where
+  supported; otherwise the next `UserPromptSubmit` must reprepare before writes.
 
 Existing unrelated Claude hooks and permissions are preserved. Re-running
 `context init` is idempotent when the runtime files are unchanged. A modified
@@ -191,10 +194,9 @@ and https://code.claude.com/docs/en/hooks.
 
 ## Security and usability limitations
 
-- Context compaction can remove earlier instructions from the model's active
-  window; IROKO revokes the current permit on `PostCompact` so that it cannot
-  keep writing on that stale assumption. This intentionally interrupts work
-  until the next preflight-capable prompt.
+- Context compaction can remove earlier instructions. `PostCompact`
+  invalidates the previous permit and Claude Code's `SessionStart` re-injects
+  context after compacting; writes remain blocked if that refresh fails.
 - Hook decisions are *not* OS-level filesystem permissions. Never claim a
   complete security guarantee without a controlled runner/sandbox where
   alternative write paths are unavailable.
@@ -217,3 +219,13 @@ and https://code.claude.com/docs/en/hooks.
 prototype only, not experimental proof that guided agents make better software.
 For COM6300, compare agent conditions on separate labeled project decisions
 with controlled tasks and independent outcome checks.
+
+### Scope of supported environments
+
+The integration has been exercised in Node-based CI fixtures on Linux. Direct
+`node` hooks with `args` reduce shell-portability risk but **do not replace
+real end-to-end testing** of Claude Code and subagents on Windows, macOS and
+Linux. A supported `onFailure: block` feature requires Claude Code v2.1.295+.
+If Claude Code is absent from the installation environment, `iroko context
+init` prints an explicit compatibility warning and `context doctor` reports
+`claudeVersionSupport: unverified`.

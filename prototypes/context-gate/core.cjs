@@ -19,18 +19,45 @@ function relativePath(root, candidate) {
     throw new Error("A non-empty file path is required");
   }
   const absolute = path.resolve(root, candidate);
-  const relative = path.relative(root, absolute);
+
+  // macOS may expose the same project through /var and /private/var.
+  // Resolve only the nearest existing ancestor, then reconstruct missing
+  // path segments. Never infer in-scope status by raw string prefix alone.
+  let ancestor = absolute;
+  const missing = [];
+  while (!fs.existsSync(ancestor)) {
+    const parent = path.dirname(ancestor);
+    if (parent === ancestor) throw new Error("Cannot locate a valid ancestor");
+    missing.unshift(path.basename(ancestor));
+    ancestor = parent;
+  }
+  const canonical = path.join(fs.realpathSync(ancestor), ...missing);
+  const relative = path.relative(root, canonical);
   if (!relative || relative === ".." || relative.startsWith(".." + path.sep) || path.isAbsolute(relative)) {
     throw new Error("Path escapes project root or points to its root");
   }
 
-  // Refuse symlinks, including symlinked parents, to prevent path-scope escape.
-  let current = root;
-  for (const segment of relative.split(path.sep)) {
-    current = path.join(current, segment);
-    if (fs.existsSync(current) && fs.lstatSync(current).isSymbolicLink()) {
-      throw new Error("Symlink path not permitted: " + relative);
+  function rejectSymlinks(base, rel) {
+    let current = base;
+    for (const segment of rel.split(path.sep)) {
+      current = path.join(current, segment);
+      try {
+        if (fs.lstatSync(current).isSymbolicLink()) {
+          throw new Error("Symlink path not permitted: " + rel);
+        }
+      } catch (error) {
+        if (error.code !== "ENOENT") throw error;
+      }
     }
+  }
+  // Reject links in both the canonical spelling and the original spelling
+  // (a path alias can otherwise hide an in-project symlink).
+  rejectSymlinks(root, relative);
+  const rawProject = path.resolve(process.env.CLAUDE_PROJECT_DIR || root);
+  const rawRelative = path.relative(rawProject, absolute);
+  if (rawRelative && rawRelative !== ".." &&
+      !rawRelative.startsWith(".." + path.sep) && !path.isAbsolute(rawRelative)) {
+    rejectSymlinks(rawProject, rawRelative);
   }
   return relative.split(path.sep).join("/");
 }

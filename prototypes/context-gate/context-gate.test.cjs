@@ -277,3 +277,30 @@ test("safe scoped reads are allowed but secret and absolute file reads are denie
     assert.equal(hook(f.env, "Bash", {command}).status, 2, command);
   }
 });
+
+
+test("trusted-base CI checker rejects candidate policy edits and architecture violations", () => {
+  const a = fixture();
+  const b = fixture();
+  const cli = "ci-check.cjs";
+  const runCI = () => run(cli, a.env, [a.root, b.root]);
+  assert.equal(runCI().status, 0);
+  fs.writeFileSync(path.join(b.root, "src/core/bad.ts"),
+    'import vendor from "@crm-vendor/sdk";');
+  const violation = runCI();
+  assert.equal(violation.status, 1);
+  assert.match(violation.stderr, /no-crm-sdk-in-core/);
+  fs.rmSync(path.join(b.root, "src/core/bad.ts"));
+  const policyFile = path.join(b.root, "iroko.context.json");
+  const policy = JSON.parse(fs.readFileSync(policyFile, "utf8"));
+  policy.forbiddenPatterns = [];
+  fs.writeFileSync(policyFile, JSON.stringify(policy));
+  const tampered = runCI();
+  assert.equal(tampered.status, 1);
+  assert.match(tampered.stderr, /Candidate policy differs/);
+});
+
+test("trusted-base checker refuses to evaluate itself as a candidate checkout", () => {
+  const f = fixture();
+  assert.equal(run("ci-check.cjs", f.env, [f.root, f.root]).status, 1);
+});

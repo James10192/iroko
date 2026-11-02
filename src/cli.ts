@@ -8,6 +8,7 @@ import { updateCommand } from "./commands/update.js";
 import { aboutCommand } from "./commands/about.js";
 import { doctorCommand } from "./commands/doctor.js";
 import { uninstallCommand } from "./commands/uninstall.js";
+import { contextInitCommand, contextDoctorCommand } from "./lib/context-installer.js";
 
 // Check for updates silently on every run (throttled to 1×/24h).
 checkForUpdates();
@@ -26,6 +27,18 @@ program
   .option("--full", "install everything, including create-pr and create-issue")
   .option("--yes", "non-interactive: install the selected pack without prompts")
   .action((opts) => initCommand(opts));
+
+const context = program
+  .command("context")
+  .description("Opt-in project-specific context gate");
+
+context.command("init")
+  .description("Install a scoped local guard for a project with an approved context policy")
+  .action(contextInitCommand);
+
+context.command("doctor")
+  .description("Check project-local context guard installation")
+  .action(contextDoctorCommand);
 
 program
   .command("list")

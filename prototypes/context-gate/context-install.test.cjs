@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const { spawnSync } = require("node:child_process");
+const { spawnSync, execFileSync } = require("node:child_process");
 
 const cli = path.resolve(__dirname, "../../dist/cli.js");
 
@@ -21,6 +21,10 @@ function fixture() {
       id: "no-sdk-core", pathPrefix: "src/core/", literal: "@vendor/sdk"
     }]
   }));
+  execFileSync("git", ["init", "-q"], {cwd:root});
+  execFileSync("git", ["add", "-A"], {cwd:root});
+  execFileSync("git", ["-c", "user.name=IROKO", "-c", "user.email=tests@invalid.example",
+    "commit", "-qm", "fixture"], {cwd:root});
   return root;
 }
 

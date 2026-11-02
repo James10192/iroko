@@ -25,4 +25,6 @@ jobs:
           node --check prototypes/context-gate/core.cjs
           node --check prototypes/context-gate/prepare.cjs
           node --check prototypes/context-gate/hook.cjs
+          node --check prototypes/context-gate/session.cjs
+          node --check prototypes/context-gate/post-compact.cjs
           node --check prototypes/context-gate/verify.cjs

@@ -237,3 +237,22 @@ export function contextDoctorCommand(): void {
   if (!Object.values(status).every(Boolean) ||
       claudeVersionSupport === "unsupported") process.exitCode = 1;
 }
+
+export function contextVerifyCommand(): void {
+  const project = resolve(process.cwd());
+  try {
+    verifyPolicy(project);
+    const verifier = join(project, ".iroko", "context-gate", "verify.cjs");
+    if (!existsSync(verifier)) {
+      throw new Error("Context verifier not installed. Run iroko context init first.");
+    }
+    execFileSync(process.execPath, [verifier], {
+      cwd: project, timeout: 30_000,
+      env: {...process.env, CLAUDE_PROJECT_DIR: project},
+      stdio: "inherit",
+    });
+  } catch (error) {
+    console.error("IROKO context verification failed: " + String(error));
+    process.exitCode = 1;
+  }
+}

@@ -1,4 +1,5 @@
 import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -53,6 +54,14 @@ function verifyPolicy(project: string): void {
   }
   for (const value of policy.sources) validatePath(project, value, true);
   for (const value of policy.writeScopes) validatePath(project, value, false);
+  try {
+    const head = execFileSync("git", ["rev-parse", "HEAD"], {
+      cwd: project, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"]
+    }).trim();
+    if (!/^[a-f0-9]{40,64}$/i.test(head)) throw new Error("Missing commit");
+  } catch {
+    throw new Error("Context Gate requires a Git repository with at least one commit");
+  }
 }
 
 function hookCommand(script: string): string {

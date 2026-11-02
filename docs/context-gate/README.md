@@ -69,6 +69,7 @@ this alpha:
 ```sh
 iroko context init
 iroko context doctor
+iroko context verify
 ```
 
 Until publication, development-branch testing can use:
@@ -110,6 +111,13 @@ node .iroko/context-gate/verify.cjs
 
 This verifier checks a deliberately limited, deterministic rule type. Passing
 it does not mean the project architecture is compliant in every respect.
+
+The CLI command `iroko context verify` runs deterministic checks against
+the current project and exits nonzero on missing required paths or configured
+forbidden literals. The agent may also run the fixed read-only command
+`node .iroko/context-gate/verify.cjs` through its guarded Bash tool;
+arbitrary build and test shell commands remain blocked. Both results are
+independent of claims made by the model.
 
 The manual `prepare.cjs` prints a diagnostic snapshot. It intentionally
 does not give a live session a write permit unless explicitly bound to a
@@ -229,3 +237,8 @@ Linux. A supported `onFailure: block` feature requires Claude Code v2.1.295+.
 If Claude Code is absent from the installation environment, `iroko context
 init` prints an explicit compatibility warning and `context doctor` reports
 `claudeVersionSupport: unverified`.
+
+**Local Git hygiene:** the installer creates `.iroko/context-gate/`.
+Review whether to exclude `.iroko/` from your project Git history, or to
+commit a protected copy of the checker deliberately if using the trusted CI
+example. Do not accidentally publish unreviewed local configuration.

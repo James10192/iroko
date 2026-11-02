@@ -110,12 +110,22 @@ const definitions = {
   },
 };
 
+function ensureNotSymlink(file: string): void {
+  if (existsSync(file) && lstatSync(file).isSymbolicLink()) {
+    throw new Error("Refusing symlinked IROKO/Claude configuration target: " + file);
+  }
+}
+
 function readSettings(filename: string): Record<string, any> {
+  ensureNotSymlink(filename);
   if (!existsSync(filename)) return {};
   const settings = JSON.parse(readFileSync(filename, "utf8"));
   if (!settings || typeof settings !== "object" || Array.isArray(settings) ||
       (settings.hooks && (typeof settings.hooks !== "object" || Array.isArray(settings.hooks)))) {
     throw new Error("Existing Claude settings are not a valid JSON object");
+  }
+  if (settings.disableAllHooks === true) {
+    throw new Error("Claude settings currently disable all hooks; context enforcement cannot run");
   }
   for (const event of Object.keys(definitions)) {
     if (settings.hooks?.[event] && !Array.isArray(settings.hooks[event])) {
@@ -165,6 +175,7 @@ function installFiles(source: string, target: string): void {
   // Validate every existing target before copying any file.
   for (const file of files) {
     const destination = join(target, file);
+    ensureNotSymlink(destination);
     if (existsSync(destination) &&
         !readFileSync(destination).equals(readFileSync(join(source, file)))) {
       throw new Error("Refusing to overwrite modified IROKO file: " + destination);
@@ -187,6 +198,10 @@ export function contextInitCommand(): void {
     verifyPolicy(project);
     const target = join(project, ".iroko", "context-gate");
     const settingsFile = join(project, ".claude", "settings.local.json");
+    ensureNotSymlink(join(project, ".iroko"));
+    ensureNotSymlink(target);
+    ensureNotSymlink(join(project, ".claude"));
+    ensureNotSymlink(settingsFile);
     const source = sourceDirectory();
     const settings = readSettings(settingsFile);
     const changed = mergeHooks(settings);

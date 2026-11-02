@@ -102,6 +102,9 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Exercise opt-in context installer, configuration preservation and idempotence
+        run: node --test prototypes/context-gate/context-install.test.cjs
+
       - name: Exercise the CLI in a temporary HOME
         run: |
           set -e
@@ -199,7 +202,7 @@ jobs:
           tarball=$(npm pack --silent)
           mkdir -p /tmp/pack-smoke
           tar -xzf "$tarball" -C /tmp/pack-smoke
-          for dir in rules skills agents hooks templates dist; do
+          for dir in rules skills agents hooks templates dist prototypes/context-gate; do
             if [ ! -d "/tmp/pack-smoke/package/$dir" ]; then
               echo "::error::'$dir/' is missing from the npm tarball — check the 'files' field in package.json."
               exit 1

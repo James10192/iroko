@@ -242,3 +242,20 @@ test("required scan directory missing fails the independent verifier", () => {
   assert.equal(checked.status, 1);
   assert.match(checked.stderr, /Required policy scan directory/);
 });
+
+
+test("after context compaction, stale authorizations cannot permit edits", () => {
+  const f = fixture();
+  const preflight = () => run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit", prompt: "Work"
+  }));
+  const target = {file_path:path.join(f.root,"src/integrations/new.ts")};
+  assert.equal(preflight().status, 0);
+  assert.equal(hook(f.env, "Write", target).status, 0);
+  assert.equal(run("post-compact.cjs", f.env, [], JSON.stringify({
+    session_id:"fixture-session", hook_event_name:"PostCompact", trigger:"auto"
+  })).status, 0);
+  assert.equal(hook(f.env, "Write", target).status, 2);
+  assert.equal(preflight().status, 0);
+  assert.equal(hook(f.env, "Write", target).status, 0);
+});

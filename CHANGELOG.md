@@ -9,6 +9,10 @@ removals/renames and CLI interface changes are MAJOR.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Release-guard manifest audit**: check the actual manifest entries rather than a stale hardcoded count of 24, so the existing 27-component manifest is checked correctly.
+
 ### Added
 
 - **Experimental Context Gate proof of concept (issue #12)**: opt-in, project-scoped preparation of document evidence, expiring source/commit fingerprint, a fail-closed Claude Code PreToolUse write guard, deterministic project-rule checks, and negative-path tests in a dedicated GitHub Actions workflow. Research prototype only; not installed or enabled by the v4 CLI, not a security sandbox, and no claim of guaranteed model understanding.

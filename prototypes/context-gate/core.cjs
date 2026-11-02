@@ -64,11 +64,13 @@ function readPolicy(root) {
 
 function gitHead(root) {
   try {
-    return execFileSync("git", ["rev-parse", "HEAD"], {
+    const head = execFileSync("git", ["rev-parse", "HEAD"], {
       cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"]
     }).trim();
+    if (!/^[a-f0-9]{40,64}$/i.test(head)) throw new Error("Invalid Git HEAD");
+    return head;
   } catch {
-    return null;
+    throw new Error("Context gate requires a Git repository with at least one commit");
   }
 }
 

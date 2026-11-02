@@ -154,3 +154,22 @@ test("the context verify CLI exits unsuccessfully on a broken project decision",
   assert.equal(result.status, 1);
   assert.match(result.stderr + result.stdout, /no-sdk-core/);
 });
+
+
+test("a matching command with narrowed tool matcher is NOT an active write guard", () => {
+  const root = fixture();
+  const file = path.join(root, ".claude/settings.local.json");
+  fs.writeFileSync(file, JSON.stringify({
+    hooks: { PreToolUse: [{
+      matcher: "Write", hooks: [{
+        type: "command", command: "node",
+        args: ["$" + "{CLAUDE_PROJECT_DIR}/.iroko/context-gate/hook.cjs"],
+        onFailure: "block"
+      }]
+    }] }
+  }));
+  const result = run(root, "init");
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /unsafe IROKO hook/);
+  assert.ok(!fs.existsSync(path.join(root, ".iroko/context-gate")));
+});

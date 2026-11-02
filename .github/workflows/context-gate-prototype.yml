@@ -9,6 +9,12 @@ on:
 permissions:
   contents: read
 
+# Every push supersedes earlier checks for this PR. Avoid wasting scarce
+# Windows/macOS runners and accidentally treating old green results as current.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   prototype-tests:
     name: Context gate negative and positive tests

@@ -132,7 +132,8 @@ test("symlinks and paths escaping the project are rejected", () => {
     file_path: path.join(f.root, "..", "escape.ts")
   }).status, 2);
   const outside = fs.mkdtempSync(path.join(os.tmpdir(), "iroko-outside-"));
-  fs.symlinkSync(outside, path.join(f.root, "src/integrations/link"), "dir");
+  fs.symlinkSync(outside, path.join(f.root, "src/integrations/link"),
+    process.platform === "win32" ? "junction" : "dir");
   assert.equal(hook(f.env, "Write", {
     file_path: path.join(f.root, "src/integrations/link/escape.ts")
   }).status, 2);
@@ -320,4 +321,26 @@ test("SessionStart reinjects project context after a compaction", () => {
   assert.equal(resumed.status,0);
   assert.match(resumed.stdout,/Use provider adapters/);
   assert.equal(hook(f.env,"Write",target).status, 0);
+});
+
+
+test("base-branch PR verification refuses symlinked candidate policy and scan roots", () => {
+  const trusted = fixture();
+  const candidate = fixture();
+  const policyFile = path.join(candidate.root, "iroko.context.json");
+  const realPolicy = path.join(candidate.root, "external-policy.json");
+  fs.renameSync(policyFile, realPolicy);
+  fs.symlinkSync(realPolicy, policyFile, "file");
+  let result = run("ci-check.cjs", trusted.env, [trusted.root, candidate.root]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /ordinary file, not a symlink/);
+  fs.rmSync(policyFile);
+  fs.renameSync(realPolicy, policyFile);
+  const target = path.join(candidate.root, "src/core");
+  fs.rmSync(target, { recursive: true });
+  fs.symlinkSync(path.join(trusted.root,"src/core"), target,
+    process.platform === "win32" ? "junction" : "dir");
+  result = run("ci-check.cjs", trusted.env, [trusted.root, candidate.root]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Symlink|symlink/i);
 });

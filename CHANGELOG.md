@@ -15,7 +15,7 @@ removals/renames and CLI interface changes are MAJOR.
 
 ### Added
 
-- **Experimental Context Gate (issue #12)**: per-project opt-in CLI commands `iroko context init` and `iroko context doctor`; automatic `UserPromptSubmit` evidence injection with session-bound and expiring source/commit fingerprints; scoped fail-closed `PreToolUse` write guard; independent deterministic policy checks; updated npm packaging, installer smoke and negative-path CI. **Not enabled by regular `iroko init`**, no npm publication yet, not an OS sandbox and no claim of guaranteed model understanding.
+- **Experimental Context Gate (issue #12)**: per-project opt-in CLI commands `iroko context init` and `iroko context doctor`; automatic per-prompt context injection, session-bound source/commit fingerprints, fail-closed scoped write hooks, `PostCompact` invalidation, protected guard paths, secret-source screening, Git prerequisite, independent deterministic rules, issue intake template, installer smoke tests and bypass-focused CI. **Not enabled by regular `iroko init`**, no npm publication yet, not an OS sandbox and no claim of guaranteed model understanding.
 
 ## [4.0.0] — 2026-08-25
 

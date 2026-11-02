@@ -111,7 +111,11 @@ test("shell escape attempts and unknown tool classes are denied", () => {
     "git status; touch /tmp/written",
     "cat README.md $(touch /tmp/written)",
     "pnpm install",
-    "echo hacked > src/core/item.ts"
+    "echo hacked > src/core/item.ts",
+    "cat .env",
+    "cat ../credentials.json",
+    "rg secret .env",
+    "cat /etc/passwd"
   ]) {
     assert.equal(hook(f.env, "Bash", { command }).status, 2, command);
   }
@@ -258,4 +262,18 @@ test("after context compaction, stale authorizations cannot permit edits", () =>
   assert.equal(hook(f.env, "Write", target).status, 2);
   assert.equal(preflight().status, 0);
   assert.equal(hook(f.env, "Write", target).status, 0);
+});
+
+
+test("safe scoped reads are allowed but secret and absolute file reads are denied", () => {
+  const f = fixture();
+  fs.writeFileSync(path.join(f.root, ".env"), "PASSWORD=sensitive");
+  assert.equal(hook(f.env, "Bash", {command:"cat docs/ADR.md"}).status, 0);
+  assert.equal(hook(f.env, "Bash", {command:"rg provider docs/ADR.md"}).status, 0);
+  for (const command of [
+    "cat .env", "cat /etc/passwd", "cat ../secrets.txt",
+    "rg password .env", "rg token /etc"
+  ]) {
+    assert.equal(hook(f.env, "Bash", {command}).status, 2, command);
+  }
 });

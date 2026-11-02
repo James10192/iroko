@@ -102,7 +102,7 @@ const definitions = {
     hooks: [hookDefinition("session.cjs")],
   },
   PreToolUse: {
-    matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash|mcp__.*",
+    matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell|Workflow|mcp__.*",
     hooks: [hookDefinition("hook.cjs")],
   },
   PostCompact: {

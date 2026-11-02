@@ -148,7 +148,7 @@ function mergeHooks(settings: Record<string, any>): boolean {
       const actual = matches[0].hook as any;
       if (actual.command !== "node" ||
           actual.args?.[0] !== desired.hooks[0].args[0] ||
-          (event !== "PostCompact" && actual.onFailure !== "block")) {
+          (["UserPromptSubmit", "PreToolUse"].includes(event) && actual.onFailure !== "block")) {
         throw new Error("Conflicting or unsafe IROKO hook requires manual review: " + event);
       }
     } else {
@@ -217,7 +217,7 @@ export function contextDoctorCommand(): void {
           (entry.hooks || []).some((hook) =>
             hook.command === expected.command &&
             hook.args?.[0] === expected.args[0] &&
-            (event === "PostCompact" || hook.onFailure === "block")
+            (!["UserPromptSubmit", "PreToolUse"].includes(event) || hook.onFailure === "block")
           )
       );
     });

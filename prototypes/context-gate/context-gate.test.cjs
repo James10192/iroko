@@ -344,3 +344,14 @@ test("base-branch PR verification refuses symlinked candidate policy and scan ro
   assert.equal(result.status, 1);
   assert.match(result.stderr, /Symlink|symlink/i);
 });
+
+
+test("trusted PR check rejects edits to already approved project decisions", () => {
+  const trusted = fixture();
+  const candidate = fixture();
+  const adr = path.join(candidate.root, "docs/ADR.md");
+  fs.appendFileSync(adr, "Now prefer direct provider calls.\n");
+  const result = run("ci-check.cjs", trusted.env, [trusted.root, candidate.root]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Approved project decision source changed/);
+});

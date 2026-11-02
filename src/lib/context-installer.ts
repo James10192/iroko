@@ -16,11 +16,14 @@ function sourceDirectory(): string {
 }
 
 function validatePath(root: string, input: unknown, source: boolean): string {
-  if (typeof input !== "string" || !input.trim() || isAbsolute(input) ||
-      input.includes("\\") || input.split("/").some((part) => part === ".." || part === "." || !part)) {
+  if (typeof input !== "string" || !input.trim()) {
     throw new Error("Invalid relative project path: " + String(input));
   }
-  const relativePath = input.endsWith("/") ? input.slice(0, -1) : input;
+  const relativePath = input.endsWith("/") && !source ? input.slice(0, -1) : input;
+  if (isAbsolute(input) || input.includes("\\") ||
+      relativePath.split("/").some((part) => part === ".." || part === "." || !part)) {
+    throw new Error("Invalid relative project path: " + String(input));
+  }
   if (!relativePath || relative(root, resolve(root, relativePath)).startsWith("..")) {
     throw new Error("Project path escapes root: " + input);
   }

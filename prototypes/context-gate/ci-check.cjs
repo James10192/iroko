@@ -29,6 +29,22 @@ function check(trustedRoot, candidateRoot) {
     throw new Error("Candidate policy differs from approved base-branch policy; review separately");
   }
 
+  // A PR changing an ADR/contract would otherwise keep the same policy file
+  // while quietly changing the instructions the next agent receives.
+  for (const rel of policy.sources) {
+    const approved = path.join(base, rel);
+    const proposedSource = path.join(candidate, rel);
+    const baseStat = fs.lstatSync(approved);
+    const candidateStat = fs.lstatSync(proposedSource);
+    if (!baseStat.isFile() || baseStat.isSymbolicLink() ||
+        !candidateStat.isFile() || candidateStat.isSymbolicLink()) {
+      throw new Error("Approved context source must remain a regular file: " + rel);
+    }
+    if (!fs.readFileSync(approved).equals(fs.readFileSync(proposedSource))) {
+      throw new Error("Approved project decision source changed; needs separate reviewed policy update: " + rel);
+    }
+  }
+
   const violations = verify(candidate, policy);
   if (violations.length) {
     throw new Error("Approved project policy violations:\n" + violations.join("\n"));

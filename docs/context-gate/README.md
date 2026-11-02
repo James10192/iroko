@@ -171,9 +171,12 @@ node trusted/.iroko/context-gate/ci-check.cjs trusted candidate
 
 The checker reads the approved `iroko.context.json` and the checker code
 **only** from the base checkout. The candidate's code is read as data, never
-`require()`d, built or run. It rejects any candidate attempting to weaken
-or remove the approved policy, then checks the candidate source tree against
-the protected base policy using the available deterministic literal rules.
+`require()`d, built or run. It rejects a candidate that changes the approved policy **or any
+approved ADR/source document**, then checks candidate code against the
+protected base policy using deterministic rules. Policy or ADR updates
+should be reviewed in a separate, explicitly approved change before
+application code relies on them. Symlinked policy files and scanner paths
+are refused.
 
 A commented example workflow is provided in
 `prototypes/context-gate/examples/approved-policy-workflow.yml`. It uses
@@ -183,14 +186,24 @@ and *no untrusted code execution*. It must not be casually modified to run
 commands: these would introduce a serious "pwn request" security risk. The
 candidate is untrusted; treat it strictly as passive data.
 
+**GitHub Actions policy note (November 2026):** GitHub's new default
+policy for `pull_request_target` in affected public repositories is in
+evaluation mode, with enforcement announced for December 2, 2026. Prefer
+`pull_request` when high-trust base execution is unnecessary, and review
+the repository's applicable Actions event policy before adopting this example.
+A required check that never runs can block all merges; never change the
+ruleset before verifying a successful first execution.
+
 The example assumes the checker and its dependencies have been deliberately
 committed and reviewed on the protected target repository's base branch.
 Running `iroko context init` locally alone does not install the workflow or
 enable mandatory PR protection.
 
 For a genuine gate, an administrator must configure the GitHub ruleset to
-require **IROKO approved-project-policy** (matching the actual check name)
-and restrict bypass permissions. Until then, CI is advisory. An issue can
+require **IROKO approved-project-policy** (matching the actual check name),
+the chosen release-guard checks, and any required Windows/macOS context-gate
+matrix checks, and restrict bypass permissions. Require PR reviews and
+prevent unreviewed workflow/policy modifications. Until then, CI is advisory. An issue can
 trigger preparatory research but never attests to compliance by itself.
 
 This verifier is still a **literal rule checker**, not an architecture-aware
@@ -242,3 +255,17 @@ init` prints an explicit compatibility warning and `context doctor` reports
 Review whether to exclude `.iroko/` from your project Git history, or to
 commit a protected copy of the checker deliberately if using the trusted CI
 example. Do not accidentally publish unreviewed local configuration.
+
+## Deployment decision record
+
+This branch deliberately changes only the **IROKO project**. It neither
+installs hooks in a consumer repository nor installs a required status check
+in GitHub settings. A production rollout is a separate decision requiring
+(1) a review of the target project's actual ADRs and scope, (2) a rehearsal
+with a disposable repository and a real supported Claude Code session,
+(3) independent verification of build/test execution in a restricted
+runner, and (4) a GitHub administrator's approval of branch rules.
+
+Do not equate a locally passing hook unit test with a sandbox or with
+an AI model understanding the architecture. CI tests here are evidence
+of *mechanism behavior*, not of better code quality or research outcomes.

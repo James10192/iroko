@@ -64,21 +64,28 @@ function verifyPolicy(project: string): void {
   }
 }
 
-function hookCommand(script: string): string {
-  // Prefer CLAUDE_PROJECT_DIR over a working-directory-dependent script path.
-  return `node -e "require(require('node:path').join(process.env.CLAUDE_PROJECT_DIR, '.iroko/context-gate/${script}'))"`;
+// Exec-form hooks avoid shell quoting differences across Windows, macOS and Linux.
+// CLAUDE_PROJECT_DIR is expanded by Claude Code in the hook argument.
+function hookDefinition(script: string, block = true) {
+  return {
+    type: "command",
+    command: "node",
+    args: [`\${CLAUDE_PROJECT_DIR}/.iroko/context-gate/${script}`],
+    timeout: 20,
+    ...(block ? { onFailure: "block" } : {}),
+  };
 }
 
 const definitions = {
   UserPromptSubmit: {
-    hooks: [{ type: "command", command: hookCommand("session.cjs"), timeout: 20, onFailure: "block" }],
+    hooks: [hookDefinition("session.cjs")],
   },
   PreToolUse: {
     matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash|mcp__.*",
-    hooks: [{ type: "command", command: hookCommand("hook.cjs"), timeout: 10, onFailure: "block" }],
+    hooks: [hookDefinition("hook.cjs")],
   },
   PostCompact: {
-    hooks: [{ type: "command", command: hookCommand("post-compact.cjs"), timeout: 10 }],
+    hooks: [hookDefinition("post-compact.cjs", false)],
   },
 };
 
@@ -103,15 +110,27 @@ function mergeHooks(settings: Record<string, any>): boolean {
   for (const event of Object.keys(definitions) as Array<keyof typeof definitions>) {
     const existing = (settings.hooks[event] || []) as Array<{hooks?: Array<{command?: string}>}>;
     const desired = definitions[event];
-    const command = desired.hooks[0].command;
     const signature = ".iroko/context-gate/" +
       (event === "PreToolUse" ? "hook.cjs" :
        event === "PostCompact" ? "post-compact.cjs" : "session.cjs");
-    const commands = existing.flatMap((entry) => (entry.hooks || []).map((hook) => hook.command || ""));
-    if (!commands.includes(command)) {
-      if (commands.some((candidate) => candidate.includes(signature))) {
-        throw new Error("Conflicting IROKO hook requires manual review: " + event);
+    const matches = existing.flatMap((entry) => (entry.hooks || []).map(
+      (hook) => ({
+        match: String(hook.command || "").includes(signature) ||
+          (Array.isArray((hook as any).args) &&
+           (hook as any).args.some((arg: unknown) =>
+             typeof arg === "string" && arg.includes(signature))),
+        hook
+      })
+    )).filter((v) => v.match);
+    if (matches.length > 1) throw new Error("Duplicate IROKO hooks: " + event);
+    if (matches.length === 1) {
+      const actual = matches[0].hook as any;
+      if (actual.command !== "node" ||
+          actual.args?.[0] !== desired.hooks[0].args[0] ||
+          (event !== "PostCompact" && actual.onFailure !== "block")) {
+        throw new Error("Conflicting or unsafe IROKO hook requires manual review: " + event);
       }
+    } else {
       existing.push(desired);
       changed = true;
     }
@@ -163,13 +182,17 @@ export function contextDoctorCommand(): void {
   let hooks = false;
   try {
     const settings = readSettings(settingsFile);
-    hooks = Object.keys(definitions).every((event) =>
-      (settings.hooks?.[event] || []).some((entry: {hooks?: Array<{command?: string}>}) =>
-        (entry.hooks || []).some((hook) =>
-          hook.command === definitions[event as keyof typeof definitions].hooks[0].command
-        )
-      )
-    );
+    hooks = Object.keys(definitions).every((event) => {
+      const expected = definitions[event as keyof typeof definitions].hooks[0];
+      return (settings.hooks?.[event] || []).some(
+        (entry: {hooks?: Array<{command?: string;args?: string[];onFailure?: string}>}) =>
+          (entry.hooks || []).some((hook) =>
+            hook.command === expected.command &&
+            hook.args?.[0] === expected.args[0] &&
+            (event === "PostCompact" || hook.onFailure === "block")
+          )
+      );
+    });
   } catch { /* diagnostic only */ }
   let policy = false;
   try { verifyPolicy(project); policy = true; }

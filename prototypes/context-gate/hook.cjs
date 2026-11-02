@@ -15,7 +15,20 @@ function safeReadOnlyBash(command) {
   if (/^node\s+prototypes\/context-gate\/prepare\.cjs\s+[A-Za-z0-9_.:#-]{3,80}$/.test(command)) {
     return true;
   }
-  return /^(?:pwd|ls|cat|head|tail|rg|grep|git\s+(?:status|diff|show|log|rev-parse))(?:\s+[^;&|><\x60$(){}\\]+)?$/.test(command);
+  // Exact read-only forms only. Never accept arbitrary flags (--output, --pre,
+  // shell functions, subshells) or chained commands as "read only".
+  const readOnly = [
+    /^pwd$/,
+    /^ls(?: -la)?$/,
+    /^git status(?: --short)?$/,
+    /^git diff(?: --stat| --name-only)?$/,
+    /^git rev-parse HEAD$/,
+    /^git log -1 --oneline$/,
+    /^git show --stat$/,
+    /^cat [A-Za-z0-9_./-]+$/,
+    /^rg [A-Za-z0-9_./-]+ [A-Za-z0-9_./-]+$/
+  ];
+  return readOnly.some((pattern) => pattern.test(command));
 }
 
 function evaluate(event) {

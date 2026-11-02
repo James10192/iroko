@@ -8,8 +8,8 @@ const { projectRoot, readPolicy, relativePath } = require("./core.cjs");
 
 const DEFAULT_EXTENSIONS = [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".php", ".py"];
 
-function verify(root) {
-  const { policy } = readPolicy(root);
+function verify(root, trustedPolicy = null) {
+  const policy = trustedPolicy || readPolicy(root).policy;
   const rules = policy.forbiddenPatterns || [];
   if (!Array.isArray(rules)) throw new Error("forbiddenPatterns must be an array");
   const violations = [];

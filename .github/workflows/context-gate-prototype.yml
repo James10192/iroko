@@ -28,3 +28,4 @@ jobs:
           node --check prototypes/context-gate/session.cjs
           node --check prototypes/context-gate/post-compact.cjs
           node --check prototypes/context-gate/verify.cjs
+          node --check prototypes/context-gate/ci-check.cjs

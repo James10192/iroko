@@ -46,8 +46,9 @@ test("project installer preserves unrelated settings and is idempotent", () => {
   assert.deepEqual(data.permissions.deny, ["Bash(sudo *)"]);
   assert.equal(data.hooks.PreToolUse.length, 2);
   assert.equal(data.hooks.UserPromptSubmit.length, 1);
+  assert.equal(data.hooks.PostCompact.length, 1);
   assert.equal(data.hooks.UserPromptSubmit[0].hooks[0].onFailure, "block");
-  for (const file of ["core.cjs", "session.cjs", "hook.cjs", "verify.cjs", "prepare.cjs"]) {
+  for (const file of ["core.cjs", "session.cjs", "hook.cjs", "verify.cjs", "prepare.cjs", "post-compact.cjs"]) {
     assert.ok(fs.existsSync(path.join(root, ".iroko/context-gate", file)), file);
   }
   const second = run(root, "init");

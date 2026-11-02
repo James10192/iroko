@@ -24,7 +24,9 @@ function verify(root) {
       : rule.pathPrefix + "/";
     const rel = relativePath(root, prefix + "_scope_check_");
     const directory = path.join(root, rel, "..");
-    if (!fs.existsSync(directory)) continue;
+    if (!fs.existsSync(directory)) {
+      throw new Error("Required policy scan directory is missing: " + prefix);
+    }
 
     function visit(target) {
       if (fs.lstatSync(target).isSymbolicLink()) {

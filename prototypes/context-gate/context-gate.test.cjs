@@ -120,6 +120,10 @@ test("shell escape attempts and unknown tool classes are denied", () => {
     assert.equal(hook(f.env, "Bash", { command }).status, 2, command);
   }
   assert.equal(hook(f.env, "mcp__unclassified__write", {}).status, 2);
+  assert.equal(hook(f.env, "PowerShell", {
+    command: "Set-Content -Path src/core/test.ts -Value unsafe"
+  }).status, 2);
+  assert.equal(hook(f.env, "Workflow", {name: "untrusted"}).status, 2);
 });
 
 test("symlinks and paths escaping the project are rejected", () => {

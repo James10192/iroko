@@ -34,8 +34,9 @@ semantic architectural violation.
 
 ## Install locally (after the alpha is merged and released)
 
-**Prerequisites:** Node >=20, a Git repository with at least one commit,
-reviewed architectural documents and a carefully prepared
+**Prerequisites:** Node >=20, **Claude Code v2.1.295 or later** for reliable
+fail-closed `onFailure: "block"` hooks, a Git repository with at least one
+commit, reviewed architectural documents and a carefully prepared
 `iroko.context.json` file.
 
 The configuration is per-project, **not** a global rule and does not invent
@@ -75,11 +76,14 @@ Until publication, development-branch testing can use:
 Do **not** run `npx @james10192/iroko` expecting unreleased features.
 
 The installer copies the small runtime to `.iroko/context-gate/` and **merges**
-two local hooks into `.claude/settings.local.json`:
+three local hooks into `.claude/settings.local.json`:
 
 - `UserPromptSubmit`: synchronous context load with `onFailure: block`.
 - `PreToolUse`: scoped tool protection for `Write|Edit|MultiEdit|NotebookEdit|Bash|mcp__.*`,
   also configured `onFailure: block`.
+- Hooks are invoked using the direct `node` executable and arguments rather
+  than a shell command, avoiding shell quoting differences across platforms.
+  An existing hook wired without `onFailure: "block"` is refused rather than trusted.
 - `PostCompact`: invalidates the previous write permit after compaction.
   Because Claude Code does not permit a PostCompact hook to reinject context,
   the next submitted prompt must reprepare the documents before further writes.
@@ -144,6 +148,46 @@ See:
 **Repository setting still needed:** `protect-master` currently only disallows
 deletion and non-fast-forward changes. Its requirements do not include passing
 status checks. The current GitHub connector cannot change that setting.
+
+## Reference PR gate using the approved base-branch policy
+
+This alpha now includes `prototypes/context-gate/ci-check.cjs`, which accepts
+a **trusted base-branch checkout** and a **candidate checkout**:
+
+```sh
+node trusted/.iroko/context-gate/ci-check.cjs trusted candidate
+```
+
+The checker reads the approved `iroko.context.json` and the checker code
+**only** from the base checkout. The candidate's code is read as data, never
+`require()`d, built or run. It rejects any candidate attempting to weaken
+or remove the approved policy, then checks the candidate source tree against
+the protected base policy using the available deterministic literal rules.
+
+A commented example workflow is provided in
+`prototypes/context-gate/examples/approved-policy-workflow.yml`. It uses
+`pull_request_target` with **read-only permissions**, two isolated checkouts
+and *no untrusted code execution*. It must not be casually modified to run
+`npm install`, `build`, test scripts, `git hooks`, or any other candidate
+commands: these would introduce a serious "pwn request" security risk. The
+candidate is untrusted; treat it strictly as passive data.
+
+The example assumes the checker and its dependencies have been deliberately
+committed and reviewed on the protected target repository's base branch.
+Running `iroko context init` locally alone does not install the workflow or
+enable mandatory PR protection.
+
+For a genuine gate, an administrator must configure the GitHub ruleset to
+require **IROKO approved-project-policy** (matching the actual check name)
+and restrict bypass permissions. Until then, CI is advisory. An issue can
+trigger preparatory research but never attests to compliance by itself.
+
+This verifier is still a **literal rule checker**, not an architecture-aware
+static analyzer. Context decisions requiring semantic interpretation need
+separate tests, analysis and review.
+
+References: https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target
+and https://code.claude.com/docs/en/hooks.
 
 ## Security and usability limitations
 

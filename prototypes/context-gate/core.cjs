@@ -35,6 +35,18 @@ function relativePath(root, candidate) {
   return relative.split(path.sep).join("/");
 }
 
+function disallowInternalTarget(relative) {
+  const blocked = [".git/", ".claude/", ".iroko/", "node_modules/"];
+  return relative === "iroko.context.json" ||
+    blocked.some((prefix) => relative === prefix.slice(0, -1) || relative.startsWith(prefix));
+}
+
+function disallowSensitiveSource(relative) {
+  return relative.split("/").some((piece) =>
+    /^(?:\.env(?:\..*)?|id_rsa|id_ed25519|\.npmrc|\.pypirc|credentials(?:\..*)?|secrets?(?:\..*)?)$/i.test(piece)
+  ) || relative.startsWith(".git/") || relative.startsWith("node_modules/");
+}
+
 function readPolicy(root) {
   const filename = path.join(root, "iroko.context.json");
   const raw = fs.readFileSync(filename, "utf8");
@@ -67,6 +79,13 @@ function snapshot(root) {
   const documents = [];
   for (const name of policy.sources) {
     const rel = relativePath(root, name);
+    if (disallowSensitiveSource(rel)) {
+      throw new Error("Refusing to inject sensitive source into model context: " + rel);
+    }
+    const stat = fs.statSync(path.join(root, rel));
+    if (!stat.isFile() || stat.size > 32000) {
+      throw new Error("Context source is not a small, regular text file: " + rel);
+    }
     const data = fs.readFileSync(path.join(root, rel), "utf8");
     total += Buffer.byteLength(data, "utf8");
     if (total > 32000) throw new Error("Context exceeds 32 KB limit; narrow the required sources");
@@ -112,6 +131,9 @@ function authorized(root, candidate, sessionId) {
     throw new Error("Project decisions or Git HEAD changed after context preparation");
   }
   const relative = relativePath(root, candidate);
+  if (disallowInternalTarget(relative)) {
+    throw new Error("Agent may not rewrite the context guard or project policy: " + relative);
+  }
   if (!isInScope(relative, fresh.policy.writeScopes)) {
     throw new Error("File is outside approved write scopes: " + relative);
   }

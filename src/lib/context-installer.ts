@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const files = ["core.cjs", "session.cjs", "hook.cjs", "prepare.cjs", "verify.cjs", "post-compact.cjs"];
+const files = ["core.cjs", "session.cjs", "hook.cjs", "prepare.cjs", "verify.cjs", "post-compact.cjs", "ci-check.cjs"];
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function sourceDirectory(): string {

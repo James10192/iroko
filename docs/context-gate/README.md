@@ -1,24 +1,24 @@
 # IROKO Context Gate — research prototype (not production-ready)
 
 Issue #12. This is an isolated proof of concept, NOT wired into IROKO v4
-\`init\`, npm releases, existing global hooks or existing user projects.
+`init`, npm releases, existing global hooks or existing user projects.
 
 ## What the code really enforces
 
-- \`prepare.cjs\` loads explicitly listed *project* sources and prints their
+- `prepare.cjs` loads explicitly listed *project* sources and prints their
   complete contents (bounded at 32 KB) to the agent's tool output. It stores
   an expiring fingerprint of those sources, policy and Git HEAD.
-- \`hook.cjs\` is a Claude Code \`PreToolUse\` guard for the tool classes it is
-  actually configured to intercept. Before preparation, \`Write\`/\`Edit\`/
-  \`MultiEdit\`/\`NotebookEdit\` are blocked (exit 2). After preparation,
-  file writes are allowed only within configured \`writeScopes\`. A changed
+- `hook.cjs` is a Claude Code `PreToolUse` guard for the tool classes it is
+  actually configured to intercept. Before preparation, `Write`/`Edit`/
+  `MultiEdit`/`NotebookEdit` are blocked (exit 2). After preparation,
+  file writes are allowed only within configured `writeScopes`. A changed
   source, policy, Git HEAD, expired state, or symlink path blocks them again.
-- To avoid shell-writing bypasses in this narrow prototype, \`Bash\` is
+- To avoid shell-writing bypasses in this narrow prototype, `Bash` is
   limited to a short allowlist of *single-command*, read-only probes and
   the exact preparation command. It intentionally blocks builds, tests,
   package managers and all other shell commands: NOT a full development
   runtime. Use a supervised shell / sandbox for a practical production agent.
-- \`verify.cjs\` independently checks project-defined forbidden *literal*
+- `verify.cjs` independently checks project-defined forbidden *literal*
   import strings inside selected source directories. This is a demonstrator
   of deterministic decisions, NOT a complete semantic architecture checker.
 
@@ -30,17 +30,17 @@ No production security claims and no benchmark performance claims.
 
 ## How to run locally against an isolated sample project
 
-1. Use Node.js >=20. Copy the \`prototypes/context-gate\` folder into
-   the **sample repository** and create \`iroko.context.json\` at its root.
+1. Use Node.js >=20. Copy the `prototypes/context-gate` folder into
+   the **sample repository** and create `iroko.context.json` at its root.
 2. Write and approve *that project's* real decisions. Specify exact
-   \`sources\` (existing regular text files) and \`writeScopes\` (paths
-   ending in \`/\` for directories or exact file paths).
-   See \`prototypes/context-gate/examples/\` for a fictional starting point.
-3. Set the Claude project-local settings \`.claude/settings.json\` to include
+   `sources` (existing regular text files) and `writeScopes` (paths
+   ending in `/` for directories or exact file paths).
+   See `prototypes/context-gate/examples/` for a fictional starting point.
+3. Set the Claude project-local settings `.claude/settings.json` to include
    the following hook entry, **merged with existing hooks**, never replacing
-   \`guard-destructive\` or existing configuration:
+   `guard-destructive` or existing configuration:
 
-\`\`\`json
+```json
 {
   "hooks": {
     "PreToolUse": [{
@@ -53,37 +53,37 @@ No production security claims and no benchmark performance claims.
     }]
   }
 }
-\`\`\`
+```
 
 4. Run the tool **inside the project** and keep its full output in the
    agent's working context:
 
-\`\`\`sh
+```sh
 node prototypes/context-gate/prepare.cjs ISSUE-123
-\`\`\`
+```
 
-5. Only now attempt a scoped \`Write\` or \`Edit\`. To check deterministic
+5. Only now attempt a scoped `Write` or `Edit`. To check deterministic
    project policies independently (including from CI), run:
 
-\`\`\`sh
+```sh
 node prototypes/context-gate/verify.cjs
-\`\`\`
+```
 
-Both the hook and verifier need \`CLAUDE_PROJECT_DIR\` or the correct CWD.
+Both the hook and verifier need `CLAUDE_PROJECT_DIR` or the correct CWD.
 No automatic activation occurs merely by installing IROKO. The policy is
 **per project**, never hardcoded globally.
 
 ## Tests
 
-\`\`\`sh
+```sh
 node --test prototypes/context-gate/context-gate.test.cjs
-\`\`\`
+```
 
 Tests cover missing evidence, valid preparation, out-of-scope writes,
 source mutation, expiry, shell escape attempts, symlinks, missing sources,
 and independently detected architectural violations.
 
-The repository workflow \`context-gate-prototype.yml\` runs these tests
+The repository workflow `context-gate-prototype.yml` runs these tests
 on the draft PR. It tests the prototype; it does **not** claim to audit
 all other pull requests in unrelated repositories.
 

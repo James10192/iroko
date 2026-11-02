@@ -12,7 +12,8 @@ function deny(reason) {
 
 function safeReadOnlyBash(command) {
   if (typeof command !== "string" || /[\r\n;&|><\x60$(){}\\]/.test(command)) return false;
-  if (/^node\s+prototypes\/context-gate\/prepare\.cjs\s+[A-Za-z0-9_.:#-]{3,80}$/.test(command)) {
+  if (/^node\s+prototypes\/context-gate\/prepare\.cjs\s+[A-Za-z0-9_.:#-]{3,80}$/.test(command) ||
+      command === "node .iroko/context-gate/verify.cjs") {
     return true;
   }
   // Exact read-only forms only. Never accept arbitrary flags (--output, --pre,
@@ -21,7 +22,7 @@ function safeReadOnlyBash(command) {
     /^pwd$/,
     /^ls(?: -la)?$/,
     /^git status(?: --short)?$/,
-    /^git diff(?: --stat| --name-only)?$/,
+    /^git diff(?: --stat| --name-only| --check)?$/,
     /^git rev-parse HEAD$/,
     /^git log -1 --oneline$/,
     /^git show --stat$/,

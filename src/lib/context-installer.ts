@@ -2,7 +2,7 @@ import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, realpathS
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const files = ["core.cjs", "session.cjs", "hook.cjs", "prepare.cjs", "verify.cjs"];
+const files = ["core.cjs", "session.cjs", "hook.cjs", "prepare.cjs", "verify.cjs", "post-compact.cjs"];
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function sourceDirectory(): string {
@@ -68,6 +68,9 @@ const definitions = {
     matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash|mcp__.*",
     hooks: [{ type: "command", command: hookCommand("hook.cjs"), timeout: 10, onFailure: "block" }],
   },
+  PostCompact: {
+    hooks: [{ type: "command", command: hookCommand("post-compact.cjs"), timeout: 10 }],
+  },
 };
 
 function readSettings(filename: string): Record<string, any> {
@@ -92,8 +95,9 @@ function mergeHooks(settings: Record<string, any>): boolean {
     const existing = (settings.hooks[event] || []) as Array<{hooks?: Array<{command?: string}>}>;
     const desired = definitions[event];
     const command = desired.hooks[0].command;
-    const signature = event === "PreToolUse"
-      ? ".iroko/context-gate/hook.cjs" : ".iroko/context-gate/session.cjs";
+    const signature = ".iroko/context-gate/" +
+      (event === "PreToolUse" ? "hook.cjs" :
+       event === "PostCompact" ? "post-compact.cjs" : "session.cjs");
     const commands = existing.flatMap((entry) => (entry.hooks || []).map((hook) => hook.command || ""));
     if (!commands.includes(command)) {
       if (commands.some((candidate) => candidate.includes(signature))) {

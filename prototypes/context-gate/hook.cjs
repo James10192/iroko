@@ -3,7 +3,7 @@
 
 // Claude Code PreToolUse prototype. Fail-closed for covered tool classes.
 // This is NOT a sandbox: independent write-capable tools must also be restricted.
-const { projectRoot, authorized } = require("./core.cjs");
+const { projectRoot, authorized, relativePath, disallowSensitiveSource } = require("./core.cjs");
 
 function deny(reason) {
   console.error("IROKO CONTEXT GATE BLOCK: " + reason);
@@ -28,7 +28,18 @@ function safeReadOnlyBash(command) {
     /^cat [A-Za-z0-9_./-]+$/,
     /^rg [A-Za-z0-9_./-]+ [A-Za-z0-9_./-]+$/
   ];
-  return readOnly.some((pattern) => pattern.test(command));
+  if (!readOnly.some((pattern) => pattern.test(command))) return false;
+  const match = command.match(/^(?:cat|rg [A-Za-z0-9_./-]+) ([A-Za-z0-9_./-]+)$/);
+  if (match) {
+    try {
+      const rel = relativePath(projectRoot(), match[1]);
+      if (disallowSensitiveSource(rel) || rel.startsWith(".iroko/") ||
+          rel.startsWith(".git/")) return false;
+    } catch {
+      return false;
+    }
+  }
+  return true;
 }
 
 function evaluate(event) {

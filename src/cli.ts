@@ -85,6 +85,9 @@ program.action(() => {
     `     ${ochre(MARK)}  ${ivory("update")}    ${graphite("Update from GitHub")}`,
   );
   console.log(
+    `     ${ochre(MARK)}  ${ivory("context")}   ${graphite("Opt-in project context gate (alpha)")}`,
+  );
+  console.log(
     `     ${ochre(MARK)}  ${ivory("doctor")}    ${graphite("Diagnose the environment")}`,
   );
   console.log(

@@ -110,6 +110,27 @@ The **guide pack** is designed to accompany people who are discovering developme
 | `websearch` (agent) | guide | Quick targeted web research for planning and docs skills. |
 | `guard-destructive` (hook) | guide | PreToolUse hook that blocks `git reset --hard`, `push --force`, `migrate:fresh`, db wipes, unscoped `rm -rf`... with a clear "ask first" message. |
 
+## Experimental Context Gate (opt-in, not yet released)
+
+The [Context Gate research prototype](docs/context-gate/README.md) is being developed
+in draft PR [#13](https://github.com/James10192/iroko/pull/13).
+It is **not activated by the regular `iroko init`** and not available in the
+currently published npm version.
+
+When the updated CLI is available, a project maintainer can write and approve
+its own `iroko.context.json`, then explicitly run:
+
+```sh
+iroko context init
+iroko context doctor
+```
+
+The local installer preserves existing Claude Code settings. A per-prompt hook
+injects approved project context, and a pre-tool hook restricts covered writes.
+This alpha deliberately blocks most Bash commands and is **not an operating
+system sandbox** or proof that the AI understood the documents. See the
+[limitations and tests](docs/context-gate/README.md) before enabling it.
+
 ## Install
 
 ```bash

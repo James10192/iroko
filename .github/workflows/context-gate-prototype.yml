@@ -1,0 +1,61 @@
+name: context-gate-prototype
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [feat/12-context-gate-proof-of-concept]
+
+permissions:
+  contents: read
+
+# Every push supersedes earlier checks for this PR. Avoid wasting scarce
+# Windows/macOS runners and accidentally treating old green results as current.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prototype-tests:
+    name: Context gate negative and positive tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Test the hooks and independent repository checks
+        run: node --test prototypes/context-gate/context-gate.test.cjs
+      - name: Validate module syntax
+        run: |
+          node --check prototypes/context-gate/core.cjs
+          node --check prototypes/context-gate/prepare.cjs
+          node --check prototypes/context-gate/hook.cjs
+          node --check prototypes/context-gate/session.cjs
+          node --check prototypes/context-gate/post-compact.cjs
+          node --check prototypes/context-gate/verify.cjs
+          node --check prototypes/context-gate/ci-check.cjs
+
+  portability-matrix:
+    name: Cross-platform Context Gate — ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Exercise real filesystem hooks on the runner OS
+        run: node --test prototypes/context-gate/context-gate.test.cjs
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Install CLI dependencies
+        run: pnpm install --frozen-lockfile=false
+      - name: Build CLI for current OS
+        run: pnpm build
+      - name: Exercise project-local CLI installer and verifier on this OS
+        run: node --test prototypes/context-gate/context-install.test.cjs

@@ -14,7 +14,8 @@
     "hooks",
     "templates",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "prototypes/context-gate"
   ],
   "scripts": {
     "build": "tsup",

@@ -9,6 +9,14 @@ removals/renames and CLI interface changes are MAJOR.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Release-guard manifest audit**: check the actual manifest entries rather than a stale hardcoded count of 24, so the existing 27-component manifest is checked correctly.
+
+### Added
+
+- **Experimental Context Gate (issue #12)**: per-project opt-in CLI commands `iroko context init`, `doctor`, and `verify`; automatic context injection on `SessionStart`/`UserPromptSubmit`, session-bound source/commit fingerprints, fail-closed scoped write hooks, `PostCompact` invalidation, protected guard paths and secret-source screening. Adds shell-free cross-platform Node hooks, a Claude Code version check (v2.1.295+), exact tool matcher validation (including PowerShell), symlink-safe installation and canonical path handling, and a trusted-base PR checker protecting the policy **and approved ADR documents**. Includes a non-auto-installed, read-only PR workflow example, issue intake template, Linux/Windows/macOS CI coverage, positive/negative installer tests and bypass-focused regression tests. **Not enabled by regular `iroko init`**, no npm publication yet, not an OS sandbox and no claim of guaranteed model understanding.
+
 ## [4.0.0] — 2026-08-25
 
 Names the target audience understands instantly (the MAJOR bump: two renames), plus the end-to-end build orchestrator.

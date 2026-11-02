@@ -1,0 +1,44 @@
+# EXAMPLE ONLY — copy into the TARGET REPOSITORY's .github/workflows/
+# only after reviewing the threat model and committing a trusted
+# .iroko/context-gate/ci-check.cjs + its dependencies on the protected base.
+# This workflow is NOT installed automatically by IROKO.
+name: IROKO approved-project-policy
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# No secrets and no token with write permissions are needed.
+permissions:
+  contents: read
+
+jobs:
+  approved-project-policy:
+    name: IROKO approved-project-policy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout protected base — trusted scripts and policy
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted
+          persist-credentials: false
+
+      - name: Checkout candidate — untrusted code treated as data ONLY
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: candidate
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # IMPORTANT: node executes the checker from the TRUSTED base checkout.
+      # Never npm install, require(), source(), build, or test candidate files
+      # in this pull_request_target workflow.
+      - name: Compare candidate against protected decisions
+        run: node trusted/.iroko/context-gate/ci-check.cjs trusted candidate

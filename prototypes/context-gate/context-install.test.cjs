@@ -52,7 +52,7 @@ test("project installer preserves unrelated settings and is idempotent", () => {
   assert.equal(data.hooks.UserPromptSubmit.length, 1);
   assert.equal(data.hooks.PostCompact.length, 1);
   assert.equal(data.hooks.UserPromptSubmit[0].hooks[0].onFailure, "block");
-  for (const file of ["core.cjs", "session.cjs", "hook.cjs", "verify.cjs", "prepare.cjs", "post-compact.cjs"]) {
+  for (const file of ["core.cjs", "session.cjs", "hook.cjs", "verify.cjs", "prepare.cjs", "post-compact.cjs", "ci-check.cjs"]) {
     assert.ok(fs.existsSync(path.join(root, ".iroko/context-gate", file)), file);
   }
   const second = run(root, "init");

@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const { spawnSync } = require("node:child_process");
+const { spawnSync, execFileSync } = require("node:child_process");
 
 const here = __dirname;
 
@@ -26,6 +26,10 @@ function fixture() {
       literal: "@crm-vendor/sdk"
     }]
   }));
+  execFileSync("git", ["init", "-q"], { cwd: root });
+  execFileSync("git", ["add", "-A"], { cwd: root });
+  execFileSync("git", ["-c", "user.name=IROKO", "-c", "user.email=tests@invalid.example",
+    "commit", "-qm", "fixture"], { cwd: root });
   const state = path.join(root, "evidence-state.json");
   const env = { ...process.env, CLAUDE_PROJECT_DIR: root, IROKO_CONTEXT_STATE: state };
   return { root, state, env };
@@ -183,4 +187,58 @@ test("session hook injects the documented project decisions on every prompt", ()
   assert.equal(result.status, 0);
   assert.match(result.stdout, /Use provider adapters/);
   assert.match(result.stdout, /APPROVED WRITE SCOPES/);
+});
+
+
+test("a new Git HEAD invalidates a previous session preflight", () => {
+  const f = fixture();
+  assert.equal(run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit", prompt: "Implement"
+  })).status, 0);
+  fs.writeFileSync(path.join(f.root, "unrelated.txt"), "a new commit");
+  execFileSync("git", ["add", "-A"], {cwd:f.root});
+  execFileSync("git", ["-c", "user.name=IROKO", "-c", "user.email=tests@invalid.example",
+    "commit", "-qm", "new head"], {cwd:f.root});
+  assert.equal(hook(f.env, "Write", {
+    file_path: path.join(f.root, "src/integrations/new.ts")
+  }).status, 2);
+});
+
+test("guard internals are protected even when the policy broadly permits writes", () => {
+  const f = fixture();
+  const policyFile = path.join(f.root, "iroko.context.json");
+  const policy = JSON.parse(fs.readFileSync(policyFile, "utf8"));
+  policy.writeScopes = ["src/", ".iroko/", ".claude/", "iroko.context.json"];
+  fs.writeFileSync(policyFile, JSON.stringify(policy));
+  assert.equal(run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit", prompt: "Work"
+  })).status, 0);
+  for (const file of [
+    ".iroko/context-gate/hook.cjs", ".claude/settings.local.json",
+    "iroko.context.json"
+  ]) {
+    assert.equal(hook(f.env, "Write", {file_path:path.join(f.root,file)}).status, 2, file);
+  }
+});
+
+test("refuse to inject .env credentials into the model context", () => {
+  const f = fixture();
+  fs.writeFileSync(path.join(f.root, ".env"), "TEST_SECRET=never-inject");
+  const policyFile = path.join(f.root, "iroko.context.json");
+  const policy = JSON.parse(fs.readFileSync(policyFile, "utf8"));
+  policy.sources.push(".env");
+  fs.writeFileSync(policyFile, JSON.stringify(policy));
+  const result = run("session.cjs", f.env, [], JSON.stringify({
+    session_id: "fixture-session", hook_event_name: "UserPromptSubmit", prompt: "Work"
+  }));
+  assert.equal(result.status, 2);
+  assert.doesNotMatch(result.stdout, /never-inject/);
+});
+
+test("required scan directory missing fails the independent verifier", () => {
+  const f = fixture();
+  fs.rmSync(path.join(f.root, "src/core"), {recursive:true});
+  const checked = run("verify.cjs", f.env);
+  assert.equal(checked.status, 1);
+  assert.match(checked.stderr, /Required policy scan directory/);
 });
